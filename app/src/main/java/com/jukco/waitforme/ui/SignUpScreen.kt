@@ -1,7 +1,6 @@
 package com.jukco.waitforme.ui
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Button
@@ -15,33 +14,28 @@ import androidx.compose.ui.unit.sp
 import com.jukco.waitforme.R
 
 @Composable
-fun MyInfoScreen(
-    onSignInButtonClicked: () -> Unit,
-    onSignUpButtonClicked: () -> Unit
+fun SignUpScreen(
+    onCancelButtonClicked: () -> Unit
 ) {
     Column(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier.fillMaxSize()
     ) {
+        Button(
+            onClick = onCancelButtonClicked
+        ) {
+            Text(stringResource(R.string.cancel))
+        }
         Text(
-            text = "내 정보",
+            text = "회원가입",
             fontSize = 60.sp
         )
-        Button(onClick = onSignInButtonClicked) {
-            Text(stringResource(R.string.sign_in))
-        }
-        Button(onClick = onSignUpButtonClicked) {
-            Text(stringResource(R.string.sign_up))
-        }
     }
 }
 
 @Preview(showBackground = true)
 @Composable
-fun MyInfoScreenPreview() {
-    MyInfoScreen(
-        onSignInButtonClicked = {},
-        onSignUpButtonClicked = {}
-    )
+fun SignUpScreenPreview() {
+    SignUpScreen(onCancelButtonClicked = {})
 }

@@ -12,6 +12,8 @@ import com.jukco.waitforme.ui.PopsListScreen
 import com.jukco.waitforme.ui.PopsManagementScreen
 import com.jukco.waitforme.ui.PopupStoreScreen
 import com.jukco.waitforme.ui.SearchScreen
+import com.jukco.waitforme.ui.SignInScreen
+import com.jukco.waitforme.ui.SignUpScreen
 import com.jukco.waitforme.ui.WaitScreen
 
 @Composable
@@ -50,7 +52,10 @@ fun NavigationGraph(
             BookmarkScreen()
         }
         composable(Route.MyInfo.name) {
-            MyInfoScreen()
+            MyInfoScreen(
+                onSignInButtonClicked = { navController.navigate(Route.SignIn.name) },
+                onSignUpButtonClicked = { navController.navigate(Route.SignUp.name) }
+            )
         }
         composable(Route.Notice.name) {
             NoticeScreen(
@@ -65,6 +70,22 @@ fun NavigationGraph(
         composable(Route.PopupStore.name) {
             PopupStoreScreen(
                 onCloseButtonClicked = { navController.popBackStack() }
+            )
+        }
+        composable(Route.SignUp.name) {
+            SignUpScreen (
+                onCancelButtonClicked = {
+                    /*TODO: 모든 회원가입 단계를 초기화하고 회원가입 버튼 누른 페이지로 돌아가기 */
+                    navController.popBackStack()
+                }
+            )
+        }
+        composable(Route.SignIn.name) {
+            SignInScreen (
+                onCancelButtonClicked = {
+                    /*TODO: 모든 로그인 단계를 초기화하고 로그인 버튼 누른 페이지로 돌아가기 */
+                    navController.popBackStack()
+                }
             )
         }
     }
