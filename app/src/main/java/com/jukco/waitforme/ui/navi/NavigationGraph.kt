@@ -15,26 +15,26 @@ import com.jukco.waitforme.ui.WaitPage
 fun NavigationGraph(
     modifier: Modifier = Modifier,
     navController: NavHostController,
-    startDescription: String = NaviItem.PopsList.route
+    startDescription: String = BottomNaviItem.PopsList.route
 ) {
     NavHost(
         modifier = modifier,
         navController = navController,
         startDestination = startDescription
     ) {
-        composable(NaviItem.PopsManagement.route) {
+        composable(BottomNaviItem.PopsManagement.route) {
             PopsManagementPage()
         }
-        composable(NaviItem.PopsList.route) {
+        composable(BottomNaviItem.PopsList.route) {
             PopsListPage()
         }
-        composable(NaviItem.WaitInfo.route) {
+        composable(BottomNaviItem.WaitInfo.route) {
             WaitPage()
         }
-        composable(NaviItem.Bookmark.route) {
+        composable(BottomNaviItem.Bookmark.route) {
             BookmarkPage()
         }
-        composable(NaviItem.MyInfo.route) {
+        composable(BottomNaviItem.MyInfo.route) {
             MyPage()
         }
     }

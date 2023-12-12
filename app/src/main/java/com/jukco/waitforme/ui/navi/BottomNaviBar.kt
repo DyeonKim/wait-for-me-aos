@@ -20,12 +20,12 @@ import com.jukco.waitforme.ui.theme.Pink80
 
 @Composable
 fun BottomNaviBar(navController: NavHostController) {
-    val items = listOf<NaviItem>(
-        NaviItem.PopsManagement,
-        NaviItem.PopsList,
-        NaviItem.WaitInfo,
-        NaviItem.Bookmark,
-        NaviItem.MyInfo
+    val items = listOf<BottomNaviItem>(
+        BottomNaviItem.PopsManagement,
+        BottomNaviItem.PopsList,
+        BottomNaviItem.WaitInfo,
+        BottomNaviItem.Bookmark,
+        BottomNaviItem.MyInfo
     )
 
     BottomNavigation (

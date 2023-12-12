@@ -14,7 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.compose.rememberNavController
 import com.jukco.waitforme.ui.navi.BottomNaviBar
-import com.jukco.waitforme.ui.navi.NaviItem
+import com.jukco.waitforme.ui.navi.BottomNaviItem
 import com.jukco.waitforme.ui.navi.NavigationGraph
 import com.jukco.waitforme.ui.theme.WaitForMeTheme
 
@@ -47,7 +47,7 @@ fun MainView() {
         NavigationGraph(
             modifier = Modifier.padding(innerPadding),
             navController = navController,
-            startDescription = NaviItem.PopsList.route
+            startDescription = BottomNaviItem.PopsList.route
         )
     }
 }
