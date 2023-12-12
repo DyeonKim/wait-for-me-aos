@@ -9,13 +9,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.sp
 
 @Composable
-fun PopsManagementPage() {
+fun WaitScreen() {
     Box(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
     ) {
         Text(
-            text = "팝업 관리",
+            text = "대기 현황",
             fontSize = 60.sp
         )
     }

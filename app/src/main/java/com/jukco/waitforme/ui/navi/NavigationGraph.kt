@@ -5,11 +5,11 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import com.jukco.waitforme.ui.BookmarkPage
-import com.jukco.waitforme.ui.MyPage
-import com.jukco.waitforme.ui.PopsListPage
-import com.jukco.waitforme.ui.PopsManagementPage
-import com.jukco.waitforme.ui.WaitPage
+import com.jukco.waitforme.ui.BookmarkScreen
+import com.jukco.waitforme.ui.MyInfoScreen
+import com.jukco.waitforme.ui.PopsListScreen
+import com.jukco.waitforme.ui.PopsManagementScreen
+import com.jukco.waitforme.ui.WaitScreen
 
 @Composable
 fun NavigationGraph(
@@ -22,20 +22,20 @@ fun NavigationGraph(
         navController = navController,
         startDestination = startDescription
     ) {
-        composable(BottomNaviItem.PopsManagement.route) {
-            PopsManagementPage()
+        composable(Route.PopsManagement.name) {
+            PopsManagementScreen()
         }
-        composable(BottomNaviItem.PopsList.route) {
-            PopsListPage()
+        composable(Route.PopsList.name) {
+            PopsListScreen()
         }
-        composable(BottomNaviItem.WaitInfo.route) {
-            WaitPage()
+        composable(Route.WaitInfo.name) {
+            WaitScreen()
         }
-        composable(BottomNaviItem.Bookmark.route) {
-            BookmarkPage()
+        composable(Route.Bookmark.name) {
+            BookmarkScreen()
         }
-        composable(BottomNaviItem.MyInfo.route) {
-            MyPage()
+        composable(Route.MyInfo.name) {
+            MyInfoScreen()
         }
     }
 }

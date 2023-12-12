@@ -9,13 +9,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.sp
 
 @Composable
-fun MyPage() {
+fun PopsManagementScreen() {
     Box(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
     ) {
         Text(
-            text = "내 정보",
+            text = "팝업 관리",
             fontSize = 60.sp
         )
     }
