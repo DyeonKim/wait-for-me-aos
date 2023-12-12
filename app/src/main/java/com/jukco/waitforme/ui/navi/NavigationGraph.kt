@@ -7,8 +7,10 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.jukco.waitforme.ui.BookmarkScreen
 import com.jukco.waitforme.ui.MyInfoScreen
+import com.jukco.waitforme.ui.NoticeScreen
 import com.jukco.waitforme.ui.PopsListScreen
 import com.jukco.waitforme.ui.PopsManagementScreen
+import com.jukco.waitforme.ui.SearchScreen
 import com.jukco.waitforme.ui.WaitScreen
 
 @Composable
@@ -26,7 +28,10 @@ fun NavigationGraph(
             PopsManagementScreen()
         }
         composable(Route.PopsList.name) {
-            PopsListScreen()
+            PopsListScreen(
+                onNoticeButtonClicked = { navController.navigate(Route.Notice.name) },
+                onSearchingButtonClicked = { navController.navigate(Route.Searching.name) }
+            )
         }
         composable(Route.WaitInfo.name) {
             WaitScreen()
@@ -36,6 +41,16 @@ fun NavigationGraph(
         }
         composable(Route.MyInfo.name) {
             MyInfoScreen()
+        }
+        composable(Route.Notice.name) {
+            NoticeScreen(
+                onCloseButtonClicked = { navController.popBackStack() }
+            )
+        }
+        composable(Route.Searching.name) {
+            SearchScreen (
+                onCloseButtonClicked = { navController.popBackStack() }
+            )
         }
     }
 }

@@ -5,5 +5,7 @@ enum class Route() {
     PopsList,
     WaitInfo,
     Bookmark,
-    MyInfo
+    MyInfo,
+    Notice,
+    Searching
 }

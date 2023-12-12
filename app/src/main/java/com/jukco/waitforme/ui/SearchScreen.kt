@@ -13,11 +13,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
 import com.jukco.waitforme.R
 
-
 @Composable
-fun PopsListScreen(
-    onNoticeButtonClicked: () -> Unit,
-    onSearchingButtonClicked: () -> Unit
+fun SearchScreen(
+    onCloseButtonClicked: () -> Unit
 ) {
     Column(
         verticalArrangement = Arrangement.Center,
@@ -25,17 +23,12 @@ fun PopsListScreen(
         modifier = Modifier.fillMaxSize()
     ) {
         Button(
-            onClick = onNoticeButtonClicked
+            onClick = onCloseButtonClicked
         ) {
-            Text(stringResource(R.string.notice))
-        }
-        Button(
-            onClick = onSearchingButtonClicked
-        ) {
-            Text(stringResource(R.string.searching))
+            Text(stringResource(R.string.close))
         }
         Text(
-            text = "팝 리스트",
+            text = "검색",
             fontSize = 60.sp
         )
     }
@@ -43,9 +36,8 @@ fun PopsListScreen(
 
 @Preview(showBackground = true)
 @Composable
-fun PopListScreenPreview() {
-    PopsListScreen(
-        onNoticeButtonClicked = {},
-        onSearchingButtonClicked = {}
+fun SearchScreenPreview() {
+    SearchScreen(
+        onCloseButtonClicked = {}
     )
 }

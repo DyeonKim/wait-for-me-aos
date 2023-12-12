@@ -11,6 +11,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
+import androidx.navigation.NavDestination
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
@@ -20,6 +21,9 @@ import com.jukco.waitforme.ui.theme.Pink80
 
 @Composable
 fun BottomNaviBar(navController: NavHostController) {
+    val navBAckStackEntry by navController.currentBackStackEntryAsState()
+    val currentDestination = navBAckStackEntry?.destination
+
     val items = listOf<BottomNaviItem>(
         BottomNaviItem.PopsManagement,
         BottomNaviItem.PopsList,
@@ -28,14 +32,27 @@ fun BottomNaviBar(navController: NavHostController) {
         BottomNaviItem.MyInfo
     )
 
+    when (currentDestination?.route) {
+        BottomNaviItem.PopsManagement.route -> BottomNaviTool(navController, currentDestination, items)
+        BottomNaviItem.PopsList.route -> BottomNaviTool(navController, currentDestination, items)
+        BottomNaviItem.WaitInfo.route -> BottomNaviTool(navController, currentDestination, items)
+        BottomNaviItem.Bookmark.route -> BottomNaviTool(navController, currentDestination, items)
+        BottomNaviItem.MyInfo.route -> BottomNaviTool(navController, currentDestination, items)
+        else -> Unit
+    }
+}
+
+@Composable
+fun BottomNaviTool(
+    navController: NavHostController,
+    currentDestination: NavDestination?,
+    items: List<BottomNaviItem>
+) {
     BottomNavigation (
         backgroundColor = Pink80,
         modifier = Modifier
             .fillMaxWidth()
     ){
-        val navBAckStackEntry by navController.currentBackStackEntryAsState()
-        val currentDestination = navBAckStackEntry?.destination
-
         items.forEach { naviItem ->
             BottomNavigationItem(
                 selected = currentDestination?.hierarchy?.any { it.route == naviItem.route } == true,
