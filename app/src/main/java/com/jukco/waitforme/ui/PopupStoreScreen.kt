@@ -8,32 +8,37 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
+import com.jukco.waitforme.R
 
 @Composable
-fun PopsManagementScreen(
-    onPopItemClicked: (id: Int) -> Unit
+fun PopupStoreScreen(
+    onCloseButtonClicked: () -> Unit,
+    modifier: Modifier = Modifier
 ) {
     Column(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier.fillMaxSize()
     ) {
+        Button(
+            onClick = onCloseButtonClicked
+        ) {
+            Text(stringResource(R.string.close))
+        }
         Text(
-            text = "팝업 관리",
+            text = "팝업 상세",
             fontSize = 60.sp
         )
-        Button(onClick = { onPopItemClicked(0) }) {
-            Text("팝업 상세")
-        }
     }
 }
 
 @Preview(showBackground = true)
 @Composable
-fun PopsManagementScreenPreview() {
-    PopsManagementScreen (
-        onPopItemClicked = {}
+fun PopupStoreScreenPreview() {
+    PopupStoreScreen(
+        onCloseButtonClicked = {}
     )
 }

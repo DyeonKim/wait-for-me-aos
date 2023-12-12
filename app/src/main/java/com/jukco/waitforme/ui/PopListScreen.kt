@@ -17,27 +17,28 @@ import com.jukco.waitforme.R
 @Composable
 fun PopsListScreen(
     onNoticeButtonClicked: () -> Unit,
-    onSearchingButtonClicked: () -> Unit
+    onSearchingButtonClicked: () -> Unit,
+    onPopItemClicked: (id: Int) -> Unit,
+    modifier: Modifier = Modifier
 ) {
     Column(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier.fillMaxSize()
     ) {
-        Button(
-            onClick = onNoticeButtonClicked
-        ) {
+        Button(onClick = onNoticeButtonClicked) {
             Text(stringResource(R.string.notice))
         }
-        Button(
-            onClick = onSearchingButtonClicked
-        ) {
+        Button(onClick = onSearchingButtonClicked) {
             Text(stringResource(R.string.searching))
         }
         Text(
             text = "팝 리스트",
             fontSize = 60.sp
         )
+        Button(onClick = { onPopItemClicked(0) }) {
+            Text("팝업 상세")
+        }
     }
 }
 
@@ -46,6 +47,7 @@ fun PopsListScreen(
 fun PopListScreenPreview() {
     PopsListScreen(
         onNoticeButtonClicked = {},
-        onSearchingButtonClicked = {}
+        onSearchingButtonClicked = {},
+        onPopItemClicked = {}
     )
 }

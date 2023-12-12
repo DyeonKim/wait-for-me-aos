@@ -7,5 +7,6 @@ enum class Route() {
     Bookmark,
     MyInfo,
     Notice,
-    Searching
+    Searching,
+    PopupStore
 }

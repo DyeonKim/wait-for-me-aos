@@ -10,6 +10,7 @@ import com.jukco.waitforme.ui.MyInfoScreen
 import com.jukco.waitforme.ui.NoticeScreen
 import com.jukco.waitforme.ui.PopsListScreen
 import com.jukco.waitforme.ui.PopsManagementScreen
+import com.jukco.waitforme.ui.PopupStoreScreen
 import com.jukco.waitforme.ui.SearchScreen
 import com.jukco.waitforme.ui.WaitScreen
 
@@ -25,12 +26,21 @@ fun NavigationGraph(
         startDestination = startDescription
     ) {
         composable(Route.PopsManagement.name) {
-            PopsManagementScreen()
+            PopsManagementScreen(
+                onPopItemClicked = {
+                    /* TODO: id 전달 */
+                    navController.navigate(Route.PopupStore.name)
+                }
+            )
         }
         composable(Route.PopsList.name) {
             PopsListScreen(
                 onNoticeButtonClicked = { navController.navigate(Route.Notice.name) },
-                onSearchingButtonClicked = { navController.navigate(Route.Searching.name) }
+                onSearchingButtonClicked = { navController.navigate(Route.Searching.name) },
+                onPopItemClicked = {
+                    /* TODO: id 전달 */
+                    navController.navigate(Route.PopupStore.name)
+                }
             )
         }
         composable(Route.WaitInfo.name) {
@@ -49,6 +59,11 @@ fun NavigationGraph(
         }
         composable(Route.Searching.name) {
             SearchScreen (
+                onCloseButtonClicked = { navController.popBackStack() }
+            )
+        }
+        composable(Route.PopupStore.name) {
+            PopupStoreScreen(
                 onCloseButtonClicked = { navController.popBackStack() }
             )
         }
