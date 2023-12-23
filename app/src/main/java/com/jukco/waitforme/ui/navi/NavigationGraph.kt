@@ -14,6 +14,7 @@ import com.jukco.waitforme.ui.SearchScreen
 import com.jukco.waitforme.ui.SignInScreen
 import com.jukco.waitforme.ui.SignUpScreen
 import com.jukco.waitforme.ui.WaitScreen
+import com.jukco.waitforme.ui.components.BottomNaviItem
 import com.jukco.waitforme.ui.poplist.PopsListScreen
 
 @Composable
