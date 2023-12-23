@@ -1,4 +1,4 @@
-package com.jukco.waitforme.ui.poplist
+package com.jukco.waitforme.ui
 
 import androidx.annotation.DrawableRes
 
