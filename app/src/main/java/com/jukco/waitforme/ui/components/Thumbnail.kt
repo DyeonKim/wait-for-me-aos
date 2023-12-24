@@ -19,6 +19,7 @@ import com.jukco.waitforme.R
     로 변경.
     이미지 불러오기 실패 시 대체 이미지도 추가 */
 private val exImagePath = R.drawable.img_store_example
+val MIN_WIDTH = 154.dp
 
 @Composable
 fun LargeThumbnail(imagePath: Int, modifier: Modifier = Modifier) {
@@ -27,7 +28,7 @@ fun LargeThumbnail(imagePath: Int, modifier: Modifier = Modifier) {
         contentDescription = null,
         contentScale = ContentScale.Crop,
         modifier = modifier
-            .defaultMinSize(minWidth = 154.dp, minHeight = 192.dp)
+            .defaultMinSize(minWidth = MIN_WIDTH, minHeight = 192.dp)
             .aspectRatio(154f / 192f)
             .clip(
                 RoundedCornerShape(

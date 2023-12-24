@@ -16,9 +16,16 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.PlatformTextStyle
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.em
+import androidx.compose.ui.unit.sp
 import com.jukco.waitforme.ui.theme.MainBlue
+import com.jukco.waitforme.ui.theme.NotoSansKR
+import com.jukco.waitforme.ui.theme.WaitForMeTheme
 
 @Composable
 fun FilterButtonGroup(
@@ -53,6 +60,14 @@ fun FilterButtonGroup(
             ) {
                 Text(
                     text = item,
+                    style = TextStyle(
+                        fontFamily = NotoSansKR,
+                        fontWeight = FontWeight.Medium,
+                        fontSize = 12.sp,
+                        lineHeight = 12.sp,
+                        platformStyle = PlatformTextStyle(includeFontPadding = false),
+                        letterSpacing = (-0.05).em,
+                    ),
                     color = if (selectedIndex == index) Color.White else color,
                 )
             }
@@ -66,5 +81,7 @@ fun FilterButtonGroup(
 @Preview
 @Composable
 private fun FilterButtonGroupPreview() {
-    FilterButtonGroup(items = listOf("1", "2", "3"), color = MainBlue, onItemSelected = {})
+    WaitForMeTheme {
+        FilterButtonGroup(items = listOf("1", "2", "3"), color = MainBlue, onItemSelected = {})
+    }
 }

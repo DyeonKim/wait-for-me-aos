@@ -15,9 +15,15 @@
     <string name="sign_up">회원가입</string>
     <string name="sign_in">로그인</string>
 
-    <string name="title_ongoing">요즘 유행하는</string>
-    <string name="title_upcoming">곧 만날 수 있는</string>
+    <string name="title_ongoing">"요즘 유행하는 "</string>
+    <string name="title_upcoming">"곧 만날 수 있는 "</string>
     <string name="pops">팝스</string>
     <string name="d_day">D - %1$d</string>
     <string name="searching_hint">대기하려는 팝스를 검색해보세요!</string>
+
+    <string-array name="pops_filter_group">
+        <item>최신순</item>
+        <item>마감임박순</item>
+        <item>거리순</item>
+    </string-array>
 </resources>
