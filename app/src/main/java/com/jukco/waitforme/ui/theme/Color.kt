@@ -16,8 +16,8 @@ val MainGreen = Color(0xFFE5FF6E)
 
 // =============== Achromatic Color ========================
 val MainBlack = Color(0xFF1A1A1A)
-val GrayAAA = Color(0xFFAAAAAA)
-val GrayCCC = Color(0xFFCCCCCC)
-val GrayDDD = Color(0xFFDDDDDD)
-val GrayEEE = Color(0xFFEEEEEE)
+val GreyAAA = Color(0xFFAAAAAA)
+val GreyCCC = Color(0xFFCCCCCC)
+val GreyDDD = Color(0xFFDDDDDD)
+val GreyEEE = Color(0xFFEEEEEE)
 val MainWhite = Color(0xFFFFFFFF)
