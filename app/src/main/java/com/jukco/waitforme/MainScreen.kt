@@ -7,9 +7,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.compose.rememberNavController
-import com.jukco.waitforme.ui.navi.BottomNaviBar
-import com.jukco.waitforme.ui.navi.BottomNaviItem
+import com.jukco.waitforme.ui.components.BottomNaviBar
 import com.jukco.waitforme.ui.navi.NavigationGraph
+import com.jukco.waitforme.ui.navi.Route
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Preview(showSystemUi = true)
@@ -17,13 +17,13 @@ import com.jukco.waitforme.ui.navi.NavigationGraph
 fun MainScreen() {
     val navController = rememberNavController()
 
-    Scaffold (
-        bottomBar = { BottomNaviBar(navController) }
-    ){ innerPadding ->
+    Scaffold(
+        bottomBar = { BottomNaviBar(navController) },
+    ) { innerPadding ->
         NavigationGraph(
             modifier = Modifier.padding(innerPadding),
             navController = navController,
-            startDescription = BottomNaviItem.PopsList.route
+            startDescription = Route.PopsList.name,
         )
     }
 }

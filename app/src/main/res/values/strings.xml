@@ -5,7 +5,7 @@
     <string name="cancel">취소</string>
 
     <string name="navi_pops_management">팝업 관리</string>
-    <string name="navi_pops_list">팝 리스트</string>
+    <string name="navi_pops_list">팝스리스트</string>
     <string name="navi_wait_info">대기 현황</string>
     <string name="navi_bookmark">북마크</string>
     <string name="navi_my_info">내 정보</string>
@@ -14,4 +14,16 @@
     <string name="searching">검색</string>
     <string name="sign_up">회원가입</string>
     <string name="sign_in">로그인</string>
+
+    <string name="title_ongoing">"요즘 유행하는 "</string>
+    <string name="title_upcoming">"곧 만날 수 있는 "</string>
+    <string name="pops">팝스</string>
+    <string name="d_day">D - %1$d</string>
+    <string name="searching_hint">대기하려는 팝스를 검색해보세요!</string>
+
+    <string-array name="pops_filter_group">
+        <item>최신순</item>
+        <item>마감임박순</item>
+        <item>거리순</item>
+    </string-array>
 </resources>
