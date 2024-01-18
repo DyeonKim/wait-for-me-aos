@@ -13,7 +13,7 @@ class ApplicationClass : Application() {
 
     private val retrofit = Retrofit.Builder()
         .addConverterFactory(Json.asConverterFactory("application/json".toMediaType()))
-        .baseUrl("") // TODO : 보안 처리해서 넣을 것
+        .baseUrl("https://android-kotlin-fun-mars-server.appspot.com") // TODO : 서버 주소가 올라오면 보안 처리해서 넣을 것
         .build()
 
     override fun onCreate() {
