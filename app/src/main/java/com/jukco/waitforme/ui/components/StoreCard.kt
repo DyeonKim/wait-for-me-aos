@@ -31,7 +31,7 @@ import com.jukco.waitforme.ui.theme.WaitForMeTheme
 
 
 @Composable
-fun RectPopCard(
+fun RectStoreCard(
     storeResponse: StoreResponse,
     onClicked: (id: Int) -> Unit,
     modifier: Modifier = Modifier,
@@ -85,7 +85,7 @@ fun RectPopCard(
 }
 
 @Composable
-fun SquarePopCard(
+fun SquareStoreCard(
     storeResponse: StoreResponse,
     onClicked: (id: Int) -> Unit,
     modifier: Modifier = Modifier,
@@ -119,16 +119,16 @@ private val exStoreResponse = StoreResponse(0, "", "팝스토어 이름", "팝�
 
 @Preview(showBackground = true)
 @Composable
-private fun RectPopCardPreview() {
+private fun RectStoreCardPreview() {
     WaitForMeTheme {
-        RectPopCard(storeResponse = exStoreResponse, onClicked = {})
+        RectStoreCard(storeResponse = exStoreResponse, onClicked = {})
     }
 }
 
 @Preview(showBackground = true)
 @Composable
-private fun SmallPopCardPreview() {
+private fun SmallStoreCardPreview() {
     WaitForMeTheme {
-        SquarePopCard(storeResponse = exStoreResponse, onClicked = {})
+        SquareStoreCard(storeResponse = exStoreResponse, onClicked = {})
     }
 }

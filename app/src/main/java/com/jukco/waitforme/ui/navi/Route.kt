@@ -1,8 +1,8 @@
 package com.jukco.waitforme.ui.navi
 
 enum class Route() {
-    PopsManagement,
-    PopsList,
+    StoreManagement,
+    StoreList,
     WaitInfo,
     Bookmark,
     MyInfo,

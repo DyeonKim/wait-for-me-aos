@@ -1,4 +1,4 @@
-package com.jukco.waitforme.ui.poplist
+package com.jukco.waitforme.ui.store_list
 
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
@@ -45,9 +45,9 @@ import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
 import com.jukco.waitforme.R
 import com.jukco.waitforme.data.network.model.StoreResponse
-import com.jukco.waitforme.ui.components.RectPopCard
+import com.jukco.waitforme.ui.components.RectStoreCard
 import com.jukco.waitforme.ui.components.SearchAndNoticeTopBar
-import com.jukco.waitforme.ui.components.SquarePopCard
+import com.jukco.waitforme.ui.components.SquareStoreCard
 import com.jukco.waitforme.ui.theme.MainBlack
 import com.jukco.waitforme.ui.theme.MainBlue
 import com.jukco.waitforme.ui.theme.MainGreen
@@ -55,7 +55,7 @@ import com.jukco.waitforme.ui.theme.NotoSansKR
 import com.jukco.waitforme.ui.theme.WaitForMeTheme
 
 @Composable
-fun PopsListScreen(
+fun StoreListScreen(
     uiState: StoreListUiState,
     refreshAction: () -> Unit,
     onNoticeButtonClicked: () -> Unit,
@@ -149,7 +149,7 @@ fun PopsList(
                     )
                 }
             }
-            items(items = ongoingStores, key = { it.id }) { RectPopCard(it, onPopItemClicked) }
+            items(items = ongoingStores, key = { it.id }) { RectStoreCard(it, onPopItemClicked) }
             item(span = { GridItemSpan(maxLineSpan) }) {
                 Title(
                     img = R.drawable.img_umain_title02,
@@ -226,7 +226,7 @@ private fun UpcomingStore(
     modifier: Modifier = Modifier,
 ) {
     Box {
-        SquarePopCard(storeResponse = storeResponse, onClicked = { onPopItemClicked(storeResponse.id) })
+        SquareStoreCard(storeResponse = storeResponse, onClicked = { onPopItemClicked(storeResponse.id) })
         Text(
             text = stringResource(R.string.d_day, storeResponse.dDay),
             style = TextStyle(

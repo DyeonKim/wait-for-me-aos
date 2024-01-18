@@ -1,4 +1,4 @@
-package com.jukco.waitforme.ui.poplist
+package com.jukco.waitforme.ui.store_list
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf

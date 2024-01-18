@@ -11,7 +11,6 @@ import com.jukco.waitforme.ui.components.BottomNaviBar
 import com.jukco.waitforme.ui.navi.NavigationGraph
 import com.jukco.waitforme.ui.navi.Route
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Preview(showSystemUi = true)
 @Composable
 fun MainScreen() {
@@ -23,7 +22,7 @@ fun MainScreen() {
         NavigationGraph(
             modifier = Modifier.padding(innerPadding),
             navController = navController,
-            startDescription = Route.PopsList.name,
+            startDescription = Route.StoreList.name,
         )
     }
 }
