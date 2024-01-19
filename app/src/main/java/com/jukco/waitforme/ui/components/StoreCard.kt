@@ -7,12 +7,12 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.PlatformTextStyle
 import androidx.compose.ui.text.TextStyle
@@ -26,29 +26,37 @@ import com.jukco.waitforme.R
 import com.jukco.waitforme.data.network.model.StoreResponse
 import com.jukco.waitforme.ui.theme.GreyAAA
 import com.jukco.waitforme.ui.theme.MainBlack
+import com.jukco.waitforme.ui.theme.MainWhite
 import com.jukco.waitforme.ui.theme.NotoSansKR
 import com.jukco.waitforme.ui.theme.WaitForMeTheme
-
 
 @Composable
 fun RectStoreCard(
     storeResponse: StoreResponse,
-    onClicked: (id: Int) -> Unit,
+    onItemClicked: (id: Int) -> Unit,
+    onBookmarkChecked: (id: Int) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
         modifier = modifier
-            .clickable { onClicked(storeResponse.id) },
+            .clickable { onItemClicked(storeResponse.id) },
     ) {
         Box(modifier = modifier) {
             RectThumbnail(storeResponse.imagePath)
             Image(
-                imageVector = Icons.Outlined.FavoriteBorder,
+                painter = painterResource(
+                    if (storeResponse.isFavorite) {
+                        R.drawable.ic_bookmark_fill
+                    } else {
+                        R.drawable.ic_bookmark_line
+                    },
+                ),
                 contentDescription = stringResource(R.string.btn_bookmark),
+                colorFilter = if (storeResponse.isFavorite) null else ColorFilter.tint(MainWhite),
                 modifier = modifier
                     .align(Alignment.BottomEnd)
                     .padding(8.dp)
-                    .clickable { /*TODO*/ }
+                    .clickable { onBookmarkChecked(storeResponse.id) },
             )
         }
         Spacer(modifier = Modifier.height(10.dp))
@@ -115,13 +123,13 @@ fun SquareStoreCard(
 
 // ======================================= Preview ===============================================================
 
-private val exStoreResponse = StoreResponse(0, "", "팝스토어 이름", "팝스토어 주최자", 0, false)
+private val exStoreResponse = StoreResponse(0, "", "팝스토어 이름", "팝스토어 주최자", 0, true)
 
 @Preview(showBackground = true)
 @Composable
 private fun RectStoreCardPreview() {
     WaitForMeTheme {
-        RectStoreCard(storeResponse = exStoreResponse, onClicked = {})
+        RectStoreCard(storeResponse = exStoreResponse, onItemClicked = {}, onBookmarkChecked = {})
     }
 }
 

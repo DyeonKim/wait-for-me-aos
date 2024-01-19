@@ -2,7 +2,6 @@ package com.jukco.waitforme.ui.navi
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -17,7 +16,6 @@ import com.jukco.waitforme.ui.SignUpScreen
 import com.jukco.waitforme.ui.WaitScreen
 import com.jukco.waitforme.ui.components.BottomNaviItem
 import com.jukco.waitforme.ui.store_list.StoreListScreen
-import com.jukco.waitforme.ui.store_list.StoreListViewModel
 
 @Composable
 fun NavigationGraph(
@@ -39,11 +37,7 @@ fun NavigationGraph(
             )
         }
         composable(Route.StoreList.name) {
-            val viewModel: StoreListViewModel = viewModel(factory = StoreListViewModel.Factory)
-
             StoreListScreen(
-                uiState = viewModel.storeListUiState,
-                refreshAction = viewModel::refresh,
                 onNoticeButtonClicked = { navController.navigate(Route.Notice.name) },
                 onSearchingClicked = { navController.navigate(Route.Searching.name) },
                 onPopItemClicked = {

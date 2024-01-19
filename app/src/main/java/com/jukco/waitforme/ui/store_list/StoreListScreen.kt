@@ -18,12 +18,12 @@ import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.KeyboardArrowRight
 import androidx.compose.material3.Button
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
@@ -43,6 +43,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.jukco.waitforme.R
 import com.jukco.waitforme.data.network.model.StoreResponse
 import com.jukco.waitforme.ui.components.RectStoreCard
@@ -56,24 +57,27 @@ import com.jukco.waitforme.ui.theme.WaitForMeTheme
 
 @Composable
 fun StoreListScreen(
-    uiState: StoreListUiState,
-    refreshAction: () -> Unit,
     onNoticeButtonClicked: () -> Unit,
     onSearchingClicked: () -> Unit,
     onPopItemClicked: (id: Int) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    when(uiState) {
+    val viewModel: StoreListViewModel = viewModel(factory = StoreListViewModel.Factory)
+
+    when (val uiState = viewModel.storeListUiState) {
         is StoreListUiState.Loading -> LoadingScreen(modifier)
-        is StoreListUiState.Error -> ErrorScreen(refreshAction, modifier)
+        is StoreListUiState.Error -> ErrorScreen(viewModel::refresh, modifier)
         is StoreListUiState.Success -> {
-            PopsList(
-                ongoingStores = uiState.ongoingStores,
+            val ongoingStores by uiState.ongoingStores.collectAsState()
+
+            StoreList(
+                ongoingStores = ongoingStores,
                 upcomingStores = uiState.upcomingStores,
                 onNoticeButtonClicked = onNoticeButtonClicked,
                 onSearchingClicked = onSearchingClicked,
-                onPopItemClicked = onPopItemClicked,
-                modifier = modifier
+                onItemClicked = onPopItemClicked,
+                onItemBookmarkChecked = viewModel::checkBookmark,
+                modifier = modifier,
             )
         }
     }
@@ -84,19 +88,19 @@ fun LoadingScreen(modifier: Modifier = Modifier) {
     Text(
         text = "Loading....",
         textAlign = TextAlign.Center,
-        modifier = modifier.fillMaxSize()
+        modifier = modifier.fillMaxSize(),
     )
 }
 
 @Composable
 fun ErrorScreen(
     refreshAction: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Column(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = modifier.fillMaxSize()
+        modifier = modifier.fillMaxSize(),
     ) {
         Text(text = "오류 발생")
         Button(onClick = refreshAction) {
@@ -105,14 +109,14 @@ fun ErrorScreen(
     }
 }
 
-
 @Composable
-fun PopsList(
+fun StoreList(
     ongoingStores: List<StoreResponse>,
     upcomingStores: List<StoreResponse>,
     onNoticeButtonClicked: () -> Unit,
     onSearchingClicked: () -> Unit,
-    onPopItemClicked: (id: Int) -> Unit,
+    onItemClicked: (id: Int) -> Unit,
+    onItemBookmarkChecked: (id: Int) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Scaffold(
@@ -128,43 +132,52 @@ fun PopsList(
                 .padding(start = 20.dp, end = 20.dp),
         ) {
             item(span = { GridItemSpan(maxLineSpan) }) {
-                Row (
+                Row(
                     verticalAlignment = Alignment.CenterVertically,
-                    modifier = modifier
-                ){
+                    modifier = modifier,
+                ) {
                     Title(
-                        img = R.drawable.img_umain_title01,
+                        img = R.drawable.img_user_main_title01,
                         text = buildAnnotatedString {
                             append(stringResource(R.string.title_ongoing))
                             withStyle(style = SpanStyle(color = MainBlue)) {
                                 append(stringResource(R.string.pops))
                             }
                         },
-                        modifier = modifier.weight(1f)
+                        modifier = modifier.weight(1f),
                     )
                     Image(
-                        imageVector = Icons.Rounded.KeyboardArrowRight,
+                        painter = painterResource(R.drawable.ic_arrow_more_right),
                         contentDescription = stringResource(R.string.btn_more),
-                        Modifier.clickable { onSearchingClicked }
+                        Modifier.clickable { onSearchingClicked() }, // TODO: "" 결과 화면으로 넘어가는 함수로 수정.
                     )
                 }
             }
-            items(items = ongoingStores, key = { it.id }) { RectStoreCard(it, onPopItemClicked) }
+            items(
+                items = ongoingStores,
+                key = { it.id },
+            ) {
+                RectStoreCard(
+                    storeResponse = it,
+                    onItemClicked = onItemClicked,
+                    onBookmarkChecked = onItemBookmarkChecked,
+                )
+            }
             item(span = { GridItemSpan(maxLineSpan) }) {
                 Title(
-                    img = R.drawable.img_umain_title02,
+                    img = R.drawable.img_user_main_title02,
                     text = buildAnnotatedString {
                         append(stringResource(R.string.title_ongoing))
                         withStyle(style = SpanStyle(color = MainBlue)) {
                             append(stringResource(R.string.pops))
                         }
-                    }
+                    },
                 )
             }
             item(span = { GridItemSpan(maxLineSpan) }) {
                 UpcomingStoreList(
                     storeResponseList = upcomingStores,
-                    onPopItemClicked = onPopItemClicked,
+                    onPopItemClicked = onItemClicked,
                 )
             }
             item(span = { GridItemSpan(maxLineSpan) }) {
@@ -178,11 +191,11 @@ fun PopsList(
 private fun Title(
     @DrawableRes img: Int,
     text: AnnotatedString,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        modifier = modifier
+        modifier = modifier,
     ) {
         Image(painter = painterResource(img), contentDescription = null)
         Spacer(modifier = Modifier.width(4.dp))
@@ -212,7 +225,7 @@ private fun UpcomingStoreList(
     ) {
         items(
             items = storeResponseList,
-            key = { store -> store.id }
+            key = { store -> store.id },
         ) { store ->
             UpcomingStore(store, onPopItemClicked)
         }
@@ -258,7 +271,7 @@ private fun UpcomingStore(
     name = "LandScape Mode",
     showBackground = true,
     device = Devices.AUTOMOTIVE_1024p,
-    heightDp = 640
+    heightDp = 640,
 )
 @Preview(name = "Portrait Mode", showBackground = true, device = Devices.PHONE)
 @Preview(name = "Foldable Mode", showBackground = true, device = Devices.FOLDABLE)
@@ -279,14 +292,13 @@ private fun PopListPreview() {
     )
 
     WaitForMeTheme {
-        PopsList(
+        StoreList(
             ongoingStores = mockList,
             upcomingStores = mockList,
             onNoticeButtonClicked = {},
             onSearchingClicked = {},
-            onPopItemClicked = {},
+            onItemClicked = {},
+            onItemBookmarkChecked = {},
         )
     }
 }
-
-
