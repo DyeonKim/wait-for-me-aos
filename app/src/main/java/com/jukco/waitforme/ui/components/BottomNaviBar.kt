@@ -124,11 +124,11 @@ sealed class BottomNaviItem(
     @DrawableRes val icon: Int,
     val route: String,
 ) {
-    object StoreManagement : BottomNaviItem(R.string.navi_pops_management, R.drawable.ic_set_popup, Route.StoreManagement.name)
-    object StoreList : BottomNaviItem(R.string.navi_pops_list, R.drawable.ic_list, Route.StoreList.name)
-    object Bookmark : BottomNaviItem(R.string.navi_bookmark, R.drawable.ic_bookmark, Route.Bookmark.name)
-    object WaitInfo : BottomNaviItem(R.string.navi_wait_info, R.drawable.ic_waiting, Route.WaitInfo.name)
-    object MyInfo : BottomNaviItem(R.string.navi_my_info, R.drawable.ic_my, Route.MyInfo.name)
+    object StoreManagement : BottomNaviItem(R.string.navi_pops_management, R.drawable.ic_nav_set_popup, Route.StoreManagement.name)
+    object StoreList : BottomNaviItem(R.string.navi_pops_list, R.drawable.ic_nav_list, Route.StoreList.name)
+    object Bookmark : BottomNaviItem(R.string.navi_bookmark, R.drawable.ic_nav_bookmark, Route.Bookmark.name)
+    object WaitInfo : BottomNaviItem(R.string.navi_wait_info, R.drawable.ic_nav_waiting, Route.WaitInfo.name)
+    object MyInfo : BottomNaviItem(R.string.navi_my_info, R.drawable.ic_nav_my, Route.MyInfo.name)
 }
 
 val BOTTOM_NAVI_ROUTE = listOf(
