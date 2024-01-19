@@ -3,6 +3,8 @@
 
     <string name="close">닫기</string>
     <string name="cancel">취소</string>
+    <string name="back">뒤로가기</string>
+    <string name="share">공유하기</string>
 
     <string name="navi_pops_management">팝업 관리</string>
     <string name="navi_pops_list">팝스리스트</string>
@@ -14,6 +16,7 @@
     <string name="searching">검색</string>
     <string name="sign_up">회원가입</string>
     <string name="sign_in">로그인</string>
+    <string name="detail_page">상세페이지</string>
 
     <string name="title_ongoing">"요즘 유행하는 "</string>
     <string name="title_upcoming">"곧 만날 수 있는 "</string>
@@ -23,6 +26,10 @@
 
     <string name="btn_bookmark">북마크 버튼</string>
     <string name="btn_more">더보기 버튼</string>
+
+    <string name="btn_on_site_reservation">예약하기</string>
+    <string name="basic_info">Basic Info</string>
+    <string name="sns">SNS</string>
 
     <string-array name="pops_filter_group">
         <item>최신순</item>

@@ -70,7 +70,7 @@ fun NavigationGraph(
         }
         composable(Route.PopupStore.name) {
             PopupStoreScreen(
-                onCloseButtonClicked = { navController.popBackStack() },
+                onBackButtonClicked = { navController.popBackStack() }
             )
         }
         composable(Route.SignUp.name) {
