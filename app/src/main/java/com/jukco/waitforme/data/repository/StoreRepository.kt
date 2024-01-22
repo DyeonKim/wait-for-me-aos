@@ -1,6 +1,8 @@
 package com.jukco.waitforme.data.repository
 
 import com.jukco.waitforme.data.network.api.StoreApi
+import com.jukco.waitforme.data.network.model.ImageInfo
+import com.jukco.waitforme.data.network.model.SnsInfo
 import com.jukco.waitforme.data.network.model.StoreDetailResponse
 import com.jukco.waitforme.data.network.model.StoreResponse
 
@@ -11,7 +13,7 @@ interface StoreRepository {
 }
 
 class StoreRepositoryImplementation(
-    private val storeApi: StoreApi
+    private val storeApi: StoreApi,
 ) : StoreRepository {
     // TODO: 응답이 404 등의 오류인 경우도 생각하기, 서버 연결 전까지 목업데이터
     override suspend fun getStoreList(): List<StoreResponse> = storeApi.getStoreList()
@@ -32,9 +34,159 @@ class MockStoreRepository : StoreRepository {
         StoreResponse(8, "", "떠나요", "둘이서", 0, false),
         StoreResponse(9, "", "I만 다섯", "mbti", 0, false),
     )
-
-    override suspend fun getStore(id: Int): StoreDetailResponse {
-        TODO("Not yet implemented")
-    }
-
+    override suspend fun getStore(id: Int): StoreDetailResponse = listOf(
+        StoreDetailResponse(
+            title = "핑크 홀리데이",
+            host = "야놀자",
+            description = "핑크 홀리데이! ".repeat(100),
+            imageInfo = listOf(),
+            startedAt = "2023-12-24",
+            endedAt = "2024-01-31",
+            openedAt = "11:30",
+            closedAt = "20:00",
+            address = "주소입니다~~",
+            snsInfo = setOf(SnsInfo("INSTAGRAM", "@Sep20_N")),
+            isFavorite = false,
+            isReserved = false,
+        ),
+        StoreDetailResponse(
+            title = "코카콜라",
+            host = "코카콜라",
+            description = "코카콜라! ".repeat(100),
+            imageInfo = listOf(),
+            startedAt = "2023-12-25",
+            endedAt = "2024-01-14",
+            openedAt = "10:30",
+            closedAt = "23:00",
+            address = "주소입니다~~".repeat(2),
+            snsInfo = setOf(),
+            isFavorite = true,
+            isReserved = false,
+        ),
+        StoreDetailResponse(
+            title = "홀리데이",
+            host = "여기어때",
+            description = "여기어때 ".repeat(100),
+            imageInfo = listOf(
+                ImageInfo("MAIN", "https://cdn.pixabay.com/photo/2016/11/23/15/14/jars-1853439_1280.jpg"),
+                ImageInfo("DETAIL", "https://cdn.pixabay.com/photo/2015/11/13/07/47/italy-1041660_1280.jpg"),
+                ImageInfo("DETAIL", ""),
+            ),
+            startedAt = "2023-11-24",
+            endedAt = "2024-02-15",
+            openedAt = "08:30",
+            closedAt = "20:00",
+            address = "주소입니다~~".repeat(3),
+            snsInfo = setOf(SnsInfo("FACEBOOK", "www.example.com")),
+            isFavorite = true,
+            isReserved = true,
+        ),
+        StoreDetailResponse(
+            title = "사이다",
+            host = "칠성",
+            description = "칠성사이다 ".repeat(100),
+            imageInfo = listOf(),
+            startedAt = "2023-11-24",
+            endedAt = "2024-02-15",
+            openedAt = "08:30",
+            closedAt = "20:00",
+            address = "주소입니다~~".repeat(3),
+            snsInfo = setOf(SnsInfo("FACEBOOK", "www.example.com")),
+            isFavorite = true,
+            isReserved = false,
+        ),
+        StoreDetailResponse(
+            title = "어쩌구",
+            host = "저쩌구",
+            description = "어쩌구저쩌구 ".repeat(100),
+            imageInfo = listOf(
+                ImageInfo("MAIN", "https://cdn.pixabay.com/photo/2017/08/07/19/46/shop-2607121_1280.jpg"),
+                ImageInfo("DETAIL", "https://cdn.pixabay.com/photo/2015/11/13/07/47/italy-1041660_1280.jpg"),
+                ImageInfo("DETAIL", ""),
+                ImageInfo("DETAIL", ""),
+            ),
+            startedAt = "2023-11-24",
+            endedAt = "2024-02-15",
+            openedAt = "08:30",
+            closedAt = "20:00",
+            address = "주소입니다~~".repeat(5),
+            snsInfo = setOf(SnsInfo("FACEBOOK", "www.example.com")),
+            isFavorite = false,
+            isReserved = false,
+        ),
+        StoreDetailResponse(
+            title = "야호",
+            host = "무",
+            description = "야호~~~~~~~~~~~~~! ".repeat(100),
+            imageInfo = listOf(
+                ImageInfo("MAIN", "https://cdn.pixabay.com/photo/2017/08/07/19/46/shop-2607121_1280.jpg"),
+                ImageInfo("DETAIL", ""),
+                ImageInfo("DETAIL", ""),
+            ),
+            startedAt = "2023-11-24",
+            endedAt = "2024-02-15",
+            openedAt = "08:30",
+            closedAt = "20:00",
+            address = "주소입니다~~".repeat(10),
+            snsInfo = setOf(SnsInfo("FACEBOOK", "www.example.com")),
+            isFavorite = false,
+            isReserved = true,
+        ),
+        StoreDetailResponse(
+            title = "스마일",
+            host = "주말이다",
+            description = "주말아 와라! ".repeat(100),
+            imageInfo = listOf(ImageInfo("MAIN", "")),
+            startedAt = "2023-11-24",
+            endedAt = "2024-02-15",
+            openedAt = "08:30",
+            closedAt = "20:30",
+            address = "주소입니다~~".repeat(3),
+            snsInfo = setOf(SnsInfo("FACEBOOK", "www.example.com")),
+            isFavorite = false,
+            isReserved = false,
+        ),
+        StoreDetailResponse(
+            title = "핑크",
+            host = "Pink",
+            description = "핑크 pink ".repeat(100),
+            imageInfo = listOf(),
+            startedAt = "2023-11-24",
+            endedAt = "2024-02-15",
+            openedAt = "08:30",
+            closedAt = "20:00",
+            address = "주소입니다~~".repeat(3),
+            snsInfo = setOf(SnsInfo("FACEBOOK", "www.example.com")),
+            isFavorite = false,
+            isReserved = false,
+        ),
+        StoreDetailResponse(
+            title = "떠나요",
+            host = "둘이서",
+            description = "제주도로 가자! ".repeat(100),
+            imageInfo = listOf(),
+            startedAt = "2023-11-24",
+            endedAt = "2024-02-15",
+            openedAt = "08:30",
+            closedAt = "20:00",
+            address = "주소입니다~~".repeat(3),
+            snsInfo = setOf(SnsInfo("FACEBOOK", "www.example.com"), SnsInfo("INSTAGRAM", "@sep20_N")),
+            isFavorite = false,
+            isReserved = false,
+        ),
+        StoreDetailResponse(
+            title = "I만 다섯",
+            host = "mbti",
+            description = "IIIII ".repeat(100),
+            imageInfo = listOf(),
+            startedAt = "2023-11-24",
+            endedAt = "2024-02-15",
+            openedAt = "08:30",
+            closedAt = "20:00",
+            address = "주소입니다~~".repeat(5),
+            snsInfo = setOf(SnsInfo("INSTAGRAM", "@IonlyFive"), SnsInfo("FACEBOOK", "www.example.com")),
+            isFavorite = false,
+            isReserved = false,
+        ),
+    )[id]
 }
