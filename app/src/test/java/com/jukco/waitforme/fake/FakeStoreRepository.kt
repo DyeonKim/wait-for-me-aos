@@ -6,7 +6,5 @@ import com.jukco.waitforme.data.repository.StoreRepository
 
 class FakeStoreRepository : StoreRepository {
     override suspend fun getStoreList(): List<StoreResponse> = FakeDataSource.storeList
-    override suspend fun getStore(id: Int): StoreDetailResponse {
-        TODO("Not yet implemented")
-    }
+    override suspend fun getStore(id: Int): StoreDetailResponse = FakeDataSource.storeDetailList[id]
 }
