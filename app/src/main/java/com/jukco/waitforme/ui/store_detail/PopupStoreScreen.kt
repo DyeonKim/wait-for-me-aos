@@ -38,7 +38,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
@@ -49,19 +52,27 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import coil.compose.AsyncImage
+import coil.request.ImageRequest
 import com.jukco.waitforme.R
+import com.jukco.waitforme.data.network.model.ImageInfo
+import com.jukco.waitforme.data.network.model.StoreDetailResponse
+import com.jukco.waitforme.ui.ErrorScreen
+import com.jukco.waitforme.ui.LoadingScreen
 import com.jukco.waitforme.ui.theme.GreyAAA
 import com.jukco.waitforme.ui.theme.GreyDDD
 import com.jukco.waitforme.ui.theme.GreyEEE
 import com.jukco.waitforme.ui.theme.MainBlack
 import com.jukco.waitforme.ui.theme.MainBlue
+import com.jukco.waitforme.ui.theme.MainWhite
 import com.jukco.waitforme.ui.theme.NotoSansKR
-import com.jukco.waitforme.ui.theme.WaitForMeTheme
 import kotlinx.coroutines.launch
 
 @Composable
@@ -69,14 +80,25 @@ fun PopupStoreScreen(
     onBackButtonClicked: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    WaitForMeTheme {
-        StoreDetail(onBackButtonClicked, modifier)
+    val viewModel: StoreDetailViewModel = viewModel(factory = StoreDetailViewModel.Factory)
+
+    when (val uiState = viewModel.storeDetailUiState) {
+        is StoreDetailUiState.Loading -> LoadingScreen(modifier)
+        is StoreDetailUiState.Error -> ErrorScreen(viewModel::load, modifier)
+        is StoreDetailUiState.Success -> {
+            StoreDetail(
+                store = uiState.storeDetailResponse,
+                onBackButtonClicked = onBackButtonClicked,
+                modifier = modifier,
+            )
+        }
     }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun StoreDetail(
+    store: StoreDetailResponse,
     onBackButtonClicked: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -145,8 +167,14 @@ fun StoreDetail(
                 .fillMaxSize()
                 .padding(paddingValues),
         ) {
-            item { ImagePager() }
-            item { Title() }
+            item { ImagePager(store.images) }
+            item {
+                Title(
+                    storeTitle = store.title,
+                    storeHost = store.host,
+                    isFavorite = store.isFavorite,
+                )
+            }
             item {
                 Spacer(
                     modifier
@@ -156,8 +184,24 @@ fun StoreDetail(
                         .background(color = GreyEEE),
                 )
             }
-            item { BasicInformation(modifier.padding(horizontal = 20.dp).padding(top = 20.dp)) }
-            item { SNSInformation(modifier.padding(horizontal = 20.dp).padding(top = 34.dp)) }
+            item {
+                BasicInformation(
+                date = /*TODO: 포맷변경 */ "${store.startDate} ~ ${store.endDate}",
+                time = /*TODO: 포맷변경 */ "${store.openTime} ~ ${store.closeTime}",
+                address = store.address,
+                    modifier
+                        .padding(horizontal = 20.dp)
+                        .padding(top = 20.dp),
+                )
+            }
+            item {
+                SNSInformation(
+                snsMap = store.snsMap,
+                    modifier
+                        .padding(horizontal = 20.dp)
+                        .padding(top = 34.dp),
+                )
+            }
             item {
                 Spacer(
                     modifier
@@ -169,7 +213,7 @@ fun StoreDetail(
             }
             item {
                 Text(
-                    text = "핑크 홀리데이는 야놀자에서 2023년 12월에 진행하는  팝업입니다! 선물이 가득하므로 친구/연인 등과 함께 방문해 팝업 스토어에서 선물도 받고 함께 즐겁게 놀아보세요!",
+                    text = store.description,
                     style = TextStyle(
                         color = MainBlack,
                         fontFamily = NotoSansKR,
@@ -179,7 +223,9 @@ fun StoreDetail(
                         platformStyle = PlatformTextStyle(includeFontPadding = false),
                         letterSpacing = (-0.05).em,
                     ),
-                    modifier = modifier.padding(horizontal = 20.dp).padding(bottom = 12.dp),
+                    modifier = modifier
+                        .padding(horizontal = 20.dp)
+                        .padding(bottom = 12.dp),
                 )
             }
         }
@@ -189,47 +235,67 @@ fun StoreDetail(
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun ImagePager(
+    images: List<ImageInfo>,
     modifier: Modifier = Modifier,
 ) {
-    /*TODO : viewModel */
-    val pagerState = rememberPagerState()
-    val coroutineScope = rememberCoroutineScope()
-
-    Box {
-        HorizontalPager(pageCount = 5, state = pagerState) { page ->
-            Text(
-                text = "Page: $page",
-                modifier = modifier
-                    .fillMaxWidth()
-                    .aspectRatio(1f)
-                    .background(GreyAAA),
-            )
-        }
-        Row(
-            Modifier
-                .wrapContentHeight()
+    if (images.isEmpty()) {
+        Image(
+            painter = painterResource(R.drawable.baseline_image_24),
+            contentDescription = null,
+            colorFilter = ColorFilter.tint(MainWhite),
+            modifier = modifier
                 .fillMaxWidth()
-                .align(Alignment.BottomCenter)
-                .padding(bottom = 8.dp),
-            horizontalArrangement = Arrangement.Center,
-        ) {
-            repeat(5) { iteration ->
-                val color = if (pagerState.currentPage == iteration) MainBlue else GreyDDD
-                Box(
-                    modifier = Modifier
-                        .padding(4.dp)
-                        .padding(bottom = 12.dp)
-                        .clip(CircleShape)
-                        .background(color)
-                        .size(8.dp)
-                        .clickable {
-                            coroutineScope.launch {
-                                pagerState.animateScrollToPage(
-                                    iteration,
-                                )
-                            }
-                        },
+                .aspectRatio(1f)
+                .background(GreyAAA),
+        )
+    } else {
+        /*TODO : viewModel */
+        val pagerState = rememberPagerState()
+        val coroutineScope = rememberCoroutineScope()
+
+        Box {
+            // MAIN, DETAIL이 여기서 쓰이는가? 순서대로 주는 것이 아닌가?
+            HorizontalPager(pageCount = images.size, state = pagerState) { index ->
+                AsyncImage(
+                    model = ImageRequest.Builder(context = LocalContext.current)
+                        .data(images[index].path)
+                        .build(),
+                    contentDescription = "page $index",
+                    placeholder = painterResource(R.drawable.baseline_image_24),
+                    error = painterResource(R.drawable.img_store_example),
+                    contentScale = ContentScale.Crop,
+                    modifier = modifier
+                        .fillMaxWidth()
+                        .aspectRatio(1f)
+                        .clickable { /* TODO : 클릭하면 전체 이미지 보기, 필수는 아님 */ },
                 )
+            }
+            Row(
+                Modifier
+                    .wrapContentHeight()
+                    .fillMaxWidth()
+                    .align(Alignment.BottomCenter)
+                    .padding(bottom = 8.dp),
+                horizontalArrangement = Arrangement.Center,
+            ) {
+                repeat(images.size) { iteration ->
+                    val color = if (pagerState.currentPage == iteration) MainBlue else GreyDDD
+                    Box(
+                        modifier = Modifier
+                            .padding(4.dp)
+                            .padding(bottom = 12.dp)
+                            .clip(CircleShape)
+                            .background(color)
+                            .size(8.dp)
+                            .clickable {
+                                coroutineScope.launch {
+                                    pagerState.animateScrollToPage(
+                                        iteration,
+                                    )
+                                }
+                            },
+                    )
+                }
             }
         }
     }
@@ -283,6 +349,7 @@ private fun Title(
                 painter = painterResource(if (isFavorite) R.drawable.ic_bookmark_fill else R.drawable.ic_bookmark_line),
                 contentDescription = stringResource(R.string.btn_bookmark),
             )
+            /*TODO: 좋아요 숫자 카운트 넣을지 안 너을 지 미정*/
             Text(
                 text = "20",
                 textAlign = TextAlign.Center,
@@ -302,12 +369,14 @@ private fun Title(
 
 @Composable
 private fun BasicInformation(
-    // TODO : storeDetailUiState
+    date: String = "0000.00.00 ~ 0000.00.00",
+    time: String = "00:00 ~ 00:00",
+    address: String = "",
     modifier: Modifier = Modifier,
 ) {
     val copyId = "copyIcon"
     val place = buildAnnotatedString {
-        append("주소가 2줄일 경우 이렇게 표시됩니다................................! 참고 부탁드려요!")
+        append(address)
         appendInlineContent(copyId, "[copyIcon]")
     }
     val copyIcon = mapOf(
@@ -323,7 +392,9 @@ private fun BasicInformation(
                 Image(
                     painter = painterResource(R.drawable.ic_data_copy),
                     contentDescription = null,
-                    modifier = Modifier.fillMaxWidth().padding(start = 8.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(start = 8.dp),
                 )
             },
         ),
@@ -343,9 +414,9 @@ private fun BasicInformation(
             ),
         )
         Spacer(modifier = Modifier.height(16.dp))
-        IconText(icon = R.drawable.img_calendar, text = "날짜")
+        IconText(icon = R.drawable.img_calendar, text = date)
         Spacer(modifier = Modifier.height(10.dp))
-        IconText(icon = R.drawable.img_clock, text = "운영시간")
+        IconText(icon = R.drawable.img_clock, text = time)
         Spacer(modifier = Modifier.height(10.dp))
         Row(verticalAlignment = Alignment.Top) {
             Image(
@@ -356,6 +427,7 @@ private fun BasicInformation(
             Text(
                 text = place,
                 inlineContent = copyIcon,
+                overflow = TextOverflow.Ellipsis,
                 maxLines = 2,
                 style = TextStyle(
                     color = MainBlack,
@@ -373,14 +445,14 @@ private fun BasicInformation(
 
 @Composable
 private fun SNSInformation(
-    // TODO : storeDetailUiState의 SNS 목록?을 이용해서 존재여부에 따라 IconText 보여주거나 안 보여주거나. 아마 Map이 편할 듯
+    snsMap: Map<String, String>,
     modifier: Modifier = Modifier,
 ) {
     Column(modifier) {
         Text(
             text = stringResource(R.string.sns),
             style = TextStyle(
-                color= MainBlack,
+                color = MainBlack,
                 fontFamily = NotoSansKR,
                 fontWeight = FontWeight.Bold,
                 fontSize = 13.sp,
@@ -390,11 +462,13 @@ private fun SNSInformation(
             ),
         )
         Spacer(modifier = Modifier.height(16.dp))
-        IconText(icon = R.drawable.img_sns_instar, text = "인스타")
-        Spacer(modifier = Modifier.height(10.dp))
+        snsMap["INSTAGRAM"]?.let {
+            IconText(icon = R.drawable.img_sns_instar, text = it)
+            Spacer(modifier = Modifier.height(10.dp))
+        }
 //        IconText(icon = R.drawable.ic_nav_waiting, text = "트위터")
 //        IconText(icon = R.drawable.ic_nav_waiting, text = "페이스북?")
-        IconText(icon = R.drawable.img_homepage, text = "자체 홈페이지")
+        snsMap["FACEBOOK"]?.let { IconText(icon = R.drawable.img_homepage, text = it) }
     }
 }
 

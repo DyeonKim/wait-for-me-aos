@@ -8,16 +8,18 @@ data class StoreDetailResponse(
     @SerialName(value = "title") val title: String,
     @SerialName(value = "host") val host: String,
     @SerialName(value = "description") val description: String,
-    @SerialName(value = "imageInfo") val imageInfo: List<ImageInfo>,
-    @SerialName(value = "startedAt") val startedAt: String,
-    @SerialName(value = "endedAt") val endedAt: String,
-    @SerialName(value = "openedAt") val openedAt: String,
-    @SerialName(value = "closedAt") val closedAt: String,
+    @SerialName(value = "imageInfo") val images: List<ImageInfo>,
+    @SerialName(value = "startedAt") val startDate: String,
+    @SerialName(value = "endedAt") val endDate: String,
+    @SerialName(value = "openedAt") val openTime: String,
+    @SerialName(value = "closedAt") val closeTime: String,
     @SerialName(value = "address") val address: String,
-    @SerialName(value = "snsInfo") val snsInfo: Set<SnsInfo>,
+    @SerialName(value = "snsInfo") val snsList: List<SnsInfo> = listOf(),
     @SerialName(value = "isFavorite") val isFavorite: Boolean,
     @SerialName(value = "isReserved") val isReserved: Boolean
-)
+) {
+    val snsMap = snsList.associate { it.snsType to it.snsId }
+}
 
 
 @Serializable
