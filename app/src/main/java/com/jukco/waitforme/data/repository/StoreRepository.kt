@@ -1,10 +1,13 @@
 package com.jukco.waitforme.data.repository
 
 import com.jukco.waitforme.data.network.api.StoreApi
+import com.jukco.waitforme.data.network.model.StoreDetailResponse
 import com.jukco.waitforme.data.network.model.StoreResponse
 
 interface StoreRepository {
     suspend fun getStoreList(): List<StoreResponse>
+
+    suspend fun getStore(id: Int): StoreDetailResponse
 }
 
 class StoreRepositoryImplementation(
@@ -12,6 +15,9 @@ class StoreRepositoryImplementation(
 ) : StoreRepository {
     // TODO: 응답이 404 등의 오류인 경우도 생각하기, 서버 연결 전까지 목업데이터
 //    override suspend fun getStoreList(): List<StoreResponse> = storeApi.getStoreList()
+
+    override suspend fun getStore(id: Int): StoreDetailResponse = storeApi.getStore(id)
+
     override suspend fun getStoreList(): List<StoreResponse> = listOf(
         StoreResponse(0, "", "핑크 홀리데이", "야놀자", 0, false),
         StoreResponse(1, "", "코카콜라", "코카콜라", 1, true),
