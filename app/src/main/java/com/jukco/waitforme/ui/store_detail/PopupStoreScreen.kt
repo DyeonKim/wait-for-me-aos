@@ -14,6 +14,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
@@ -184,7 +185,7 @@ fun StoreDetail(
                 },
                 actions = {
                     IconButton(
-                        onClick = onShareButtonClicked
+                        onClick = onShareButtonClicked,
                     ) {
                         Icon(
                             imageVector = ImageVector.vectorResource(R.drawable.ic_share),
@@ -198,6 +199,7 @@ fun StoreDetail(
         bottomBar = {
             Button(
                 onClick = { /*TODO : 예약하기 */ },
+                contentPadding = PaddingValues(horizontal = 64.dp, vertical = (13.5).dp),
                 shape = RoundedCornerShape(4.dp),
                 enabled = !store.isReserved,
                 modifier = modifier
@@ -220,7 +222,6 @@ fun StoreDetail(
                         platformStyle = PlatformTextStyle(includeFontPadding = false),
                         letterSpacing = 0.em,
                     ),
-                    modifier = modifier.padding(horizontal = 64.dp, vertical = (13.5).dp),
                 )
             }
         },
@@ -576,13 +577,16 @@ private fun IconText(
 }
 
 @Preview(name = "Portrait Mode", showBackground = true, device = Devices.PHONE)
-@Preview(name = "LandScape Mode", showBackground = true, device = Devices.AUTOMOTIVE_1024p, heightDp = 640)
 @Preview(name = "Foldable Mode", showBackground = true, device = Devices.FOLDABLE)
 @Preview(name = "Tablet Mode", showBackground = true, device = Devices.TABLET)
 @Preview(showBackground = true)
 @Composable
 fun StoreDetailPreview() {
-    PopupStoreScreen(
+    StoreDetail(
+        store = StoreDetailResponse(),
         onBackButtonClicked = {},
+        onShareButtonClicked = {},
+        onBookmarkClicked = {},
+        copyStoreAddress = {},
     )
 }
