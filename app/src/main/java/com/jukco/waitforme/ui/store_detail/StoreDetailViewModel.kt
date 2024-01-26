@@ -14,12 +14,16 @@ import androidx.lifecycle.viewmodel.viewModelFactory
 import com.jukco.waitforme.config.ApplicationClass
 import com.jukco.waitforme.data.network.model.StoreDetailResponse
 import com.jukco.waitforme.data.repository.StoreRepository
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.io.IOException
 
 
 sealed interface StoreDetailUiState {
-    data class Success(val storeDetailResponse: StoreDetailResponse): StoreDetailUiState
+    data class Success(val storeDetailResponse: StateFlow<StoreDetailResponse>) : StoreDetailUiState
     object Error : StoreDetailUiState
     object Loading: StoreDetailUiState
 }
@@ -31,6 +35,7 @@ class StoreDetailViewModel(
 
     var storeDetailUiState: StoreDetailUiState by mutableStateOf(StoreDetailUiState.Loading)
         private set
+    private val _storeDetail = MutableStateFlow(StoreDetailResponse())
 
 
     init {
@@ -40,10 +45,19 @@ class StoreDetailViewModel(
     fun load() {
         viewModelScope.launch {
             storeDetailUiState = try {
-                StoreDetailUiState.Success(storeRepository.getStore(storeId ?: -1))
+                _storeDetail.value = storeRepository.getStore(storeId ?: -1)
+                StoreDetailUiState.Success(_storeDetail.asStateFlow())
             } catch (e: IOException) {
                 StoreDetailUiState.Error
             }
+        }
+    }
+
+    fun onClickBookmark() {
+        _storeDetail.update {currentStore ->
+            currentStore.copy(
+                isFavorite = !currentStore.isFavorite
+            )
         }
     }
 

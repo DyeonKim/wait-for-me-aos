@@ -6,8 +6,10 @@ import com.jukco.waitforme.fake.FakeStoreRepository
 import com.jukco.waitforme.rule.TestDispatcherRule
 import com.jukco.waitforme.ui.store_detail.StoreDetailUiState
 import com.jukco.waitforme.ui.store_detail.StoreDetailViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.test.runTest
-import org.junit.Assert.assertEquals
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -30,9 +32,11 @@ class StoreDetailViewModelTest {
 
     @Test
     fun storeDetailViewModel_init_verifyStoreListUiStateSuccess() = runTest {
-        assertEquals(
-            StoreDetailUiState.Success(storeDetailResponse = FakeDataSource.storeDetailList[storeId]),
-            viewModel.storeDetailUiState
+        assertThat(viewModel.storeDetailUiState).isInstanceOf(StoreDetailUiState.Success::class.java)
+        assertThat(viewModel.storeDetailUiState).usingRecursiveComparison().isEqualTo(
+            StoreDetailUiState.Success(
+                storeDetailResponse = MutableStateFlow(FakeDataSource.storeDetailList[storeId]).asStateFlow()
+            )
         )
     }
 }

@@ -1,5 +1,11 @@
 package com.jukco.waitforme.ui.store_detail
 
+import android.content.ActivityNotFoundException
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.Context
+import android.content.Intent
+import android.widget.Toast
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
@@ -33,6 +39,8 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -58,6 +66,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
@@ -75,20 +84,62 @@ import com.jukco.waitforme.ui.theme.MainWhite
 import com.jukco.waitforme.ui.theme.NotoSansKR
 import kotlinx.coroutines.launch
 
+private fun shareStoreInformation(intentContext: Context, title: String) {
+    val sendIntent = Intent().apply {
+        action = Intent.ACTION_SEND
+        putExtra(
+            Intent.EXTRA_TEXT,
+            intentContext.getString(R.string.share_info, title),
+        )
+        type = "text/plain"
+    }
+
+    val shareIntent = Intent.createChooser(sendIntent, null)
+
+    try {
+        ContextCompat.startActivity(intentContext, shareIntent, null)
+    } catch (e: ActivityNotFoundException) {
+        Toast.makeText(
+            intentContext,
+            intentContext.getString(R.string.sharing_not_available),
+            Toast.LENGTH_LONG,
+        ).show()
+    }
+}
+
+private fun copyStoreAddress(context: Context, address: String) {
+    val clipboardManager = ContextCompat.getSystemService(context, ClipboardManager::class.java) as ClipboardManager
+    val clip = ClipData.newPlainText("address", address)
+    clipboardManager.setPrimaryClip(clip)
+}
+
 @Composable
 fun PopupStoreScreen(
     onBackButtonClicked: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val currentContext = LocalContext.current
     val viewModel: StoreDetailViewModel = viewModel(factory = StoreDetailViewModel.Factory)
 
     when (val uiState = viewModel.storeDetailUiState) {
         is StoreDetailUiState.Loading -> LoadingScreen(modifier)
         is StoreDetailUiState.Error -> ErrorScreen(viewModel::load, modifier)
         is StoreDetailUiState.Success -> {
+            val store by uiState.storeDetailResponse.collectAsState()
+
             StoreDetail(
-                store = uiState.storeDetailResponse,
+                store = store,
                 onBackButtonClicked = onBackButtonClicked,
+                onShareButtonClicked = {
+                    shareStoreInformation(
+                        intentContext = currentContext,
+                        title = store.title,
+                    )
+                },
+                onBookmarkClicked = viewModel::onClickBookmark,
+                copyStoreAddress = {
+                                   copyStoreAddress(currentContext, store.address)
+                },
                 modifier = modifier,
             )
         }
@@ -100,6 +151,9 @@ fun PopupStoreScreen(
 fun StoreDetail(
     store: StoreDetailResponse,
     onBackButtonClicked: () -> Unit,
+    onShareButtonClicked: () -> Unit,
+    onBookmarkClicked: () -> Unit,
+    copyStoreAddress: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Scaffold(
@@ -129,7 +183,9 @@ fun StoreDetail(
                     }
                 },
                 actions = {
-                    IconButton(onClick = {}) {
+                    IconButton(
+                        onClick = onShareButtonClicked
+                    ) {
                         Icon(
                             imageVector = ImageVector.vectorResource(R.drawable.ic_share),
                             contentDescription = stringResource(R.string.share),
@@ -141,14 +197,21 @@ fun StoreDetail(
         },
         bottomBar = {
             Button(
-                onClick = { /*TODO*/ },
+                onClick = { /*TODO : 예약하기 */ },
                 shape = RoundedCornerShape(4.dp),
+                enabled = !store.isReserved,
                 modifier = modifier
                     .fillMaxWidth()
                     .padding(horizontal = 20.dp, vertical = 12.dp),
             ) {
                 Text(
-                    text = stringResource(R.string.btn_on_site_reservation),
+                    text = stringResource(
+                        if (store.isReserved) {
+                            R.string.btn_on_site_reservation_true
+                        } else {
+                            R.string.btn_on_site_reservation_false
+                        },
+                    ),
                     style = TextStyle(
                         fontFamily = NotoSansKR,
                         fontWeight = FontWeight.Bold,
@@ -167,12 +230,27 @@ fun StoreDetail(
                 .fillMaxSize()
                 .padding(paddingValues),
         ) {
-            item { ImagePager(store.images) }
+            item {
+                if (store.images.isEmpty()) {
+                    Image(
+                        painter = painterResource(R.drawable.baseline_image_24),
+                        contentDescription = null,
+                        colorFilter = ColorFilter.tint(MainWhite),
+                        modifier = modifier
+                            .fillMaxWidth()
+                            .aspectRatio(1f)
+                            .background(GreyAAA),
+                    )
+                } else {
+                    ImagePager(store.images)
+                }
+            }
             item {
                 Title(
                     storeTitle = store.title,
                     storeHost = store.host,
                     isFavorite = store.isFavorite,
+                    onBookmarkClicked = onBookmarkClicked,
                 )
             }
             item {
@@ -186,9 +264,10 @@ fun StoreDetail(
             }
             item {
                 BasicInformation(
-                date = /*TODO: 포맷변경 */ "${store.startDate} ~ ${store.endDate}",
-                time = /*TODO: 포맷변경 */ "${store.openTime} ~ ${store.closeTime}",
-                address = store.address,
+                    date = store.operatingPeriod,
+                    time = store.operatingTime,
+                    address = store.address,
+                    copyStoreAddress = copyStoreAddress,
                     modifier
                         .padding(horizontal = 20.dp)
                         .padding(top = 20.dp),
@@ -238,64 +317,51 @@ private fun ImagePager(
     images: List<ImageInfo>,
     modifier: Modifier = Modifier,
 ) {
-    if (images.isEmpty()) {
-        Image(
-            painter = painterResource(R.drawable.baseline_image_24),
-            contentDescription = null,
-            colorFilter = ColorFilter.tint(MainWhite),
-            modifier = modifier
-                .fillMaxWidth()
-                .aspectRatio(1f)
-                .background(GreyAAA),
-        )
-    } else {
-        /*TODO : viewModel */
-        val pagerState = rememberPagerState()
-        val coroutineScope = rememberCoroutineScope()
+    val pagerState = rememberPagerState()
+    val coroutineScope = rememberCoroutineScope()
 
-        Box {
-            // MAIN, DETAIL이 여기서 쓰이는가? 순서대로 주는 것이 아닌가?
-            HorizontalPager(pageCount = images.size, state = pagerState) { index ->
-                AsyncImage(
-                    model = ImageRequest.Builder(context = LocalContext.current)
-                        .data(images[index].path)
-                        .build(),
-                    contentDescription = "page $index",
-                    placeholder = painterResource(R.drawable.baseline_image_24),
-                    error = painterResource(R.drawable.img_store_example),
-                    contentScale = ContentScale.Crop,
-                    modifier = modifier
-                        .fillMaxWidth()
-                        .aspectRatio(1f)
-                        .clickable { /* TODO : 클릭하면 전체 이미지 보기, 필수는 아님 */ },
-                )
-            }
-            Row(
-                Modifier
-                    .wrapContentHeight()
+    Box {
+        // MAIN, DETAIL이 여기서 쓰이는가? 순서대로 주는 것이 아닌가?
+        HorizontalPager(pageCount = images.size, state = pagerState) { index ->
+            AsyncImage(
+                model = ImageRequest.Builder(context = LocalContext.current)
+                    .data(images[index].path)
+                    .build(),
+                contentDescription = "page $index",
+                placeholder = painterResource(R.drawable.baseline_image_24),
+                error = painterResource(R.drawable.img_store_example),
+                contentScale = ContentScale.Crop,
+                modifier = modifier
                     .fillMaxWidth()
-                    .align(Alignment.BottomCenter)
-                    .padding(bottom = 8.dp),
-                horizontalArrangement = Arrangement.Center,
-            ) {
-                repeat(images.size) { iteration ->
-                    val color = if (pagerState.currentPage == iteration) MainBlue else GreyDDD
-                    Box(
-                        modifier = Modifier
-                            .padding(4.dp)
-                            .padding(bottom = 12.dp)
-                            .clip(CircleShape)
-                            .background(color)
-                            .size(8.dp)
-                            .clickable {
-                                coroutineScope.launch {
-                                    pagerState.animateScrollToPage(
-                                        iteration,
-                                    )
-                                }
-                            },
-                    )
-                }
+                    .aspectRatio(1f)
+                    .clickable { /* TODO : 클릭하면 전체 이미지 보기, 필수는 아님 */ },
+            )
+        }
+        Row(
+            Modifier
+                .wrapContentHeight()
+                .fillMaxWidth()
+                .align(Alignment.BottomCenter)
+                .padding(bottom = 8.dp),
+            horizontalArrangement = Arrangement.Center,
+        ) {
+            repeat(images.size) { iteration ->
+                val color = if (pagerState.currentPage == iteration) MainBlue else GreyDDD
+                Box(
+                    modifier = Modifier
+                        .padding(4.dp)
+                        .padding(bottom = 12.dp)
+                        .clip(CircleShape)
+                        .background(color)
+                        .size(8.dp)
+                        .clickable {
+                            coroutineScope.launch {
+                                pagerState.animateScrollToPage(
+                                    iteration,
+                                )
+                            }
+                        },
+                )
             }
         }
     }
@@ -303,10 +369,10 @@ private fun ImagePager(
 
 @Composable
 private fun Title(
-    storeTitle: String = "스토어명",
-    storeHost: String = "주최명",
-    isFavorite: Boolean = true,
-    onBookmarkClicked: () -> Unit = {}, // TODO: viewModel function
+    storeTitle: String,
+    storeHost: String,
+    isFavorite: Boolean,
+    onBookmarkClicked: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Row(
@@ -343,15 +409,15 @@ private fun Title(
         Spacer(modifier = modifier.weight(1f))
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = modifier.clickable { onBookmarkClicked },
+            modifier = modifier.clickable { onBookmarkClicked() },
         ) {
             Image(
                 painter = painterResource(if (isFavorite) R.drawable.ic_bookmark_fill else R.drawable.ic_bookmark_line),
                 contentDescription = stringResource(R.string.btn_bookmark),
             )
-            /*TODO: 좋아요 숫자 카운트 넣을지 안 너을 지 미정*/
+            /* TODO: 좋아요 숫자 카운트 넣을지 안 너을 지 미정 */
             Text(
-                text = "20",
+                text = "0",
                 textAlign = TextAlign.Center,
                 color = if (isFavorite) MainBlue else MainBlack,
                 style = TextStyle(
@@ -369,9 +435,10 @@ private fun Title(
 
 @Composable
 private fun BasicInformation(
-    date: String = "0000.00.00 ~ 0000.00.00",
-    time: String = "00:00 ~ 00:00",
-    address: String = "",
+    date: String,
+    time: String,
+    address: String,
+    copyStoreAddress: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val copyId = "copyIcon"
@@ -394,7 +461,8 @@ private fun BasicInformation(
                     contentDescription = null,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(start = 8.dp),
+                        .padding(start = 8.dp)
+                        .clickable { copyStoreAddress() },
                 )
             },
         ),
@@ -461,20 +529,24 @@ private fun SNSInformation(
                 letterSpacing = (-0.05).em,
             ),
         )
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(6.dp))
         snsMap["INSTAGRAM"]?.let {
-            IconText(icon = R.drawable.img_sns_instar, text = it)
             Spacer(modifier = Modifier.height(10.dp))
+            IconText(icon = R.drawable.img_sns_instar, text = it, description = it)
         }
 //        IconText(icon = R.drawable.ic_nav_waiting, text = "트위터")
 //        IconText(icon = R.drawable.ic_nav_waiting, text = "페이스북?")
-        snsMap["FACEBOOK"]?.let { IconText(icon = R.drawable.img_homepage, text = it) }
+        snsMap["FACEBOOK"]?.let {
+            Spacer(modifier = Modifier.height(10.dp))
+            IconText(icon = R.drawable.img_homepage, text = it, description = it)
+        }
     }
 }
 
 @Composable
 private fun IconText(
     @DrawableRes icon: Int,
+    description: String? = null,
     text: String,
     modifier: Modifier = Modifier,
 ) {
@@ -484,7 +556,7 @@ private fun IconText(
     ) {
         Image(
             painter = painterResource(icon),
-            contentDescription = "",
+            contentDescription = description,
         )
         Spacer(modifier = Modifier.width(6.dp))
         Text(
