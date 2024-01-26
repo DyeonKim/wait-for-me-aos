@@ -32,36 +32,36 @@ import com.jukco.waitforme.ui.theme.WaitForMeTheme
 
 @Composable
 fun RectStoreCard(
-    storeResponse: StoreResponse,
+    store: StoreResponse,
     onItemClicked: (id: Int) -> Unit,
     onBookmarkChecked: (id: Int) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
         modifier = modifier
-            .clickable { onItemClicked(storeResponse.id) },
+            .clickable { onItemClicked(store.id) },
     ) {
         Box(modifier = modifier) {
-            RectThumbnail(storeResponse.imagePath)
+            RectThumbnail(store.imagePath)
             Image(
                 painter = painterResource(
-                    if (storeResponse.isFavorite) {
+                    if (store.isFavorite) {
                         R.drawable.ic_bookmark_fill
                     } else {
                         R.drawable.ic_bookmark_line
                     },
                 ),
                 contentDescription = stringResource(R.string.btn_bookmark),
-                colorFilter = if (storeResponse.isFavorite) null else ColorFilter.tint(MainWhite),
+                colorFilter = if (store.isFavorite) null else ColorFilter.tint(MainWhite),
                 modifier = modifier
                     .align(Alignment.BottomEnd)
                     .padding(8.dp)
-                    .clickable { onBookmarkChecked(storeResponse.id) },
+                    .clickable { onBookmarkChecked(store.id) },
             )
         }
         Spacer(modifier = Modifier.height(10.dp))
         Text(
-            text = storeResponse.title,
+            text = store.title,
             style = TextStyle(
                 fontFamily = NotoSansKR,
                 fontWeight = FontWeight.Medium,
@@ -76,7 +76,7 @@ fun RectStoreCard(
         )
         Spacer(modifier = Modifier.height(6.dp))
         Text(
-            text = storeResponse.host,
+            text = store.host,
             style = TextStyle(
                 fontFamily = NotoSansKR,
                 fontWeight = FontWeight.Medium,
@@ -129,7 +129,7 @@ private val exStoreResponse = StoreResponse(0, "", "팝스토어 이름", "팝�
 @Composable
 private fun RectStoreCardPreview() {
     WaitForMeTheme {
-        RectStoreCard(storeResponse = exStoreResponse, onItemClicked = {}, onBookmarkChecked = {})
+        RectStoreCard(store = exStoreResponse, onItemClicked = {}, onBookmarkChecked = {})
     }
 }
 
