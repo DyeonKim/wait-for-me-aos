@@ -11,7 +11,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.PlatformTextStyle
@@ -26,7 +25,6 @@ import com.jukco.waitforme.R
 import com.jukco.waitforme.data.network.model.StoreResponse
 import com.jukco.waitforme.ui.theme.GreyAAA
 import com.jukco.waitforme.ui.theme.MainBlack
-import com.jukco.waitforme.ui.theme.MainWhite
 import com.jukco.waitforme.ui.theme.NotoSansKR
 import com.jukco.waitforme.ui.theme.WaitForMeTheme
 
@@ -48,11 +46,10 @@ fun RectStoreCard(
                     if (store.isFavorite) {
                         R.drawable.ic_bookmark_fill
                     } else {
-                        R.drawable.ic_bookmark_line
+                        R.drawable.ic_bookmark_line_white
                     },
                 ),
                 contentDescription = stringResource(R.string.btn_bookmark),
-                colorFilter = if (store.isFavorite) null else ColorFilter.tint(MainWhite),
                 modifier = modifier
                     .align(Alignment.BottomEnd)
                     .padding(8.dp)
