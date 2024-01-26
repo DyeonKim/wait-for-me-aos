@@ -92,7 +92,7 @@ class MockStoreRepository : StoreRepository {
             closeTime = "20:00",
             address = "주소입니다~~".repeat(3),
             snsList = listOf(SnsInfo("FACEBOOK", "www.example.com")),
-            isFavorite = true,
+            isFavorite = false,
             isReserved = false,
         ),
         StoreDetailResponse(
@@ -100,8 +100,8 @@ class MockStoreRepository : StoreRepository {
             host = "저쩌구",
             description = "어쩌구저쩌구 ".repeat(100),
             images = listOf(
-                ImageInfo("MAIN", "https://cdn.pixabay.com/photo/2017/08/07/19/46/shop-2607121_1280.jpg"),
-                ImageInfo("DETAIL", "https://cdn.pixabay.com/photo/2015/11/13/07/47/italy-1041660_1280.jpg"),
+                ImageInfo("MAIN", "https://cdn.pixabay.com/photo/2016/11/22/21/57/apparel-1850804_1280.jpg"),
+                ImageInfo("DETAIL", "https://cdn.pixabay.com/photo/2017/08/07/19/46/shop-2607121_1280.jpg"),
                 ImageInfo("DETAIL", ""),
                 ImageInfo("DETAIL", ""),
             ),
