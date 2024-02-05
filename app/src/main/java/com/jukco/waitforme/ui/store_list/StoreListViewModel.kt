@@ -20,11 +20,10 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.io.IOException
 
-
 sealed interface StoreListUiState {
     data class Success(
         val ongoingStores: StateFlow<List<StoreResponse>>,
-        val upcomingStores: List<StoreResponse>
+        val upcomingStores: List<StoreResponse>,
     ) : StoreListUiState
     object Error : StoreListUiState
     object Loading : StoreListUiState
@@ -32,8 +31,7 @@ sealed interface StoreListUiState {
 class StoreListViewModel(private val storeRepository: StoreRepository) : ViewModel() {
     var storeListUiState: StoreListUiState by mutableStateOf(StoreListUiState.Loading)
         private set
-    private val _ongoingStores = MutableStateFlow<List<StoreResponse>>(emptyList())
-
+    private val _ongoingStores = MutableStateFlow<MutableList<StoreResponse>>(mutableListOf())
 
     init {
         refresh()
@@ -44,7 +42,7 @@ class StoreListViewModel(private val storeRepository: StoreRepository) : ViewMod
             storeListUiState = try {
                 val ongoing = async { storeRepository.getStoreList() }.await()
                 val upcoming = async { storeRepository.getStoreList() }.await()
-                _ongoingStores.value = ongoing
+                _ongoingStores.value = ongoing.toMutableList()
                 StoreListUiState.Success(_ongoingStores.asStateFlow(), upcoming)
             } catch (e: IOException) {
                 StoreListUiState.Error
@@ -58,7 +56,7 @@ class StoreListViewModel(private val storeRepository: StoreRepository) : ViewMod
                 currentStateList.map {
                     if (it.id == id) it.copy(isFavorite = !it.isFavorite)
                     else it
-                }
+                }.toMutableList()
             }
         }
     }
