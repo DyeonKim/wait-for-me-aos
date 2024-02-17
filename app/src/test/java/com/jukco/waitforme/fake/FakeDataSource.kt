@@ -1,10 +1,13 @@
 package com.jukco.waitforme.fake
 
+import com.jukco.waitforme.data.network.model.GenderType
+import com.jukco.waitforme.data.network.model.Provider
 import com.jukco.waitforme.data.network.model.SignInResponse
 import com.jukco.waitforme.data.network.model.SnsInfo
 import com.jukco.waitforme.data.network.model.StoreDetailResponse
 import com.jukco.waitforme.data.network.model.StoreResponse
 import com.jukco.waitforme.data.network.model.Token
+import com.jukco.waitforme.data.network.model.UserInfoRes
 
 object FakeDataSource {
     val storeList = listOf(
@@ -179,5 +182,25 @@ object FakeDataSource {
         isOwner = false,
         accessToken = accessToken,
         refreshToken = refreshToken,
+    )
+
+    val userInfoRes = UserInfoRes(
+        provider = Provider.LOCAL,
+        phoneNumber = "01012345678",
+        name = "테스트입니다.",
+        isOwner = false,
+        birthedAt = null,
+        genderType = GenderType.OTHER,
+        profileImage = null,
+    )
+
+    val revisedUserInfoRes = UserInfoRes(
+        provider = Provider.LOCAL,
+        phoneNumber = "01012345678",
+        name = "테스트라구요!",
+        isOwner = false,
+        birthedAt = "1995-01-18",
+        genderType = GenderType.FEMALE,
+        profileImage = null,
     )
 }

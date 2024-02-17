@@ -7,6 +7,7 @@ import com.jukco.waitforme.BuildConfig
 import com.jukco.waitforme.data.mock.MockSignRepository
 import com.jukco.waitforme.data.network.api.SignApi
 import com.jukco.waitforme.data.network.api.StoreApi
+import com.jukco.waitforme.data.network.api.UserApi
 import kotlinx.serialization.json.Json
 import okhttp3.MediaType.Companion.toMediaType
 import retrofit2.Retrofit
@@ -18,6 +19,7 @@ interface AppContainer {
     val naverAuthProvider: AuthProvider
     val signRepository: SignRepository
     val storeRepository: StoreRepository
+    val userRepository: UserRepository
 }
 
 class DefaultContainer(context: Context) : AppContainer {
@@ -47,6 +49,9 @@ class DefaultContainer(context: Context) : AppContainer {
     private val signApi: SignApi by lazy {
         retrofit.create(SignApi::class.java)
     }
+    private val userApi: UserApi by lazy {
+        retrofit.create(UserApi::class.java)
+    }
 
     // TODO : 서버 연결 전까지 임시 Repository
     override val signRepository: SignRepository by lazy {
@@ -56,5 +61,9 @@ class DefaultContainer(context: Context) : AppContainer {
     override val storeRepository: StoreRepository by lazy {
 //        StoreRepositoryImplementation(storeApi)
         MockStoreRepository()
+    }
+    override val userRepository: UserRepository by lazy {
+//        UserRepositoryImplementation(userApi)
+        MockUserRepository
     }
 }
