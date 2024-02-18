@@ -10,6 +10,8 @@ import androidx.navigation.navArgument
 import com.jukco.waitforme.ui.BookmarkScreen
 import com.jukco.waitforme.ui.MyInfoScreen
 import com.jukco.waitforme.ui.NoticeScreen
+import com.jukco.waitforme.ui.StoreManagementScreen
+import com.jukco.waitforme.ui.PopupStoreScreen
 import com.jukco.waitforme.ui.SearchScreen
 import com.jukco.waitforme.ui.SignInScreen
 import com.jukco.waitforme.ui.SignUpScreen
