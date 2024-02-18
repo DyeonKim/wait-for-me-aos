@@ -3,8 +3,10 @@ package com.jukco.waitforme.ui.navi
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.navArgument
 import com.jukco.waitforme.ui.BookmarkScreen
 import com.jukco.waitforme.ui.MyInfoScreen
 import com.jukco.waitforme.ui.NoticeScreen
@@ -13,8 +15,10 @@ import com.jukco.waitforme.ui.PopupStoreScreen
 import com.jukco.waitforme.ui.SearchScreen
 import com.jukco.waitforme.ui.SignInScreen
 import com.jukco.waitforme.ui.SignUpScreen
+import com.jukco.waitforme.ui.StoreManagementScreen
 import com.jukco.waitforme.ui.WaitScreen
 import com.jukco.waitforme.ui.components.BottomNaviItem
+import com.jukco.waitforme.ui.store_detail.PopupStoreScreen
 import com.jukco.waitforme.ui.store_list.StoreListScreen
 
 @Composable
@@ -41,8 +45,7 @@ fun NavigationGraph(
                 onNoticeButtonClicked = { navController.navigate(Route.Notice.name) },
                 onSearchingClicked = { navController.navigate(Route.Searching.name) },
                 onPopItemClicked = {
-                    /* TODO: id 전달 */
-                    navController.navigate(Route.PopupStore.name)
+                    navController.navigate("${Route.PopupStore.name}/$it")
                 },
             )
         }
@@ -68,9 +71,12 @@ fun NavigationGraph(
                 onCloseButtonClicked = { navController.popBackStack() },
             )
         }
-        composable(Route.PopupStore.name) {
+        composable(
+            route = "${Route.PopupStore.name}/{storeId}",
+            arguments = listOf(navArgument("storeId") { type = NavType.IntType }),
+        ) {
             PopupStoreScreen(
-                onCloseButtonClicked = { navController.popBackStack() },
+                onBackButtonClicked = { navController.popBackStack() },
             )
         }
         composable(Route.SignUp.name) {

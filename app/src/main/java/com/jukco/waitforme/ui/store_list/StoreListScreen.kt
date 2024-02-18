@@ -5,7 +5,6 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -18,7 +17,6 @@ import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.Button
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -34,7 +32,6 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
@@ -44,6 +41,8 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.jukco.waitforme.R
 import com.jukco.waitforme.data.network.model.StoreResponse
+import com.jukco.waitforme.ui.ErrorScreen
+import com.jukco.waitforme.ui.LoadingScreen
 import com.jukco.waitforme.ui.components.RectStoreCard
 import com.jukco.waitforme.ui.components.SearchAndNoticeTopBar
 import com.jukco.waitforme.ui.components.SquareStoreCard
@@ -75,32 +74,6 @@ fun StoreListScreen(
                 onItemBookmarkChecked = viewModel::checkBookmark,
                 modifier = modifier,
             )
-        }
-    }
-}
-
-@Composable
-fun LoadingScreen(modifier: Modifier = Modifier) {
-    Text(
-        text = "Loading....",
-        textAlign = TextAlign.Center,
-        modifier = modifier.fillMaxSize(),
-    )
-}
-
-@Composable
-fun ErrorScreen(
-    refreshAction: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    Column(
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = modifier.fillMaxSize(),
-    ) {
-        Text(text = "오류 발생")
-        Button(onClick = refreshAction) {
-            Text(text = "재시도")
         }
     }
 }
@@ -154,7 +127,7 @@ fun StoreList(
                 key = { it.id },
             ) {
                 RectStoreCard(
-                    storeResponse = it,
+                    store = it,
                     onItemClicked = onItemClicked,
                     onBookmarkChecked = onItemBookmarkChecked,
                 )
@@ -172,7 +145,7 @@ fun StoreList(
             }
             item(span = { GridItemSpan(maxLineSpan) }) {
                 UpcomingStoreList(
-                    storeResponseList = upcomingStores,
+                    storeList = upcomingStores,
                     onPopItemClicked = onItemClicked,
                 )
             }
@@ -212,7 +185,7 @@ private fun Title(
 
 @Composable
 private fun UpcomingStoreList(
-    storeResponseList: List<StoreResponse>,
+    storeList: List<StoreResponse>,
     onPopItemClicked: (id: Int) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -220,7 +193,7 @@ private fun UpcomingStoreList(
         horizontalArrangement = Arrangement.spacedBy(10.dp),
     ) {
         items(
-            items = storeResponseList,
+            items = storeList,
             key = { store -> store.id },
         ) { store ->
             UpcomingStore(store, onPopItemClicked)
@@ -230,14 +203,14 @@ private fun UpcomingStoreList(
 
 @Composable
 private fun UpcomingStore(
-    storeResponse: StoreResponse,
+    store: StoreResponse,
     onPopItemClicked: (id: Int) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Box {
-        SquareStoreCard(storeResponse = storeResponse, onClicked = { onPopItemClicked(storeResponse.id) })
+        SquareStoreCard(storeResponse = store, onClicked = { onPopItemClicked(store.id) })
         Text(
-            text = stringResource(R.string.d_day, storeResponse.dDay),
+            text = stringResource(R.string.dDay, if (store.dDay >= 0) "-" else "+", store.dDay),
             style = TextStyle(
                 fontFamily = NotoSansKR,
                 fontWeight = FontWeight.Medium,

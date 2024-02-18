@@ -12,8 +12,11 @@ class DefaultContainer(retrofit: Retrofit) : AppContainer {
         retrofit.create(StoreApi::class.java)
     }
 
-
+    // TODO : 서버 연결 전까지 임시 Repository
+//    override val storeRepository: StoreRepository by lazy {
+//        StoreRepositoryImplementation(storeApi)
+//    }
     override val storeRepository: StoreRepository by lazy {
-        StoreRepositoryImplementation(storeApi)
+        MockStoreRepository()
     }
 }
