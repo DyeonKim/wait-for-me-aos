@@ -22,8 +22,6 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
@@ -68,10 +66,8 @@ fun StoreListScreen(
         is StoreListUiState.Loading -> LoadingScreen(modifier)
         is StoreListUiState.Error -> ErrorScreen(viewModel::refresh, modifier)
         is StoreListUiState.Success -> {
-            val ongoingStores by uiState.ongoingStores.collectAsState()
-
             StoreList(
-                ongoingStores = ongoingStores,
+                ongoingStores = uiState.ongoingStores,
                 upcomingStores = uiState.upcomingStores,
                 onNoticeButtonClicked = onNoticeButtonClicked,
                 onSearchingClicked = onSearchingClicked,
@@ -116,7 +112,7 @@ fun StoreList(
     onNoticeButtonClicked: () -> Unit,
     onSearchingClicked: () -> Unit,
     onItemClicked: (id: Int) -> Unit,
-    onItemBookmarkChecked: (id: Int) -> Unit,
+    onItemBookmarkChecked: (storeResponse: StoreResponse) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Scaffold(

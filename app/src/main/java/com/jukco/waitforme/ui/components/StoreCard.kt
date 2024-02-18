@@ -34,7 +34,7 @@ import com.jukco.waitforme.ui.theme.WaitForMeTheme
 fun RectStoreCard(
     storeResponse: StoreResponse,
     onItemClicked: (id: Int) -> Unit,
-    onBookmarkChecked: (id: Int) -> Unit,
+    onBookmarkChecked: (storeResponse: StoreResponse) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -56,7 +56,7 @@ fun RectStoreCard(
                 modifier = modifier
                     .align(Alignment.BottomEnd)
                     .padding(8.dp)
-                    .clickable { onBookmarkChecked(storeResponse.id) },
+                    .clickable { onBookmarkChecked(storeResponse) },
             )
         }
         Spacer(modifier = Modifier.height(10.dp))

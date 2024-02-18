@@ -1,8 +1,10 @@
 package com.jukco.waitforme.ui.store_list
 
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.toMutableStateList
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.APPLICATION_KEY
@@ -13,16 +15,12 @@ import com.jukco.waitforme.config.ApplicationClass
 import com.jukco.waitforme.data.network.model.StoreResponse
 import com.jukco.waitforme.data.repository.StoreRepository
 import kotlinx.coroutines.async
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.io.IOException
 
 sealed interface StoreListUiState {
     data class Success(
-        val ongoingStores: StateFlow<List<StoreResponse>>,
+        val ongoingStores: List<StoreResponse>,
         val upcomingStores: List<StoreResponse>,
     ) : StoreListUiState
     object Error : StoreListUiState
@@ -31,7 +29,7 @@ sealed interface StoreListUiState {
 class StoreListViewModel(private val storeRepository: StoreRepository) : ViewModel() {
     var storeListUiState: StoreListUiState by mutableStateOf(StoreListUiState.Loading)
         private set
-    private val _ongoingStores = MutableStateFlow<MutableList<StoreResponse>>(mutableListOf())
+    private var _ongoingStores = mutableStateListOf<StoreResponse>()
 
     init {
         refresh()
@@ -42,22 +40,18 @@ class StoreListViewModel(private val storeRepository: StoreRepository) : ViewMod
             storeListUiState = try {
                 val ongoing = async { storeRepository.getStoreList() }.await()
                 val upcoming = async { storeRepository.getStoreList() }.await()
-                _ongoingStores.value = ongoing.toMutableList()
-                StoreListUiState.Success(_ongoingStores.asStateFlow(), upcoming)
+                _ongoingStores = ongoing.toMutableStateList()
+                StoreListUiState.Success(_ongoingStores, upcoming)
             } catch (e: IOException) {
                 StoreListUiState.Error
             }
         }
     }
 
-    fun checkBookmark(id: Int) {
+    fun checkBookmark(storeResponse: StoreResponse) {
         if (storeListUiState is StoreListUiState.Success) {
-            _ongoingStores.update { currentStateList ->
-                currentStateList.map {
-                    if (it.id == id) it.copy(isFavorite = !it.isFavorite)
-                    else it
-                }.toMutableList()
-            }
+            val index = _ongoingStores.indexOf(storeResponse)
+            _ongoingStores[index] = storeResponse.copy(isFavorite = !storeResponse.isFavorite)
         }
     }
 
