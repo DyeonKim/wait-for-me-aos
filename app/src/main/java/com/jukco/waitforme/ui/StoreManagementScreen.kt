@@ -10,9 +10,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
+import com.jukco.waitforme.ui.theme.WaitForMeTheme
 
 @Composable
-fun PopsManagementScreen(
+fun StoreManagementScreen(
     onPopItemClicked: (id: Int) -> Unit
 ) {
     Column(
@@ -32,8 +33,10 @@ fun PopsManagementScreen(
 
 @Preview(showBackground = true)
 @Composable
-fun PopsManagementScreenPreview() {
-    PopsManagementScreen (
-        onPopItemClicked = {}
-    )
+fun StoreManagementScreenPreview() {
+    WaitForMeTheme {
+        StoreManagementScreen (
+            onPopItemClicked = {}
+        )
+    }
 }

@@ -21,6 +21,9 @@
     <string name="d_day">D - %1$d</string>
     <string name="searching_hint">대기하려는 팝스를 검색해보세요!</string>
 
+    <string name="btn_bookmark">북마크 버튼</string>
+    <string name="btn_more">더보기 버튼</string>
+
     <string-array name="pops_filter_group">
         <item>최신순</item>
         <item>마감임박순</item>

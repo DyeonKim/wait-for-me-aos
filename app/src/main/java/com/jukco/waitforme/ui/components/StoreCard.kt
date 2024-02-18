@@ -1,12 +1,19 @@
 package com.jukco.waitforme.ui.components
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.PlatformTextStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -16,31 +23,45 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
 import com.jukco.waitforme.R
-import com.jukco.waitforme.ui.Store
+import com.jukco.waitforme.data.network.model.StoreResponse
 import com.jukco.waitforme.ui.theme.GreyAAA
 import com.jukco.waitforme.ui.theme.MainBlack
+import com.jukco.waitforme.ui.theme.MainWhite
 import com.jukco.waitforme.ui.theme.NotoSansKR
 import com.jukco.waitforme.ui.theme.WaitForMeTheme
 
-/* TODO : 인터넷에서 이미지 로드로 기능 변경 시
-    imagePath: Int -> url: String
-    로 변경. */
-private val exStore = Store(0, R.drawable.img_store_example, "팝스토어 이름", "팝스토어 주최자")
-
 @Composable
-fun LargePopCard(
-    store: Store,
-    onClicked: (id: Int) -> Unit,
+fun RectStoreCard(
+    storeResponse: StoreResponse,
+    onItemClicked: (id: Int) -> Unit,
+    onBookmarkChecked: (storeResponse: StoreResponse) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
         modifier = modifier
-            .clickable { onClicked(store.id) },
+            .clickable { onItemClicked(storeResponse.id) },
     ) {
-        LargeThumbnail(store.imagePath)
+        Box(modifier = modifier) {
+            RectThumbnail(storeResponse.imagePath)
+            Image(
+                painter = painterResource(
+                    if (storeResponse.isFavorite) {
+                        R.drawable.ic_bookmark_fill
+                    } else {
+                        R.drawable.ic_bookmark_line
+                    },
+                ),
+                contentDescription = stringResource(R.string.btn_bookmark),
+                colorFilter = if (storeResponse.isFavorite) null else ColorFilter.tint(MainWhite),
+                modifier = modifier
+                    .align(Alignment.BottomEnd)
+                    .padding(8.dp)
+                    .clickable { onBookmarkChecked(storeResponse) },
+            )
+        }
         Spacer(modifier = Modifier.height(10.dp))
         Text(
-            text = store.title,
+            text = storeResponse.title,
             style = TextStyle(
                 fontFamily = NotoSansKR,
                 fontWeight = FontWeight.Medium,
@@ -55,7 +76,7 @@ fun LargePopCard(
         )
         Spacer(modifier = Modifier.height(6.dp))
         Text(
-            text = store.host,
+            text = storeResponse.host,
             style = TextStyle(
                 fontFamily = NotoSansKR,
                 fontWeight = FontWeight.Medium,
@@ -72,27 +93,19 @@ fun LargePopCard(
 }
 
 @Composable
-fun MediumPopCard(
-    store: Store,
-    onClicked: (id: Int) -> Unit,
-    modifier: Modifier = Modifier,
-) {
-}
-
-@Composable
-fun SmallPopCard(
-    store: Store,
+fun SquareStoreCard(
+    storeResponse: StoreResponse,
     onClicked: (id: Int) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
         modifier = modifier
-            .clickable { onClicked(store.id) },
+            .clickable { onClicked(storeResponse.id) },
     ) {
-        SmallThumbnail(imagePath = store.imagePath)
+        SquareThumbnail(imagePath = storeResponse.imagePath)
         Spacer(modifier = modifier.height(8.dp))
         Text(
-            text = store.title,
+            text = storeResponse.title,
             style = TextStyle(
                 fontFamily = NotoSansKR,
                 fontWeight = FontWeight.Medium,
@@ -108,26 +121,22 @@ fun SmallPopCard(
     }
 }
 
+// ======================================= Preview ===============================================================
+
+private val exStoreResponse = StoreResponse(0, "", "팝스토어 이름", "팝스토어 주최자", 0, true)
+
 @Preview(showBackground = true)
 @Composable
-private fun LargePopCardPreview() {
+private fun RectStoreCardPreview() {
     WaitForMeTheme {
-        LargePopCard(store = exStore, onClicked = {})
+        RectStoreCard(storeResponse = exStoreResponse, onItemClicked = {}, onBookmarkChecked = {})
     }
 }
 
 @Preview(showBackground = true)
 @Composable
-private fun MediumPopCardPreview() {
+private fun SmallStoreCardPreview() {
     WaitForMeTheme {
-        MediumPopCard(store = exStore, onClicked = {})
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-private fun SmallPopCardPreview() {
-    WaitForMeTheme {
-        SmallPopCard(store = exStore, onClicked = {})
+        SquareStoreCard(storeResponse = exStoreResponse, onClicked = {})
     }
 }

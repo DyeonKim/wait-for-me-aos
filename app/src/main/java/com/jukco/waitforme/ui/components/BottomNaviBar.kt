@@ -3,7 +3,7 @@ package com.jukco.waitforme.ui.components
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.material.Icon
+import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalAbsoluteTonalElevation
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
@@ -36,16 +36,19 @@ import com.jukco.waitforme.ui.theme.NotoSansKR
 import com.jukco.waitforme.ui.theme.WaitForMeTheme
 
 @Composable
-fun BottomNaviBar(navController: NavHostController) {
+fun BottomNaviBar(
+    navController: NavHostController,
+    modifier: Modifier = Modifier
+) {
     val navBAckStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = navBAckStackEntry?.destination
 
     when (currentDestination?.route) {
-        BottomNaviItem.PopsManagement.route -> BottomNavi(navController, currentDestination)
-        BottomNaviItem.PopsList.route -> BottomNavi(navController, currentDestination)
-        BottomNaviItem.WaitInfo.route -> BottomNavi(navController, currentDestination)
-        BottomNaviItem.Bookmark.route -> BottomNavi(navController, currentDestination)
-        BottomNaviItem.MyInfo.route -> BottomNavi(navController, currentDestination)
+        BottomNaviItem.StoreManagement.route -> BottomNavi(navController, currentDestination, modifier)
+        BottomNaviItem.StoreList.route -> BottomNavi(navController, currentDestination, modifier)
+        BottomNaviItem.WaitInfo.route -> BottomNavi(navController, currentDestination, modifier)
+        BottomNaviItem.Bookmark.route -> BottomNavi(navController, currentDestination, modifier)
+        BottomNaviItem.MyInfo.route -> BottomNavi(navController, currentDestination, modifier)
         else -> Unit
     }
 }
@@ -54,6 +57,7 @@ fun BottomNaviBar(navController: NavHostController) {
 fun BottomNavi(
     navController: NavHostController,
     currentDestination: NavDestination?,
+    modifier: Modifier
 ) {
     NavigationBar(
         modifier = Modifier.fillMaxWidth(),
@@ -110,6 +114,7 @@ private fun BottomNaviBarPreview() {
         BottomNavi(
             navController = rememberNavController(),
             currentDestination = null,
+            modifier = Modifier
         )
     }
 }
@@ -119,16 +124,16 @@ sealed class BottomNaviItem(
     @DrawableRes val icon: Int,
     val route: String,
 ) {
-    object PopsManagement : BottomNaviItem(R.string.navi_pops_management, R.drawable.ic_set_popup, Route.PopsManagement.name)
-    object PopsList : BottomNaviItem(R.string.navi_pops_list, R.drawable.ic_list, Route.PopsList.name)
-    object Bookmark : BottomNaviItem(R.string.navi_bookmark, R.drawable.ic_bookmark, Route.Bookmark.name)
-    object WaitInfo : BottomNaviItem(R.string.navi_wait_info, R.drawable.ic_waiting, Route.WaitInfo.name)
-    object MyInfo : BottomNaviItem(R.string.navi_my_info, R.drawable.ic_my, Route.MyInfo.name)
+    object StoreManagement : BottomNaviItem(R.string.navi_pops_management, R.drawable.ic_nav_set_popup, Route.StoreManagement.name)
+    object StoreList : BottomNaviItem(R.string.navi_pops_list, R.drawable.ic_nav_list, Route.StoreList.name)
+    object Bookmark : BottomNaviItem(R.string.navi_bookmark, R.drawable.ic_nav_bookmark, Route.Bookmark.name)
+    object WaitInfo : BottomNaviItem(R.string.navi_wait_info, R.drawable.ic_nav_waiting, Route.WaitInfo.name)
+    object MyInfo : BottomNaviItem(R.string.navi_my_info, R.drawable.ic_nav_my, Route.MyInfo.name)
 }
 
-val BOTTOM_NAVI_ROUTE = listOf<BottomNaviItem>(
-    BottomNaviItem.PopsManagement,
-    BottomNaviItem.PopsList,
+val BOTTOM_NAVI_ROUTE = listOf(
+    BottomNaviItem.StoreManagement,
+    BottomNaviItem.StoreList,
     BottomNaviItem.Bookmark,
     BottomNaviItem.WaitInfo,
     BottomNaviItem.MyInfo,

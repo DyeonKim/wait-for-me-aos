@@ -8,36 +8,36 @@ import androidx.navigation.compose.composable
 import com.jukco.waitforme.ui.BookmarkScreen
 import com.jukco.waitforme.ui.MyInfoScreen
 import com.jukco.waitforme.ui.NoticeScreen
-import com.jukco.waitforme.ui.PopsManagementScreen
+import com.jukco.waitforme.ui.StoreManagementScreen
 import com.jukco.waitforme.ui.PopupStoreScreen
 import com.jukco.waitforme.ui.SearchScreen
 import com.jukco.waitforme.ui.SignInScreen
 import com.jukco.waitforme.ui.SignUpScreen
 import com.jukco.waitforme.ui.WaitScreen
 import com.jukco.waitforme.ui.components.BottomNaviItem
-import com.jukco.waitforme.ui.poplist.PopsListScreen
+import com.jukco.waitforme.ui.store_list.StoreListScreen
 
 @Composable
 fun NavigationGraph(
     modifier: Modifier = Modifier,
     navController: NavHostController,
-    startDescription: String = BottomNaviItem.PopsList.route,
+    startDescription: String = BottomNaviItem.StoreList.route,
 ) {
     NavHost(
         modifier = modifier,
         navController = navController,
         startDestination = startDescription,
     ) {
-        composable(Route.PopsManagement.name) {
-            PopsManagementScreen(
+        composable(Route.StoreManagement.name) {
+            StoreManagementScreen(
                 onPopItemClicked = {
                     /* TODO: id 전달 */
                     navController.navigate(Route.PopupStore.name)
                 },
             )
         }
-        composable(Route.PopsList.name) {
-            PopsListScreen(
+        composable(Route.StoreList.name) {
+            StoreListScreen(
                 onNoticeButtonClicked = { navController.navigate(Route.Notice.name) },
                 onSearchingClicked = { navController.navigate(Route.Searching.name) },
                 onPopItemClicked = {
