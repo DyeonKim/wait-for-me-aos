@@ -9,6 +9,7 @@ enum class Route() {
     Notice,
     Searching,
     PopupStore,
+    SignProgress,
     SignUp,
-    SignIn
+    SignIn,
 }

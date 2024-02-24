@@ -1,4 +1,4 @@
-package com.jukco.waitforme.ui
+package com.jukco.waitforme.ui.sign
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
