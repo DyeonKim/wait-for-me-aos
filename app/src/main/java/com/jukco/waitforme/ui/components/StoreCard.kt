@@ -53,7 +53,7 @@ fun RectStoreCard(
                 modifier = modifier
                     .align(Alignment.BottomEnd)
                     .padding(8.dp)
-                    .clickable { onBookmarkChecked(storeResponse) },
+                    .clickable { onBookmarkChecked(store) },
             )
         }
         Spacer(modifier = Modifier.height(10.dp))
