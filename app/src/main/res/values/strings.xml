@@ -35,9 +35,8 @@
     <string name="sign_announcement_1">"웨잇포미는 "</string>
     <string name="sign_announcement_2">휴대폰 번호가 ID</string>
     <string name="sign_announcement_3">에요.\n번호는 외부에 공개되지 않아요.</string>
-    <string name="label_id_input">ID를 입력해주세요</string>
-    <string name="example_id_input">010-000-0000</string>
-    <string name="label_pw_input">비밀번호를 입력해주세요</string>
+    <string name="placeholder_input_id">ID를 입력해주세요</string>
+    <string name="placeholder_input_password">비밀번호를 입력해주세요</string>
     <string name="sign_in">로그인하기</string>
     <string name="sign_up">가입하기</string>
     <string name="no_sign_in">구경만 하고 싶어요</string>

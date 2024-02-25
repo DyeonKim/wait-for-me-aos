@@ -1,4 +1,4 @@
-package com.jukco.waitforme.ui.sign
+package com.jukco.waitforme.ui.sign.sign_in
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
@@ -30,6 +30,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.jukco.waitforme.R
+import com.jukco.waitforme.ui.sign.SignAnnouncement
 import com.jukco.waitforme.ui.theme.GreyAAA
 import com.jukco.waitforme.ui.theme.KakaoYellow
 import com.jukco.waitforme.ui.theme.MainWhite
@@ -42,13 +43,10 @@ fun SignInScreen(
     goMain: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val viewModel: SignViewModel = viewModel()
+    val viewModel: SignInViewModel = viewModel()
 
     SignContainer(
-        id = viewModel.id,
-        password = viewModel.password,
-        updateID = viewModel::updateID,
-        updatePW = viewModel::updatePW,
+        viewModel = viewModel,
         onSignInClicked = onSignInClicked,
         onSignUpClicked = onSignUpClicked,
         onNoSignClicked = goMain,
@@ -58,10 +56,7 @@ fun SignInScreen(
 
 @Composable
 fun SignContainer(
-    id: String,
-    password: String,
-    updateID: (String) -> Unit,
-    updatePW: (String) -> Unit,
+    viewModel: SignInViewModel,
     onSignInClicked: () -> Unit,
     onSignUpClicked: () -> Unit,
     onNoSignClicked: () -> Unit,
@@ -75,10 +70,7 @@ fun SignContainer(
     ) {
         SignAnnouncement(modifier)
         SignIn(
-            id = id,
-            password = password,
-            updateID = updateID,
-            updatePW = updatePW,
+            viewModel = viewModel,
             onSignInClicked = onSignInClicked,
             modifier = modifier,
         )
@@ -105,28 +97,24 @@ fun SignContainer(
 
 @Composable
 private fun SignIn(
-    id: String,
-    password: String,
-    updateID: (String) -> Unit,
-    updatePW: (String) -> Unit,
+    viewModel: SignInViewModel,
     onSignInClicked: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(modifier) {
         OutlinedTextField(
-            value = id,
-            onValueChange = updateID,
-            label = { Text(text = stringResource(R.string.label_id_input)) },
-            placeholder = { Text(text = stringResource(R.string.example_id_input)) },
+            value = viewModel.id,
+            onValueChange = viewModel::inputId,
+            placeholder = { Text(text = stringResource(R.string.placeholder_input_id)) },
             singleLine = true,
             keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Phone),
             modifier = Modifier.fillMaxWidth(),
         )
         Spacer(modifier = Modifier.height(12.dp))
         OutlinedTextField(
-            value = password,
-            onValueChange = updatePW,
-            label = { Text(text = stringResource(R.string.label_pw_input)) },
+            value = viewModel.password,
+            onValueChange = viewModel::inputPassword,
+            placeholder = { Text(text = stringResource(R.string.placeholder_input_password)) },
             singleLine = true,
             visualTransformation = PasswordVisualTransformation(),
             keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Password),
@@ -183,11 +171,10 @@ private fun SocialSignInButtons(
 @Preview(showBackground = true)
 @Composable
 private fun SignInScreenPreview() {
+    val viewModel: SignInViewModel = viewModel()
+
     SignContainer(
-        id = "",
-        password = "",
-        updateID = {},
-        updatePW = {},
+        viewModel = viewModel,
         onSignInClicked = {},
         onSignUpClicked = {},
         onNoSignClicked = {},

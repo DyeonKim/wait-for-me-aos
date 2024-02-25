@@ -10,6 +10,9 @@ enum class Route() {
     Searching,
     PopupStore,
     SignProgress,
-    SignUp,
     SignIn,
+    SignUpInputPhoneNumAndPw,
+    SignUpInputName,
+    SignUpSelectCustomerOwner,
+    SignUpComplete,
 }

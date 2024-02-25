@@ -13,10 +13,13 @@ import com.jukco.waitforme.ui.MyInfoScreen
 import com.jukco.waitforme.ui.NoticeScreen
 import com.jukco.waitforme.ui.StoreManagementScreen
 import com.jukco.waitforme.ui.SearchScreen
-import com.jukco.waitforme.ui.sign.SignInScreen
-import com.jukco.waitforme.ui.sign.SignUpScreen
+import com.jukco.waitforme.ui.sign.sign_in.SignInScreen
+import com.jukco.waitforme.ui.sign.sign_up.InputPhoneNumAndPwScreen
 import com.jukco.waitforme.ui.WaitScreen
 import com.jukco.waitforme.ui.components.BottomNaviItem
+import com.jukco.waitforme.ui.sign.sign_up.CompleteScreen
+import com.jukco.waitforme.ui.sign.sign_up.InputNameScreen
+import com.jukco.waitforme.ui.sign.sign_up.SelectCustomerOwnerScreen
 import com.jukco.waitforme.ui.store_detail.PopupStoreScreen
 import com.jukco.waitforme.ui.store_list.StoreListScreen
 
@@ -57,7 +60,7 @@ fun NavigationGraph(
         composable(Route.MyInfo.name) {
             MyInfoScreen(
                 onSignInButtonClicked = { navController.navigate(Route.SignIn.name) },
-                onSignUpButtonClicked = { navController.navigate(Route.SignUp.name) },
+                onSignUpButtonClicked = { navController.navigate(Route.SignUpInputPhoneNumAndPw.name) },
             )
         }
         composable(Route.Notice.name) {
@@ -83,7 +86,7 @@ fun NavigationGraph(
             composable(Route.SignIn.name) {
                 SignInScreen(
                     onSignInClicked = {},
-                    onSignUpClicked = { navController.navigate(Route.SignUp.name) },
+                    onSignUpClicked = { navController.navigate(Route.SignUpInputPhoneNumAndPw.name) },
                     goMain = {
                         navController.navigate(Route.StoreList.name) {
                             popUpTo(Route.SignProgress.name) { inclusive = true }
@@ -91,13 +94,21 @@ fun NavigationGraph(
                     },
                 )
             }
-            composable(Route.SignUp.name) {
-                SignUpScreen(
-                    onCancelButtonClicked = {
-                        /*TODO: 모든 회원가입 단계를 초기화하고 회원가입 버튼 누른 페이지로 돌아가기 */
-                        navController.popBackStack()
-                    },
+            composable(Route.SignUpInputPhoneNumAndPw.name) {
+                InputPhoneNumAndPwScreen(
+                    onNextButtonClicked = {
+                        navController.navigate(Route.SignUpInputName.name)
+                    }
                 )
+            }
+            composable(Route.SignUpInputName.name) {
+                InputNameScreen()
+            }
+            composable(Route.SignUpSelectCustomerOwner.name) {
+                SelectCustomerOwnerScreen()
+            }
+            composable(Route.SignUpComplete.name) {
+                CompleteScreen()
             }
         }
     }
