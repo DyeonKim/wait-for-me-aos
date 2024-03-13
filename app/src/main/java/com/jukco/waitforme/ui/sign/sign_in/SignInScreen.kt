@@ -16,11 +16,14 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -30,35 +33,39 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.jukco.waitforme.R
-import com.jukco.waitforme.ui.sign.SignAnnouncement
+import com.jukco.waitforme.ui.sign.SignGuide
+import com.jukco.waitforme.ui.theme.ErrorRed
 import com.jukco.waitforme.ui.theme.GreyAAA
 import com.jukco.waitforme.ui.theme.KakaoYellow
 import com.jukco.waitforme.ui.theme.MainWhite
 import com.jukco.waitforme.ui.theme.NaverGreen
+import com.jukco.waitforme.ui.util.PhoneNumberVisualTransformation
 
 @Composable
 fun SignInScreen(
-    onSignInClicked: () -> Unit,
-    onSignUpClicked: () -> Unit,
+    onSignInClicked: (String, String) -> Unit,
+    goSignUp: () -> Unit,
     goMain: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val viewModel: SignInViewModel = viewModel()
 
-    SignContainer(
-        viewModel = viewModel,
+    SignInLayout(
+        form = viewModel.form,
+        onEvent = viewModel::onEvent,
         onSignInClicked = onSignInClicked,
-        onSignUpClicked = onSignUpClicked,
+        goSignUp = goSignUp,
         onNoSignClicked = goMain,
         modifier = modifier,
     )
 }
 
 @Composable
-fun SignContainer(
-    viewModel: SignInViewModel,
-    onSignInClicked: () -> Unit,
-    onSignUpClicked: () -> Unit,
+private fun SignInLayout(
+    form: SignInForm,
+    onEvent: (SignInEvent) -> Unit,
+    onSignInClicked: (String, String) -> Unit,
+    goSignUp: () -> Unit,
     onNoSignClicked: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -68,17 +75,18 @@ fun SignContainer(
             .padding(horizontal = 20.dp)
             .padding(bottom = 56.dp),
     ) {
-        SignAnnouncement(modifier)
-        SignIn(
-            viewModel = viewModel,
-            onSignInClicked = onSignInClicked,
-            modifier = modifier,
+        SignGuide(modifier)
+        SignInForm(
+            form = form,
+            onEvent = onEvent,
+            signIn = onSignInClicked,
+            modifier = modifier.fillMaxWidth(),
         )
         Spacer(modifier = Modifier.weight(1f))
         SocialSignInButtons(modifier)
         Spacer(modifier = Modifier.height(24.dp))
         OutlinedButton(
-            onClick = onSignUpClicked,
+            onClick = goSignUp,
             modifier = Modifier.fillMaxWidth(),
         ) {
             Text(text = stringResource(R.string.sign_up))
@@ -96,33 +104,52 @@ fun SignContainer(
 }
 
 @Composable
-private fun SignIn(
-    viewModel: SignInViewModel,
-    onSignInClicked: () -> Unit,
+private fun SignInForm(
+    form: SignInForm,
+    onEvent: (SignInEvent) -> Unit,
+    signIn: (String, String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(modifier) {
         OutlinedTextField(
-            value = viewModel.id,
-            onValueChange = viewModel::inputId,
+            value = form.id,
+            onValueChange = { id -> onEvent(SignInEvent.InputId(id)) },
             placeholder = { Text(text = stringResource(R.string.placeholder_input_id)) },
             singleLine = true,
-            keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Phone),
+            visualTransformation = PhoneNumberVisualTransformation(),
+            keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
             modifier = Modifier.fillMaxWidth(),
         )
         Spacer(modifier = Modifier.height(12.dp))
         OutlinedTextField(
-            value = viewModel.password,
-            onValueChange = viewModel::inputPassword,
+            value = form.password,
+            onValueChange = { password -> onEvent(SignInEvent.InputPassword(password)) },
             placeholder = { Text(text = stringResource(R.string.placeholder_input_password)) },
             singleLine = true,
             visualTransformation = PasswordVisualTransformation(),
             keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Password),
             modifier = Modifier.fillMaxWidth(),
         )
+        if (form.hasError == true) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.padding(top = 12.dp),
+            ){
+                Icon(
+                    painter = painterResource(R.drawable.ic_error),
+                    contentDescription = null,
+                    tint = ErrorRed,
+                )
+                Spacer(modifier = Modifier.width(4.dp))
+                Text(
+                    text = stringResource(R.string.error_id_password),
+                    color = ErrorRed,
+                )
+            }
+        }
         Spacer(modifier = Modifier.height(24.dp))
         Button(
-            onClick = onSignInClicked,
+            onClick = { onEvent(SignInEvent.CheckSignInValid(signIn)) },
             modifier = Modifier.fillMaxWidth(),
         ) {
             Text(text = stringResource(R.string.sign_in))
@@ -170,13 +197,14 @@ private fun SocialSignInButtons(
 
 @Preview(showBackground = true)
 @Composable
-private fun SignInScreenPreview() {
+private fun SignInLayoutPreview() {
     val viewModel: SignInViewModel = viewModel()
 
-    SignContainer(
-        viewModel = viewModel,
-        onSignInClicked = {},
-        onSignUpClicked = {},
+    SignInLayout(
+        form = viewModel.form,
+        onEvent = viewModel::onEvent,
+        onSignInClicked = {s1, s2 -> },
+        goSignUp = {},
         onNoSignClicked = {},
     )
 }
