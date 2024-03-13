@@ -85,7 +85,6 @@ fun NavigationGraph(
         navigation(startDestination = Route.SignIn.name, route = Route.SignProgress.name) {
             composable(Route.SignIn.name) {
                 SignInScreen(
-                    onSignInClicked = {id, password -> },
                     goSignUp = { navController.navigate(Route.SignUpInputPhoneNumAndPw.name) },
                     goMain = {
                         navController.navigate(Route.StoreList.name) {

@@ -32,6 +32,7 @@ class DefaultContainer : AppContainer {
         MockStoreRepository()
     }
     override val signRepository: SignRepository by lazy {
-        SignRepositoryImplementation(signApi)
+//        SignRepositoryImplementation(signApi)
+        MockSignRepository()
     }
 }

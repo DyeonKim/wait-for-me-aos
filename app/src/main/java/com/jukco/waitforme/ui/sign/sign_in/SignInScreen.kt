@@ -3,6 +3,7 @@ package com.jukco.waitforme.ui.sign.sign_in
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -16,11 +17,13 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -31,6 +34,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.jukco.waitforme.R
 import com.jukco.waitforme.ui.sign.SignGuide
@@ -43,63 +48,85 @@ import com.jukco.waitforme.ui.util.PhoneNumberVisualTransformation
 
 @Composable
 fun SignInScreen(
-    onSignInClicked: (String, String) -> Unit,
     goSignUp: () -> Unit,
     goMain: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val viewModel: SignInViewModel = viewModel()
+    val viewModel: SignInViewModel = viewModel(factory = SignInViewModel.Factory)
 
-    SignInLayout(
-        form = viewModel.form,
-        onEvent = viewModel::onEvent,
-        onSignInClicked = onSignInClicked,
-        goSignUp = goSignUp,
-        onNoSignClicked = goMain,
-        modifier = modifier,
-    )
+    when (viewModel.signInState) {
+        SignInState.Init -> {
+            SignInLayout(
+                form = viewModel.form,
+                isLoading = viewModel.isLoading,
+                onEvent = viewModel::onEvent,
+                goSignUp = goSignUp,
+                onNoSignClicked = goMain,
+                modifier = modifier,
+            )
+        }
+        SignInState.Success -> {
+            LaunchedEffect(Unit) {
+                goMain()
+            }
+        }
+    }
 }
 
 @Composable
 private fun SignInLayout(
     form: SignInForm,
+    isLoading: Boolean,
     onEvent: (SignInEvent) -> Unit,
-    onSignInClicked: (String, String) -> Unit,
     goSignUp: () -> Unit,
     onNoSignClicked: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .padding(horizontal = 20.dp)
-            .padding(bottom = 56.dp),
-    ) {
-        SignGuide(modifier)
-        SignInForm(
-            form = form,
-            onEvent = onEvent,
-            signIn = onSignInClicked,
-            modifier = modifier.fillMaxWidth(),
-        )
-        Spacer(modifier = Modifier.weight(1f))
-        SocialSignInButtons(modifier)
-        Spacer(modifier = Modifier.height(24.dp))
-        OutlinedButton(
-            onClick = goSignUp,
-            modifier = Modifier.fillMaxWidth(),
-        ) {
-            Text(text = stringResource(R.string.sign_up))
-        }
-        Spacer(modifier = Modifier.height(39.dp))
-        Text(
-            text = stringResource(R.string.no_sign_in),
-            textAlign = TextAlign.Center,
-            textDecoration = TextDecoration.Underline,
+    Box(modifier = modifier) {
+        Column(
             modifier = Modifier
-                .fillMaxWidth()
-                .clickable { onNoSignClicked() },
-        )
+                .fillMaxSize()
+                .padding(horizontal = 20.dp)
+                .padding(bottom = 56.dp),
+        ) {
+            SignGuide(modifier)
+            SignInForm(
+                form = form,
+                onEvent = onEvent,
+                modifier = modifier.fillMaxWidth(),
+            )
+            Spacer(modifier = Modifier.weight(1f))
+            SocialSignInButtons(modifier)
+            Spacer(modifier = Modifier.height(24.dp))
+            OutlinedButton(
+                onClick = goSignUp,
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                Text(text = stringResource(R.string.sign_up))
+            }
+            Spacer(modifier = Modifier.height(39.dp))
+            Text(
+                text = stringResource(R.string.no_sign_in),
+                textAlign = TextAlign.Center,
+                textDecoration = TextDecoration.Underline,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable { onNoSignClicked() },
+            )
+        }
+        if (isLoading) {
+            Dialog(
+                onDismissRequest = { },
+                properties = DialogProperties(dismissOnBackPress = false, dismissOnClickOutside = false),
+            ) {
+                Box(
+                    contentAlignment = Alignment.Center,
+                    modifier = Modifier.size(100.dp),
+                ) {
+                    CircularProgressIndicator()
+                }
+            }
+        }
     }
 }
 
@@ -107,7 +134,6 @@ private fun SignInLayout(
 private fun SignInForm(
     form: SignInForm,
     onEvent: (SignInEvent) -> Unit,
-    signIn: (String, String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(modifier) {
@@ -149,7 +175,7 @@ private fun SignInForm(
         }
         Spacer(modifier = Modifier.height(24.dp))
         Button(
-            onClick = { onEvent(SignInEvent.CheckSignInValid(signIn)) },
+            onClick = { onEvent(SignInEvent.CheckSignInValid) },
             modifier = Modifier.fillMaxWidth(),
         ) {
             Text(text = stringResource(R.string.sign_in))
@@ -202,8 +228,8 @@ private fun SignInLayoutPreview() {
 
     SignInLayout(
         form = viewModel.form,
+        isLoading = viewModel.isLoading,
         onEvent = viewModel::onEvent,
-        onSignInClicked = {s1, s2 -> },
         goSignUp = {},
         onNoSignClicked = {},
     )
