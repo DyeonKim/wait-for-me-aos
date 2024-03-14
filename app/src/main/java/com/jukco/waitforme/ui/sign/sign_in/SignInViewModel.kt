@@ -35,6 +35,7 @@ class SignInViewModel(
     private val signRepository: SignRepository,
     private val googleAuthProvider: AuthProvider,
     private val kakaoAuthProvider: AuthProvider,
+    private val naverAuthProvider: AuthProvider,
 ) : ViewModel() {
     var signInState by mutableStateOf<SignInState>(SignInState.Init)
         private set
@@ -73,6 +74,7 @@ class SignInViewModel(
         when (service) {
             is SocialService.Google -> { googleAuthProvider }
             is SocialService.Kakao -> { kakaoAuthProvider }
+            is SocialService.Naver -> { naverAuthProvider }
         }
 
     private fun onSocialSignInClicked(user: SocialSignUpRequest?) {
@@ -136,7 +138,9 @@ class SignInViewModel(
                 val signRepository = application.container.signRepository
                 val googleAuthProvider = application.container.googleAuthProvider
                 val kakaoAuthProvider = application.container.kakaoAuthProvider
-                SignInViewModel(signRepository, googleAuthProvider, kakaoAuthProvider)
+                val naverAuthProvider = application.container.naverAuthProvider
+
+                SignInViewModel(signRepository, googleAuthProvider, kakaoAuthProvider, naverAuthProvider)
             }
         }
     }

@@ -15,6 +15,7 @@ interface AppContainer {
     val storeRepository: StoreRepository
     val googleAuthProvider: AuthProvider
     val kakaoAuthProvider: AuthProvider
+    val naverAuthProvider: AuthProvider
 }
 
 class DefaultContainer(context: Context) : AppContainer {
@@ -45,5 +46,8 @@ class DefaultContainer(context: Context) : AppContainer {
     }
     override val kakaoAuthProvider: AuthProvider by lazy {
         KakaoAuthProvider()
+    }
+    override val naverAuthProvider: AuthProvider by lazy {
+        NaverAuthProvider()
     }
 }
