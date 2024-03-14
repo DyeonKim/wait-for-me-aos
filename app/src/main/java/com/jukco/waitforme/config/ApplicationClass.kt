@@ -1,6 +1,7 @@
 package com.jukco.waitforme.config
 
 import android.app.Application
+import androidx.credentials.CredentialManager
 import com.jukco.waitforme.data.repository.AppContainer
 import com.jukco.waitforme.data.repository.DefaultContainer
 
@@ -9,6 +10,6 @@ class ApplicationClass : Application() {
 
     override fun onCreate() {
         super.onCreate()
-        container = DefaultContainer()
+        container = DefaultContainer(this)
     }
 }

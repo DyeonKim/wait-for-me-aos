@@ -24,7 +24,7 @@ class SignRepositoryImplementation(
         signApi.socialSignIn(snsId)
 }
 
-class MockSignRepository : SignRepository {
+object MockSignRepository : SignRepository {
     val accessToken = Token(
         token = "eyJhbGciOiJIUzUxMiJ9.eyJqdGkiOiIxIiwic3ViIjoi7YWM7Iqk7Yq47J6F64uI64ukLiIsImV4cCI6MTcwNzQwNTU4MiwiYXV0aG9yaXRpZXMiOiJVU0VSIn0.YF4wLj9m9IfJRVxiEFPTskFz8BlMPH6gaqmotlpI0iKt00KK42_ZFztOnYbNNV9vQjp-Mrn10f8nmv6UkCwKkQ",
         createdAt = "2024-02-08T23:49:42.828",
@@ -42,8 +42,9 @@ class MockSignRepository : SignRepository {
             isOwner = false,
             accessToken = accessToken,
             refreshToken = refreshToken,
-        )
+        ),
     )
+
     override suspend fun localSignIn(phoneNumAndPassword: Map<String, String>): Response<SignInResponse> =
         response
 

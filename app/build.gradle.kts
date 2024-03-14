@@ -12,12 +12,12 @@ properties.load(project.rootProject.file("local.properties").inputStream())
 
 android {
     namespace = "com.jukco.waitforme"
-    compileSdk = 33
+    compileSdk = 34
 
     defaultConfig {
         applicationId = "com.jukco.waitforme"
         minSdk = 24
-        targetSdk = 33
+        targetSdk = 34
         versionCode = 1
         versionName = "1.0"
 
@@ -26,6 +26,7 @@ android {
             useSupportLibrary = true
         }
         buildConfigField("String", "SERVER_URL", properties.getProperty("server_url"))
+        buildConfigField("String", "GOOGLE_SERVER_CLIENT_ID", properties.getProperty("google_server_client_id"))
     }
 
     buildTypes {
@@ -79,6 +80,10 @@ dependencies {
     implementation("com.squareup.okhttp3:okhttp:4.11.0")
     // Coil
     implementation("io.coil-kt:coil-compose:2.4.0")
+    // Google SignIn
+    implementation("androidx.credentials:credentials:1.2.1")
+    implementation("androidx.credentials:credentials-play-services-auth:1.2.1")
+    implementation("com.google.android.libraries.identity.googleid:googleid:1.1.0")
 
     testImplementation("junit:junit:4.13.2")
     testImplementation("org.assertj:assertj-core:3.24.2")

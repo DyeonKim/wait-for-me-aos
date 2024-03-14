@@ -24,6 +24,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -38,6 +39,10 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.jukco.waitforme.R
+import com.jukco.waitforme.data.repository.AuthProvider
+import com.jukco.waitforme.data.repository.MockAuthProvider
+import com.jukco.waitforme.data.repository.MockSignRepository
+import com.jukco.waitforme.ui.components.SocialSignIconButton
 import com.jukco.waitforme.ui.sign.SignGuide
 import com.jukco.waitforme.ui.theme.ErrorRed
 import com.jukco.waitforme.ui.theme.GreyAAA
@@ -59,6 +64,7 @@ fun SignInScreen(
             SignInLayout(
                 form = viewModel.form,
                 isLoading = viewModel.isLoading,
+                socialSignIn = viewModel::getSocialSign,
                 onEvent = viewModel::onEvent,
                 goSignUp = goSignUp,
                 onNoSignClicked = goMain,
@@ -77,6 +83,7 @@ fun SignInScreen(
 private fun SignInLayout(
     form: SignInForm,
     isLoading: Boolean,
+    socialSignIn: (SocialService) -> AuthProvider,
     onEvent: (SignInEvent) -> Unit,
     goSignUp: () -> Unit,
     onNoSignClicked: () -> Unit,
@@ -91,12 +98,16 @@ private fun SignInLayout(
         ) {
             SignGuide(modifier)
             SignInForm(
-                form = form,
-                onEvent = onEvent,
+                form,
+                onEvent,
                 modifier = modifier.fillMaxWidth(),
             )
             Spacer(modifier = Modifier.weight(1f))
-            SocialSignInButtons(modifier)
+            SocialSignInButtons(
+                socialSignIn,
+                onEvent,
+                modifier = modifier.fillMaxWidth(),
+            )
             Spacer(modifier = Modifier.height(24.dp))
             OutlinedButton(
                 onClick = goSignUp,
@@ -175,7 +186,7 @@ private fun SignInForm(
         }
         Spacer(modifier = Modifier.height(24.dp))
         Button(
-            onClick = { onEvent(SignInEvent.CheckSignInValid) },
+            onClick = { onEvent(SignInEvent.OnSignInClicked) },
             modifier = Modifier.fillMaxWidth(),
         ) {
             Text(text = stringResource(R.string.sign_in))
@@ -185,11 +196,13 @@ private fun SignInForm(
 
 @Composable
 private fun SocialSignInButtons(
+    socialSignIn: (SocialService) -> AuthProvider,
+    onEvent: (SignInEvent) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Row(
         horizontalArrangement = Arrangement.Center,
-        modifier = modifier.fillMaxWidth(),
+        modifier = modifier,
     ) {
         Button(
             shape = CircleShape,
@@ -209,26 +222,27 @@ private fun SocialSignInButtons(
         ) {
         }
         Spacer(modifier = Modifier.width(16.dp))
-        Button(
-            shape = CircleShape,
-            onClick = { /*TODO*/ },
-            border = BorderStroke(1.dp, GreyAAA),
-            colors = ButtonDefaults.buttonColors(containerColor = MainWhite),
-            modifier = Modifier
-                .size(48.dp),
-        ) {
-        }
+        SocialSignIconButton(
+            authProvider = socialSignIn(SocialService.Google),
+            onSignInClicked = { uid -> onEvent(SignInEvent.OnSocialSignInClicked(uid)) },
+            buttonBorder = BorderStroke(1.dp, GreyAAA),
+            buttonColors = ButtonDefaults.buttonColors(containerColor = MainWhite),
+            modifier = Modifier.size(48.dp),
+        )
     }
 }
 
 @Preview(showBackground = true)
 @Composable
 private fun SignInLayoutPreview() {
-    val viewModel: SignInViewModel = viewModel()
+    val viewModel = remember {
+        SignInViewModel(MockSignRepository, MockAuthProvider)
+    }
 
     SignInLayout(
         form = viewModel.form,
         isLoading = viewModel.isLoading,
+        socialSignIn = viewModel::getSocialSign,
         onEvent = viewModel::onEvent,
         goSignUp = {},
         onNoSignClicked = {},
