@@ -204,14 +204,12 @@ private fun SocialSignInButtons(
         horizontalArrangement = Arrangement.Center,
         modifier = modifier,
     ) {
-        Button(
-            shape = CircleShape,
-            onClick = { /*TODO*/ },
-            colors = ButtonDefaults.buttonColors(containerColor = KakaoYellow),
-            modifier = Modifier
-                .size(48.dp),
-        ) {
-        }
+        SocialSignIconButton(
+            authProvider = socialSignIn(SocialService.Kakao),
+            onSignInClicked = { user -> onEvent(SignInEvent.OnSocialSignInClicked(user)) },
+            buttonColors = ButtonDefaults.buttonColors(containerColor = KakaoYellow),
+            modifier = Modifier.size(48.dp),
+        )
         Spacer(modifier = Modifier.width(16.dp))
         Button(
             shape = CircleShape,
@@ -224,7 +222,7 @@ private fun SocialSignInButtons(
         Spacer(modifier = Modifier.width(16.dp))
         SocialSignIconButton(
             authProvider = socialSignIn(SocialService.Google),
-            onSignInClicked = { uid -> onEvent(SignInEvent.OnSocialSignInClicked(uid)) },
+            onSignInClicked = { user -> onEvent(SignInEvent.OnSocialSignInClicked(user)) },
             buttonBorder = BorderStroke(1.dp, GreyAAA),
             buttonColors = ButtonDefaults.buttonColors(containerColor = MainWhite),
             modifier = Modifier.size(48.dp),
@@ -236,7 +234,7 @@ private fun SocialSignInButtons(
 @Composable
 private fun SignInLayoutPreview() {
     val viewModel = remember {
-        SignInViewModel(MockSignRepository, MockAuthProvider)
+        SignInViewModel(MockSignRepository, MockAuthProvider, MockAuthProvider)
     }
 
     SignInLayout(

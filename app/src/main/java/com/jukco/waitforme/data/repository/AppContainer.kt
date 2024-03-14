@@ -14,6 +14,7 @@ interface AppContainer {
     val signRepository: SignRepository
     val storeRepository: StoreRepository
     val googleAuthProvider: AuthProvider
+    val kakaoAuthProvider: AuthProvider
 }
 
 class DefaultContainer(context: Context) : AppContainer {
@@ -22,7 +23,6 @@ class DefaultContainer(context: Context) : AppContainer {
         .baseUrl(BuildConfig.SERVER_URL)
         .build()
     private val credentialManager = CredentialManager.create(context)
-
 
     private val storeApi: StoreApi by lazy {
         retrofit.create(StoreApi::class.java)
@@ -42,5 +42,8 @@ class DefaultContainer(context: Context) : AppContainer {
     }
     override val googleAuthProvider: AuthProvider by lazy {
         GoogleAuthProvider(credentialManager, BuildConfig.GOOGLE_SERVER_CLIENT_ID)
+    }
+    override val kakaoAuthProvider: AuthProvider by lazy {
+        KakaoAuthProvider()
     }
 }

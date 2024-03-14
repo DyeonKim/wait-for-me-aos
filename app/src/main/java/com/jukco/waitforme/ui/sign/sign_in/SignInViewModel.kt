@@ -34,6 +34,7 @@ sealed interface SignInEvent {
 class SignInViewModel(
     private val signRepository: SignRepository,
     private val googleAuthProvider: AuthProvider,
+    private val kakaoAuthProvider: AuthProvider,
 ) : ViewModel() {
     var signInState by mutableStateOf<SignInState>(SignInState.Init)
         private set
@@ -71,6 +72,7 @@ class SignInViewModel(
     fun getSocialSign(service: SocialService) =
         when (service) {
             is SocialService.Google -> { googleAuthProvider }
+            is SocialService.Kakao -> { kakaoAuthProvider }
         }
 
     private fun onSocialSignInClicked(user: SocialSignUpRequest?) {
@@ -133,7 +135,8 @@ class SignInViewModel(
                 val application = (this[APPLICATION_KEY] as ApplicationClass)
                 val signRepository = application.container.signRepository
                 val googleAuthProvider = application.container.googleAuthProvider
-                SignInViewModel(signRepository, googleAuthProvider)
+                val kakaoAuthProvider = application.container.kakaoAuthProvider
+                SignInViewModel(signRepository, googleAuthProvider, kakaoAuthProvider)
             }
         }
     }

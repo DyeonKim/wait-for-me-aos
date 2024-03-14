@@ -27,6 +27,9 @@ android {
         }
         buildConfigField("String", "SERVER_URL", properties.getProperty("server_url"))
         buildConfigField("String", "GOOGLE_SERVER_CLIENT_ID", properties.getProperty("google_server_client_id"))
+        buildConfigField("String", "KAKAO_NATIVE_APP_KEY", properties.getProperty("kakao_native_app_key"))
+
+        resValue("string", "kakao_oauth_host", properties.getProperty("kakao_oauth_host"))
     }
 
     buildTypes {
@@ -84,6 +87,8 @@ dependencies {
     implementation("androidx.credentials:credentials:1.2.1")
     implementation("androidx.credentials:credentials-play-services-auth:1.2.1")
     implementation("com.google.android.libraries.identity.googleid:googleid:1.1.0")
+    // Kakao SignIn
+    implementation("com.kakao.sdk:v2-user:2.20.0")
 
     testImplementation("junit:junit:4.13.2")
     testImplementation("org.assertj:assertj-core:3.24.2")
