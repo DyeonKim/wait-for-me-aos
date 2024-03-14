@@ -21,6 +21,7 @@ val GreyCCC = Color(0xFFCCCCCC)
 val GreyDDD = Color(0xFFDDDDDD)
 val GreyEEE = Color(0xFFEEEEEE)
 val MainWhite = Color(0xFFFFFFFF)
+val ErrorRed = Color(0xFFFF0E0E)
 
 val KakaoYellow = Color(0xFFFFCE51)
 val NaverGreen = Color(0xFF2AD400)

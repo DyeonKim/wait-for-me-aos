@@ -22,6 +22,7 @@ import java.io.IOException
 
 sealed interface SignInState {
     object Init : SignInState
+    object Loading : SignInState
     object Success : SignInState
 }
 sealed interface SignInEvent {
@@ -38,8 +39,6 @@ class SignInViewModel(
     private val naverAuthProvider: AuthProvider,
 ) : ViewModel() {
     var signInState by mutableStateOf<SignInState>(SignInState.Init)
-        private set
-    var isLoading by mutableStateOf(false)
         private set
     var form by mutableStateOf(SignInForm())
         private set
@@ -90,7 +89,7 @@ class SignInViewModel(
 
     private fun localSignIn(id: String, password: String) {
         viewModelScope.launch {
-            isLoading = true
+            signInState = SignInState.Loading
             delay(3000) // TODO : 서버와 연결 후에는 지울 것. 기다리는 최대 시간이 있어야 한다.
 
             try {
@@ -99,20 +98,20 @@ class SignInViewModel(
                 if (response.isSuccessful) {
                     // TODO : DataStore에 결과 저장
                     signInState = SignInState.Success
-                } else {
-                    // TODO
+                    return@launch
                 }
+                // TODO
+                signInState = SignInState.Init
             } catch (e: IOException) {
                 // TODO
-            } finally {
-                isLoading = false
+                signInState = SignInState.Init
             }
         }
     }
 
     private fun socialSignIn(uid: String) {
         viewModelScope.launch {
-            isLoading = true
+            signInState = SignInState.Loading
             delay(3000) // TODO : 서버와 연결 후에는 지울 것. 기다리는 최대 시간이 있어야 한다.
 
             try {
@@ -120,13 +119,13 @@ class SignInViewModel(
                 if (response.isSuccessful) {
                     // TODO : DataStore에 결과 저장
                     signInState = SignInState.Success
-                } else {
-                    // TODO : 가입되어 있지 않음. 회원가입으로, 혹은 다른 오류 처리
+                    return@launch
                 }
+                // TODO : 가입되어 있지 않음. 회원가입으로, 혹은 다른 오류 처리
+                signInState = SignInState.Init
             } catch (e: IOException) {
                 // TODO
-            } finally {
-                isLoading = false
+                signInState = SignInState.Init
             }
         }
     }

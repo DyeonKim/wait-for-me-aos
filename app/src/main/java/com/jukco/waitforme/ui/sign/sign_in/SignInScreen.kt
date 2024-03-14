@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -63,13 +62,15 @@ fun SignInScreen(
         SignInState.Init -> {
             SignInLayout(
                 form = viewModel.form,
-                isLoading = viewModel.isLoading,
                 socialSignIn = viewModel::getSocialSign,
                 onEvent = viewModel::onEvent,
                 goSignUp = goSignUp,
                 onNoSignClicked = goMain,
                 modifier = modifier,
             )
+        }
+        SignInState.Loading -> {
+            LoadingSignInLayout(form = viewModel.form, modifier = modifier.fillMaxSize())
         }
         SignInState.Success -> {
             LaunchedEffect(Unit) {
@@ -80,69 +81,80 @@ fun SignInScreen(
 }
 
 @Composable
-private fun SignInLayout(
+fun LoadingSignInLayout(
     form: SignInForm,
-    isLoading: Boolean,
-    socialSignIn: (SocialService) -> AuthProvider,
-    onEvent: (SignInEvent) -> Unit,
-    goSignUp: () -> Unit,
-    onNoSignClicked: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Box(modifier = modifier) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(horizontal = 20.dp)
-                .padding(bottom = 56.dp),
+    Box(modifier) {
+        SignInLayout(
+            form = form,
+            socialSignIn = { MockAuthProvider },
+            onEvent = {},
+            goSignUp = {},
+            onNoSignClicked = {},
+        )
+        Dialog(
+            onDismissRequest = { },
+            properties = DialogProperties(dismissOnBackPress = false, dismissOnClickOutside = false),
         ) {
-            SignGuide(modifier)
-            SignInForm(
-                form,
-                onEvent,
-                modifier = modifier.fillMaxWidth(),
-            )
-            Spacer(modifier = Modifier.weight(1f))
-            SocialSignInButtons(
-                socialSignIn,
-                onEvent,
-                modifier = modifier.fillMaxWidth(),
-            )
-            Spacer(modifier = Modifier.height(24.dp))
-            OutlinedButton(
-                onClick = goSignUp,
-                modifier = Modifier.fillMaxWidth(),
+            Box(
+                contentAlignment = Alignment.Center,
+                modifier = Modifier.size(100.dp),
             ) {
-                Text(text = stringResource(R.string.sign_up))
-            }
-            Spacer(modifier = Modifier.height(39.dp))
-            Text(
-                text = stringResource(R.string.no_sign_in),
-                textAlign = TextAlign.Center,
-                textDecoration = TextDecoration.Underline,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable { onNoSignClicked() },
-            )
-        }
-        if (isLoading) {
-            Dialog(
-                onDismissRequest = { },
-                properties = DialogProperties(dismissOnBackPress = false, dismissOnClickOutside = false),
-            ) {
-                Box(
-                    contentAlignment = Alignment.Center,
-                    modifier = Modifier.size(100.dp),
-                ) {
-                    CircularProgressIndicator()
-                }
+                CircularProgressIndicator()
             }
         }
     }
 }
 
 @Composable
-private fun SignInForm(
+fun SignInLayout(
+    form: SignInForm,
+    socialSignIn: (SocialService) -> AuthProvider,
+    onEvent: (SignInEvent) -> Unit,
+    goSignUp: () -> Unit,
+    onNoSignClicked: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(horizontal = 20.dp)
+            .padding(bottom = 56.dp),
+    ) {
+        SignGuide(modifier)
+        SignInForm(
+            form,
+            onEvent,
+            modifier = modifier.fillMaxWidth(),
+        )
+        Spacer(modifier = Modifier.weight(1f))
+        SocialSignInButtons(
+            socialSignIn,
+            onEvent,
+            modifier = modifier.fillMaxWidth(),
+        )
+        Spacer(modifier = Modifier.height(24.dp))
+        OutlinedButton(
+            onClick = goSignUp,
+            modifier = Modifier.fillMaxWidth(),
+        ) {
+            Text(text = stringResource(R.string.sign_up))
+        }
+        Spacer(modifier = Modifier.height(39.dp))
+        Text(
+            text = stringResource(R.string.no_sign_in),
+            textAlign = TextAlign.Center,
+            textDecoration = TextDecoration.Underline,
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable { onNoSignClicked() },
+        )
+    }
+}
+
+@Composable
+fun SignInForm(
     form: SignInForm,
     onEvent: (SignInEvent) -> Unit,
     modifier: Modifier = Modifier,
@@ -195,7 +207,7 @@ private fun SignInForm(
 }
 
 @Composable
-private fun SocialSignInButtons(
+fun SocialSignInButtons(
     socialSignIn: (SocialService) -> AuthProvider,
     onEvent: (SignInEvent) -> Unit,
     modifier: Modifier = Modifier,
@@ -237,7 +249,6 @@ private fun SignInLayoutPreview() {
 
     SignInLayout(
         form = viewModel.form,
-        isLoading = viewModel.isLoading,
         socialSignIn = viewModel::getSocialSign,
         onEvent = viewModel::onEvent,
         goSignUp = {},
