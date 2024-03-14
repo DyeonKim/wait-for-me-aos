@@ -52,7 +52,18 @@ class SignRepositoryTest {
         server.takeRequest()
 
         assertTrue(actualRes.isSuccessful)
-        assertEquals(200, actualRes.code())
+        assertEquals(FakeDataSource.signInResponse, actualRes.body())
+    }
+
+    fun signRepository_socialSignIn_success() = runTest {
+        val json = Json.encodeToJsonElement(FakeDataSource.signInResponse).toString()
+        val res = MockResponse().setBody(json)
+        server.enqueue(res)
+
+        val actualRes = signRepository.socialSignIn("test123%23")
+        server.takeRequest()
+
+        assertTrue(actualRes.isSuccessful)
         assertEquals(FakeDataSource.signInResponse, actualRes.body())
     }
 }

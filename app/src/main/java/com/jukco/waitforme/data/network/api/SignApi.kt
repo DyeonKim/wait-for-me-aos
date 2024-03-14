@@ -8,4 +8,8 @@ import retrofit2.http.POST
 interface SignApi {
     @POST("auth/local/sign-in")
     suspend fun localSignIn(@Body phoneNumAndPassword: Map<String, String>): Response<SignInResponse>
+
+    // TODO: 임시 uri, 나중에 수정할 것
+    @POST("auth/social/sign-in")
+    suspend fun socialSignIn(@Body snsId: String): Response<SignInResponse>
 }
