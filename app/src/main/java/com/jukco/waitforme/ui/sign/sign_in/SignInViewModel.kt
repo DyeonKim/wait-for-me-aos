@@ -12,13 +12,11 @@ import androidx.lifecycle.viewmodel.viewModelFactory
 import com.jukco.waitforme.config.ApplicationClass
 import com.jukco.waitforme.data.network.model.LocalSignInRequest
 import com.jukco.waitforme.data.network.model.SocialSignInRequest
-import com.jukco.waitforme.data.network.model.SocialSignUpRequest
 import com.jukco.waitforme.data.repository.AuthProvider
 import com.jukco.waitforme.data.repository.SignRepository
+import com.jukco.waitforme.ui.sign.sign_up.SignUpForm
 import com.jukco.waitforme.ui.util.ValidationChecker
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.io.IOException
 
@@ -31,7 +29,7 @@ sealed interface SignInEvent {
     data class InputId(val id: String) : SignInEvent
     data class InputPassword(val password: String) : SignInEvent
     object OnSignInClicked : SignInEvent
-    data class OnSocialSignInClicked(val user: SocialSignUpRequest?) : SignInEvent
+    data class OnSocialSignInClicked(val user: SignUpForm?) : SignInEvent
 }
 
 class SignInViewModel(
@@ -44,7 +42,6 @@ class SignInViewModel(
         private set
     var form by mutableStateOf(SignInForm())
         private set
-    private val _socialSignUpRequest = MutableStateFlow<SocialSignUpRequest?>(null)
 
     fun onEvent(event: SignInEvent) {
         when (event) {
@@ -54,6 +51,13 @@ class SignInViewModel(
             is SignInEvent.OnSocialSignInClicked -> { onSocialSignInClicked(event.user) }
         }
     }
+
+    fun getSocialSign(service: SocialService) =
+        when (service) {
+            is SocialService.Google -> { googleAuthProvider }
+            is SocialService.Kakao -> { kakaoAuthProvider }
+            is SocialService.Naver -> { naverAuthProvider }
+        }
 
     private fun inputId(input: String) {
         form = form.copy(id = input)
@@ -71,17 +75,10 @@ class SignInViewModel(
             form = form.copy(hasError = true)
         }
     }
-    fun getSocialSign(service: SocialService) =
-        when (service) {
-            is SocialService.Google -> { googleAuthProvider }
-            is SocialService.Kakao -> { kakaoAuthProvider }
-            is SocialService.Naver -> { naverAuthProvider }
-        }
 
-    private fun onSocialSignInClicked(user: SocialSignUpRequest?) {
+    private fun onSocialSignInClicked(user: SignUpForm?) {
         if (user != null) {
-            _socialSignUpRequest.update { user }
-            socialSignIn(user.provider, user.uid)
+            socialSignIn(user.provider, user.snsId)
         }
     }
 

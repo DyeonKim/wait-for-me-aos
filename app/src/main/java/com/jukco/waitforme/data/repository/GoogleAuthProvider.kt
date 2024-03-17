@@ -4,8 +4,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
 import androidx.credentials.ClearCredentialStateRequest
 import androidx.credentials.CredentialManager
-import com.jukco.waitforme.ui.sign.AuthUiProvider
-import com.jukco.waitforme.ui.sign.GoogleAuthUiProvider
+import com.jukco.waitforme.ui.sign.social.AuthUiProvider
+import com.jukco.waitforme.ui.sign.social.GoogleAuthUiProvider
 
 class GoogleAuthProvider(
     private val credentialManager: CredentialManager,

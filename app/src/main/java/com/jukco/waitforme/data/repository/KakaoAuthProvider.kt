@@ -3,11 +3,9 @@ package com.jukco.waitforme.data.repository
 import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
-import com.jukco.waitforme.ui.sign.AuthUiProvider
-import com.jukco.waitforme.ui.sign.KakaoAuthUiProvider
+import com.jukco.waitforme.ui.sign.social.AuthUiProvider
+import com.jukco.waitforme.ui.sign.social.KakaoAuthUiProvider
 import com.kakao.sdk.user.UserApiClient
-import kotlinx.coroutines.suspendCancellableCoroutine
-import kotlin.coroutines.resume
 
 class KakaoAuthProvider : AuthProvider {
     @Composable
