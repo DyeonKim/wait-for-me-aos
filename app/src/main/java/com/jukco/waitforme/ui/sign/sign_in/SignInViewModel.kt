@@ -20,18 +20,6 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.io.IOException
 
-sealed interface SignInState {
-    object Init : SignInState
-    object Loading : SignInState
-    object Success : SignInState
-}
-sealed interface SignInEvent {
-    data class InputId(val id: String) : SignInEvent
-    data class InputPassword(val password: String) : SignInEvent
-    object OnSignInClicked : SignInEvent
-    data class OnSocialSignInClicked(val user: SignUpForm?) : SignInEvent
-}
-
 class SignInViewModel(
     private val signRepository: SignRepository,
     private val googleAuthProvider: AuthProvider,
@@ -96,7 +84,7 @@ class SignInViewModel(
                 val response = signRepository.localSignIn(request)
                 if (response.isSuccessful) {
                     // TODO : DataStore에 결과 저장
-                    signInState = SignInState.Success
+                    signInState = SignInState.MovingMain
                     return@launch
                 }
                 // TODO
@@ -120,7 +108,7 @@ class SignInViewModel(
                     when(response.code()) {
                         200 -> {
                             // TODO : DataStore에 결과 저장
-                            signInState = SignInState.Success
+                            signInState = SignInState.MovingMain
                             return@launch
                         }
                         204 -> {

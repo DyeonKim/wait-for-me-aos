@@ -72,7 +72,7 @@ fun SignInScreen(
         SignInState.Loading -> {
             LoadingSignInLayout(form = viewModel.form, modifier = modifier.fillMaxSize())
         }
-        SignInState.Success -> {
+        SignInState.MovingMain -> {
             LaunchedEffect(Unit) {
                 goMain()
             }
