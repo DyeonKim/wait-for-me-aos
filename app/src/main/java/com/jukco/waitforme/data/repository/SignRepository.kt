@@ -1,27 +1,26 @@
 package com.jukco.waitforme.data.repository
 
 import com.jukco.waitforme.data.network.api.SignApi
+import com.jukco.waitforme.data.network.model.LocalSignInRequest
 import com.jukco.waitforme.data.network.model.SignInResponse
+import com.jukco.waitforme.data.network.model.SocialSignInRequest
 import com.jukco.waitforme.data.network.model.Token
 import retrofit2.Response
 
 interface SignRepository {
-    suspend fun localSignIn(phoneNumAndPassword: Map<String, String>): Response<SignInResponse>
+    suspend fun localSignIn(request: LocalSignInRequest): Response<SignInResponse>
 
-    suspend fun socialSignIn(snsId: String): Response<SignInResponse>
-
-    fun convertLocalSignInBody(phoneNum: String, password: String): Map<String, String> =
-        mapOf("phoneNumber" to phoneNum, "password" to password)
+    suspend fun socialSignIn(request: SocialSignInRequest): Response<SignInResponse>
 }
 
 class SignRepositoryImplementation(
     private val signApi: SignApi,
 ) : SignRepository {
-    override suspend fun localSignIn(phoneNumAndPassword: Map<String, String>): Response<SignInResponse> =
-        signApi.localSignIn(phoneNumAndPassword)
+    override suspend fun localSignIn(request: LocalSignInRequest): Response<SignInResponse> =
+        signApi.localSignIn(request)
 
-    override suspend fun socialSignIn(snsId: String): Response<SignInResponse> =
-        signApi.socialSignIn(snsId)
+    override suspend fun socialSignIn(request: SocialSignInRequest): Response<SignInResponse> =
+        signApi.socialSignIn(request)
 }
 
 object MockSignRepository : SignRepository {
@@ -35,7 +34,7 @@ object MockSignRepository : SignRepository {
         createdAt = "2024-02-08T23:49:42.828",
         expiredAt = "2024-02-09T00:49:42.828",
     )
-    val response = Response.success(
+    val successResponse = Response.success(
         SignInResponse(
             phoneNumber = "01012345678",
             name = "테스트입니다.",
@@ -45,8 +44,11 @@ object MockSignRepository : SignRepository {
         ),
     )
 
-    override suspend fun localSignIn(phoneNumAndPassword: Map<String, String>): Response<SignInResponse> =
-        response
+    val response = Response.success(204, Unit)
 
-    override suspend fun socialSignIn(snsId: String): Response<SignInResponse> = response
+    override suspend fun localSignIn(request: LocalSignInRequest): Response<SignInResponse> =
+        successResponse
+
+    override suspend fun socialSignIn(request: SocialSignInRequest): Response<SignInResponse> =
+        successResponse
 }

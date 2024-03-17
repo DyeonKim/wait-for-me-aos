@@ -2,6 +2,8 @@ package com.jukco.waitforme.repository
 
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import com.jukco.waitforme.data.network.api.SignApi
+import com.jukco.waitforme.data.network.model.LocalSignInRequest
+import com.jukco.waitforme.data.network.model.SocialSignInRequest
 import com.jukco.waitforme.data.repository.SignRepository
 import com.jukco.waitforme.data.repository.SignRepositoryImplementation
 import com.jukco.waitforme.fake.FakeDataSource
@@ -47,20 +49,22 @@ class SignRepositoryTest {
         val res = MockResponse().setBody(json)
         server.enqueue(res)
 
-        val phoneNumAndPassword = mapOf("phoneNumber" to "01012345678", "password" to "test123!")
-        val actualRes = signRepository.localSignIn(phoneNumAndPassword)
+        val request = LocalSignInRequest("01012345678", "test123!")
+        val actualRes = signRepository.localSignIn(request)
         server.takeRequest()
 
         assertTrue(actualRes.isSuccessful)
         assertEquals(FakeDataSource.signInResponse, actualRes.body())
     }
 
+    @Test
     fun signRepository_socialSignIn_success() = runTest {
         val json = Json.encodeToJsonElement(FakeDataSource.signInResponse).toString()
         val res = MockResponse().setBody(json)
         server.enqueue(res)
 
-        val actualRes = signRepository.socialSignIn("test123%23")
+        val request = SocialSignInRequest("NAVER", "test123%23")
+        val actualRes = signRepository.socialSignIn(request)
         server.takeRequest()
 
         assertTrue(actualRes.isSuccessful)
