@@ -7,17 +7,19 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
+import androidx.navigation.navigation
 import com.jukco.waitforme.ui.BookmarkScreen
 import com.jukco.waitforme.ui.MyInfoScreen
 import com.jukco.waitforme.ui.NoticeScreen
 import com.jukco.waitforme.ui.StoreManagementScreen
-import com.jukco.waitforme.ui.PopupStoreScreen
 import com.jukco.waitforme.ui.SearchScreen
-import com.jukco.waitforme.ui.SignInScreen
-import com.jukco.waitforme.ui.SignUpScreen
-import com.jukco.waitforme.ui.StoreManagementScreen
+import com.jukco.waitforme.ui.sign.sign_in.SignInScreen
+import com.jukco.waitforme.ui.sign.sign_up.InputPhoneNumAndPwScreen
 import com.jukco.waitforme.ui.WaitScreen
 import com.jukco.waitforme.ui.components.BottomNaviItem
+import com.jukco.waitforme.ui.sign.sign_up.CompleteScreen
+import com.jukco.waitforme.ui.sign.sign_up.InputNameScreen
+import com.jukco.waitforme.ui.sign.sign_up.SelectCustomerOwnerScreen
 import com.jukco.waitforme.ui.store_detail.PopupStoreScreen
 import com.jukco.waitforme.ui.store_list.StoreListScreen
 
@@ -58,7 +60,7 @@ fun NavigationGraph(
         composable(Route.MyInfo.name) {
             MyInfoScreen(
                 onSignInButtonClicked = { navController.navigate(Route.SignIn.name) },
-                onSignUpButtonClicked = { navController.navigate(Route.SignUp.name) },
+                onSignUpButtonClicked = { navController.navigate(Route.SignUpInputPhoneNumAndPw.name) },
             )
         }
         composable(Route.Notice.name) {
@@ -79,21 +81,34 @@ fun NavigationGraph(
                 onBackButtonClicked = { navController.popBackStack() },
             )
         }
-        composable(Route.SignUp.name) {
-            SignUpScreen(
-                onCancelButtonClicked = {
-                    /*TODO: 모든 회원가입 단계를 초기화하고 회원가입 버튼 누른 페이지로 돌아가기 */
-                    navController.popBackStack()
-                },
-            )
-        }
-        composable(Route.SignIn.name) {
-            SignInScreen(
-                onCancelButtonClicked = {
-                    /*TODO: 모든 로그인 단계를 초기화하고 로그인 버튼 누른 페이지로 돌아가기 */
-                    navController.popBackStack()
-                },
-            )
+
+        navigation(startDestination = Route.SignIn.name, route = Route.SignProgress.name) {
+            composable(Route.SignIn.name) {
+                SignInScreen(
+                    goSignUp = { navController.navigate(Route.SignUpInputPhoneNumAndPw.name) },
+                    goMain = {
+                        navController.navigate(Route.StoreList.name) {
+                            popUpTo(Route.SignProgress.name) { inclusive = true }
+                        }
+                    },
+                )
+            }
+            composable(Route.SignUpInputPhoneNumAndPw.name) {
+                InputPhoneNumAndPwScreen(
+                    onNextButtonClicked = {
+                        navController.navigate(Route.SignUpInputName.name)
+                    }
+                )
+            }
+            composable(Route.SignUpInputName.name) {
+                InputNameScreen()
+            }
+            composable(Route.SignUpSelectCustomerOwner.name) {
+                SelectCustomerOwnerScreen()
+            }
+            composable(Route.SignUpComplete.name) {
+                CompleteScreen()
+            }
         }
     }
 }

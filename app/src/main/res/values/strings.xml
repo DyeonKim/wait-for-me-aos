@@ -14,8 +14,6 @@
 
     <string name="notice">공지</string>
     <string name="searching">검색</string>
-    <string name="sign_up">회원가입</string>
-    <string name="sign_in">로그인</string>
     <string name="detail_page">상세페이지</string>
 
     <string name="title_ongoing">"요즘 유행하는 "</string>
@@ -33,6 +31,16 @@
     <string name="sns">SNS</string>
     <string name="share_info">[팝업스토어] %s</string>
     <string name="sharing_not_available">해당 팝업스토어를 공유할 수 없습니다.</string>
+
+    <string name="sign_announcement_1">웨잇포미는 </string>
+    <string name="sign_announcement_2">휴대폰 번호가 ID</string>
+    <string name="sign_announcement_3">에요.\n번호는 외부에 공개되지 않아요.</string>
+    <string name="placeholder_input_id">-없이 입력해 주세요</string>
+    <string name="placeholder_input_password">비밀번호를 입력해주세요</string>
+    <string name="error_id_password">아이디 또는 비밀번호를 다시 확인해주세요.</string>
+    <string name="sign_in">로그인하기</string>
+    <string name="sign_up">가입하기</string>
+    <string name="no_sign_in">구경만 하고 싶어요</string>
 
     <string-array name="pops_filter_group">
         <item>최신순</item>

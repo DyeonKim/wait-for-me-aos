@@ -1,23 +1,25 @@
 package com.jukco.waitforme.config
 
 import android.app.Application
-import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
+import com.jukco.waitforme.BuildConfig
+import com.jukco.waitforme.R
 import com.jukco.waitforme.data.repository.AppContainer
 import com.jukco.waitforme.data.repository.DefaultContainer
-import kotlinx.serialization.json.Json
-import okhttp3.MediaType.Companion.toMediaType
-import retrofit2.Retrofit
+import com.kakao.sdk.common.KakaoSdk
+import com.navercorp.nid.NaverIdLoginSDK
 
 class ApplicationClass : Application() {
     lateinit var container: AppContainer
 
-    private val retrofit = Retrofit.Builder()
-        .addConverterFactory(Json.asConverterFactory("application/json".toMediaType()))
-        .baseUrl("https://android-kotlin-fun-mars-server.appspot.com") // TODO : 서버 주소가 올라오면 보안 처리해서 넣을 것
-        .build()
-
     override fun onCreate() {
         super.onCreate()
-        container = DefaultContainer(retrofit)
+        KakaoSdk.init(this, BuildConfig.KAKAO_NATIVE_APP_KEY)
+        NaverIdLoginSDK.initialize(
+            context = this,
+            clientId = BuildConfig.NAVER_CLIENT_ID,
+            clientSecret = BuildConfig.NAVER_CLIENT_SECRET,
+            clientName = getString(R.string.app_name),
+        )
+        container = DefaultContainer(this)
     }
 }
