@@ -75,6 +75,12 @@ class SignViewModel(
                 )
                 errorMessage = if (passwordConfirmed) null else R.string.error_password_confirm
             }
+            is SignUpEvent.InputName -> {
+                signUpForm = signUpForm.copy(
+                    name = event.name,
+                    nameSubmitted = checkName(event.name),
+                )
+            }
         }
     }
 
@@ -160,6 +166,10 @@ class SignViewModel(
         ValidationChecker.checkPasswordValidation(password).apply {
             errorMessage = second
         }.first
+
+    private fun checkName(name: String) = ValidationChecker.checkNameValidation(name).apply {
+        errorMessage = second
+    }.first
 
     companion object {
         val Factory: ViewModelProvider.Factory = viewModelFactory {

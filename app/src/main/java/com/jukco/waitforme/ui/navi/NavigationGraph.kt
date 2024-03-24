@@ -101,7 +101,11 @@ fun NavigationGraph(
                 )
             }
             composable(Route.SignUpInputName.name) {
-                InputNameScreen()
+                InputNameScreen(
+                    onNextButtonClicked = {
+                        navController.navigate(Route.SignUpSelectCustomerOwner.name)
+                    }
+                )
             }
             composable(Route.SignUpSelectCustomerOwner.name) {
                 SelectCustomerOwnerScreen(

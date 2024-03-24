@@ -43,4 +43,25 @@ object ValidationChecker {
             }
         }
     }
+
+    fun checkNameValidation(name: String): Pair<Boolean, Int?> {
+        val checked = name.trim()
+
+        return when {
+            checked.isBlank() -> {
+                Pair(false, R.string.error_nickname_empty)
+            }
+            checked.length !in 1..8 -> {
+                Pair(false, R.string.error_nickname_length)
+            }
+            !checked.matches(
+                Regex("^[가-힣|a-z|A-Z|0-9]{1,8}\$")
+            ) -> {
+                Pair(false, R.string.error_nickname_format)
+            }
+            else -> {
+                Pair(true, null)
+            }
+        }
+    }
 }

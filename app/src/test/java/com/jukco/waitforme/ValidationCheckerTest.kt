@@ -114,4 +114,56 @@ class ValidationCheckerTest {
         assertFalse(result.first)
         assertEquals(R.string.error_password_format, result.second)
     }
+
+    @Test
+    fun validationChecker_checkNameValidation_success() {
+        val name = "테스트"
+
+        assertTrue(ValidationChecker.checkNameValidation(name).first)
+    }
+
+    @Test
+    fun validationChecker_checkNameValidation_blank() {
+        val name = " "
+        val result = ValidationChecker.checkNameValidation(name)
+
+        assertFalse(result.first)
+        assertEquals(R.string.error_nickname_empty, result.second)
+    }
+
+    @Test
+    fun validationChecker_checkNameValidation_lengthLongerThan() {
+        val name = "나는야테스트라네하하하하"
+        val result = ValidationChecker.checkNameValidation(name)
+
+        assertFalse(result.first)
+        assertEquals(R.string.error_nickname_length, result.second)
+    }
+
+    @Test
+    fun validationChecker_checkNameValidation_notMatchesFormat_specialSymbol() {
+        val name = "테스트*A0"
+        val result = ValidationChecker.checkNameValidation(name)
+
+        assertFalse(result.first)
+        assertEquals(R.string.error_nickname_format, result.second)
+    }
+
+    @Test
+    fun validationChecker_checkNameValidation_notMatchesFormat_spaceBetweenWords() {
+        val name = "나는 테스트"
+        val result = ValidationChecker.checkNameValidation(name)
+
+        assertFalse(result.first)
+        assertEquals(R.string.error_nickname_format, result.second)
+    }
+
+    @Test
+    fun validationChecker_checkNameValidation_notMatchesFormat_unReadableWord() {
+        val name = "ㅁㅏㅠ갸0A"
+        val result = ValidationChecker.checkNameValidation(name)
+
+        assertFalse(result.first)
+        assertEquals(R.string.error_nickname_format, result.second)
+    }
 }

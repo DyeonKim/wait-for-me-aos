@@ -7,4 +7,5 @@ sealed interface SignUpEvent {
     object SubmitVerificationCode : SignUpEvent
     data class InputPassword(val password: String) : SignUpEvent
     data class InputConfirmPassword(val confirmPassword: String) : SignUpEvent
+    data class InputName(val name: String) : SignUpEvent
 }
