@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -43,6 +42,7 @@ import com.jukco.waitforme.data.repository.MockAuthProvider
 import com.jukco.waitforme.data.repository.MockSignRepository
 import com.jukco.waitforme.ui.components.SocialSignIconButton
 import com.jukco.waitforme.ui.sign.SignGuide
+import com.jukco.waitforme.ui.sign.SignViewModel
 import com.jukco.waitforme.ui.theme.ErrorRed
 import com.jukco.waitforme.ui.theme.GreyAAA
 import com.jukco.waitforme.ui.theme.KakaoYellow
@@ -57,21 +57,21 @@ fun SignInScreen(
     goMain: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val viewModel: SignInViewModel = viewModel(factory = SignInViewModel.Factory)
+    val viewModel: SignViewModel = viewModel(factory = SignViewModel.Factory)
 
     when (viewModel.signInState) {
         SignInState.Init -> {
             SignInLayout(
-                form = viewModel.form,
+                form = viewModel.signInform,
                 socialSignIn = viewModel::getSocialSign,
-                onEvent = viewModel::onEvent,
+                onEvent = viewModel::onSignInEvent,
                 goSignUp = goSignUp,
                 onNoSignClicked = goMain,
                 modifier = modifier,
             )
         }
         SignInState.Loading -> {
-            LoadingSignInLayout(form = viewModel.form, modifier = modifier)
+            LoadingSignInLayout(form = viewModel.signInform, modifier = modifier)
         }
         SignInState.MovingMain -> {
             LaunchedEffect(Unit) {
@@ -246,14 +246,14 @@ fun SocialSignInButtons(
 @Composable
 private fun SignInLayoutPreview() {
     val viewModel = remember {
-        SignInViewModel(MockSignRepository, MockAuthProvider, MockAuthProvider, MockAuthProvider)
+        SignViewModel(MockSignRepository, MockAuthProvider, MockAuthProvider, MockAuthProvider)
     }
 
     WaitForMeTheme {
         SignInLayout(
-            form = viewModel.form,
+            form = viewModel.signInform,
             socialSignIn = viewModel::getSocialSign,
-            onEvent = viewModel::onEvent,
+            onEvent = viewModel::onSignInEvent,
             goSignUp = {},
             onNoSignClicked = {},
         )
@@ -265,10 +265,10 @@ private fun SignInLayoutPreview() {
 @Composable
 private fun LoadingSignInLayoutPreview() {
     val viewModel = remember {
-        SignInViewModel(MockSignRepository, MockAuthProvider, MockAuthProvider, MockAuthProvider)
+        SignViewModel(MockSignRepository, MockAuthProvider, MockAuthProvider, MockAuthProvider)
     }
 
     WaitForMeTheme {
-        LoadingSignInLayout(form = viewModel.form)
+        LoadingSignInLayout(form = viewModel.signInform)
     }
 }

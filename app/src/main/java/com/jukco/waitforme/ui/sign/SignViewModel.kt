@@ -1,4 +1,4 @@
-package com.jukco.waitforme.ui.sign.sign_in
+package com.jukco.waitforme.ui.sign
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -14,15 +14,17 @@ import com.jukco.waitforme.data.network.model.LocalSignInRequest
 import com.jukco.waitforme.data.network.model.SocialSignInRequest
 import com.jukco.waitforme.data.repository.AuthProvider
 import com.jukco.waitforme.data.repository.SignRepository
+import com.jukco.waitforme.ui.sign.sign_in.SignInEvent
+import com.jukco.waitforme.ui.sign.sign_in.SignInForm
+import com.jukco.waitforme.ui.sign.sign_in.SignInState
+import com.jukco.waitforme.ui.sign.sign_in.SocialService
 import com.jukco.waitforme.ui.sign.sign_up.SignUpForm
 import com.jukco.waitforme.ui.util.ValidationChecker
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.io.IOException
 
-class SignInViewModel(
+class SignViewModel(
     private val signRepository: SignRepository,
     private val googleAuthProvider: AuthProvider,
     private val kakaoAuthProvider: AuthProvider,
@@ -30,13 +32,13 @@ class SignInViewModel(
 ) : ViewModel() {
     var signInState by mutableStateOf<SignInState>(SignInState.Init)
         private set
-    var form by mutableStateOf(SignInForm())
+    var signInform by mutableStateOf(SignInForm())
         private set
 
-    fun onEvent(event: SignInEvent) {
+    fun onSignInEvent(event: SignInEvent) {
         when (event) {
-            is SignInEvent.InputId -> { inputId(event.id) }
-            is SignInEvent.InputPassword -> { inputPassword(event.password) }
+            is SignInEvent.InputId -> { signInform = signInform.copy(id = event.id) }
+            is SignInEvent.InputPassword -> { signInform = signInform.copy(password = event.password) }
             is SignInEvent.OnSignInClicked -> { onSignInClicked() }
             is SignInEvent.OnSocialSignInClicked -> { onSocialSignInClicked(event.user) }
         }
@@ -49,20 +51,12 @@ class SignInViewModel(
             is SocialService.Naver -> { naverAuthProvider }
         }
 
-    private fun inputId(input: String) {
-        form = form.copy(id = input)
-    }
-
-    private fun inputPassword(input: String) {
-        form = form.copy(password = input)
-    }
-
     private fun onSignInClicked() {
         if (checkId() and checkPassword()) {
-            form = form.copy(hasError = false)
-            localSignIn(form.id, form.password)
+            signInform = signInform.copy(hasError = false)
+            localSignIn(signInform.id, signInform.password)
         } else {
-            form = form.copy(hasError = true)
+            signInform = signInform.copy(hasError = true)
         }
     }
 
@@ -72,9 +66,9 @@ class SignInViewModel(
         }
     }
 
-    private fun checkId(): Boolean = ValidationChecker.checkIdValidation(form.id).first
+    private fun checkId(): Boolean = ValidationChecker.checkIdValidation(signInform.id).first
 
-    private fun checkPassword() = ValidationChecker.checkPasswordValidation(form.password).first
+    private fun checkPassword() = ValidationChecker.checkPasswordValidation(signInform.password).first
 
     private fun localSignIn(id: String, password: String) {
         viewModelScope.launch {
@@ -136,7 +130,7 @@ class SignInViewModel(
                 val kakaoAuthProvider = application.container.kakaoAuthProvider
                 val naverAuthProvider = application.container.naverAuthProvider
 
-                SignInViewModel(signRepository, googleAuthProvider, kakaoAuthProvider, naverAuthProvider)
+                SignViewModel(signRepository, googleAuthProvider, kakaoAuthProvider, naverAuthProvider)
             }
         }
     }
