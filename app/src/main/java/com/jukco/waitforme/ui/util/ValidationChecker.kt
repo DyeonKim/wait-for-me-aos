@@ -1,43 +1,45 @@
 package com.jukco.waitforme.ui.util
 
+import com.jukco.waitforme.R
+
 object ValidationChecker {
 
-    fun checkIdValidation(id: String): Pair<Boolean, String> {
+    fun checkIdValidation(id: String): Pair<Boolean, Int?> {
         val checked = id.trim()
 
         return when {
             checked.isBlank() -> {
-                Pair(false, "id가 비었습니다.")
+                Pair(false, R.string.error_phone_number_empty)
             }
             checked.length !in 10..11 -> {
-                Pair(false, "id의 길이가 맞지 않습니다: ${checked.length}")
+                Pair(false, R.string.error_phone_number_length)
             }
             !checked.matches(Regex("^01[016789]\\d{3,4}\\d{4}")) -> {
-                Pair(false, "id가 올바른 전화번호 형식이 아닙니다.")
+                Pair(false, R.string.error_phone_number_format)
             }
             else -> {
-                Pair(true, "")
+                Pair(true, null)
             }
         }
     }
 
-    fun checkPasswordValidation(password: String): Pair<Boolean, String> {
+    fun checkPasswordValidation(password: String): Pair<Boolean, Int?> {
         val checked = password.trim()
 
         return when {
             checked.isBlank() -> {
-                Pair(false, "비밀번호가 비었습니다.")
+                Pair(false, R.string.error_password_empty)
             }
             checked.length !in 8..25 -> {
-                Pair(false, "비밀번호의 길이가 맞지 않습니다: ${checked.length}")
+                Pair(false, R.string.error_password_length)
             }
             !checked.matches(
                 Regex("^(?=.*[A-Za-z])(?=.*\\d)(?=.*[\$@!%*#?&])[A-Za-z\\d\$@!%*#?&]{8,25}\$")
             ) -> {
-                Pair(false, "비밀번호의 형식이 올바르지 않습니다.")
+                Pair(false, R.string.error_password_format)
             }
             else -> {
-                Pair(true, "")
+                Pair(true, null)
             }
         }
     }

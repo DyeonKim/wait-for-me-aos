@@ -24,7 +24,7 @@ class ValidationCheckerTest {
         val result = ValidationChecker.checkIdValidation(id)
 
         assertFalse(result.first)
-        assertEquals("id가 비었습니다.", result.second)
+        assertEquals(R.string.error_phone_number_empty, result.second)
     }
 
     @Test
@@ -33,7 +33,7 @@ class ValidationCheckerTest {
         val result = ValidationChecker.checkIdValidation(id)
 
         assertFalse(result.first)
-        assertEquals("id의 길이가 맞지 않습니다: ${id.length}", result.second)
+        assertEquals(R.string.error_phone_number_length, result.second)
     }
 
     @Test
@@ -42,7 +42,7 @@ class ValidationCheckerTest {
         val result = ValidationChecker.checkIdValidation(id)
 
         assertFalse(result.first)
-        assertEquals("id의 길이가 맞지 않습니다: ${id.length}", result.second)
+        assertEquals(R.string.error_phone_number_length, result.second)
     }
 
     @Test
@@ -51,7 +51,7 @@ class ValidationCheckerTest {
         val result = ValidationChecker.checkIdValidation(id)
 
         assertFalse(result.first)
-        assertEquals("id가 올바른 전화번호 형식이 아닙니다.", result.second)
+        assertEquals(R.string.error_phone_number_format, result.second)
     }
 
     @Test
@@ -67,7 +67,7 @@ class ValidationCheckerTest {
         val result = ValidationChecker.checkPasswordValidation(password)
 
         assertFalse(result.first)
-        assertEquals("비밀번호가 비었습니다.", result.second)
+        assertEquals(R.string.error_password_empty, result.second)
     }
 
     @Test
@@ -76,7 +76,7 @@ class ValidationCheckerTest {
         val result = ValidationChecker.checkPasswordValidation(password)
 
         assertFalse(result.first)
-        assertEquals("비밀번호의 길이가 맞지 않습니다: ${password.length}", result.second)
+        assertEquals(R.string.error_password_length, result.second)
     }
 
     @Test
@@ -85,7 +85,7 @@ class ValidationCheckerTest {
         val result = ValidationChecker.checkPasswordValidation(password)
 
         assertFalse(result.first)
-        assertEquals("비밀번호의 길이가 맞지 않습니다: ${password.length}", result.second)
+        assertEquals(R.string.error_password_length, result.second)
     }
 
     @Test
@@ -94,7 +94,7 @@ class ValidationCheckerTest {
         val result = ValidationChecker.checkPasswordValidation(password)
 
         assertFalse(result.first)
-        assertEquals("", result.second)
+        assertEquals(R.string.error_password_format, result.second)
     }
 
     @Test
@@ -103,7 +103,7 @@ class ValidationCheckerTest {
         val result = ValidationChecker.checkPasswordValidation(password)
 
         assertFalse(result.first)
-        assertEquals("", result.second)
+        assertEquals(R.string.error_password_format, result.second)
     }
 
     @Test
@@ -112,6 +112,6 @@ class ValidationCheckerTest {
         val result = ValidationChecker.checkPasswordValidation(password)
 
         assertFalse(result.first)
-        assertEquals("", result.second)
+        assertEquals(R.string.error_password_format, result.second)
     }
 }

@@ -41,6 +41,7 @@ import com.jukco.waitforme.data.repository.AuthProvider
 import com.jukco.waitforme.data.repository.MockAuthProvider
 import com.jukco.waitforme.data.repository.MockSignRepository
 import com.jukco.waitforme.ui.components.SocialSignIconButton
+import com.jukco.waitforme.ui.sign.ErrorMessage
 import com.jukco.waitforme.ui.sign.SignGuide
 import com.jukco.waitforme.ui.sign.SignViewModel
 import com.jukco.waitforme.ui.theme.ErrorRed
@@ -182,21 +183,10 @@ fun SignInForm(
             modifier = Modifier.fillMaxWidth(),
         )
         if (form.hasError == true) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
+            ErrorMessage(
+                message = stringResource(R.string.error_id_password),
                 modifier = Modifier.padding(top = 12.dp),
-            ){
-                Icon(
-                    painter = painterResource(R.drawable.ic_error),
-                    contentDescription = null,
-                    tint = ErrorRed,
-                )
-                Spacer(modifier = Modifier.width(4.dp))
-                Text(
-                    text = stringResource(R.string.error_id_password),
-                    color = ErrorRed,
-                )
-            }
+            )
         }
         Spacer(modifier = Modifier.height(24.dp))
         Button(
@@ -258,7 +248,6 @@ private fun SignInLayoutPreview() {
             onNoSignClicked = {},
         )
     }
-
 }
 
 @Preview(showBackground = true)

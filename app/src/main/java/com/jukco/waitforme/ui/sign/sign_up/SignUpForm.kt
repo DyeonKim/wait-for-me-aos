@@ -4,9 +4,16 @@ import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import com.kakao.sdk.user.model.User
 import com.navercorp.nid.profile.data.NidProfile
 data class SignUpForm(
-    val provider: String,
-    val snsId: String,
-    val phoneNumber: String? = null,
+    val provider: String = "LOCAL",
+    val snsId: String = "",
+    val phoneNumber: String = "",
+    val phoneNumberSubmitted: Boolean = false,
+    val verificationCode: String = "",
+    val verificationCodeSubmitted: Boolean = false,
+    val password: String = "",
+    val passwordVerification: Boolean? = null,
+    val confirmPassword: String = "",
+    val passwordSubmitted: Boolean = false,
     val isOwner: Boolean? = null,
     val name: String? = null,
     val birthedAt: String? = null,
@@ -16,7 +23,7 @@ data class SignUpForm(
     constructor(googleIdTokenCredential: GoogleIdTokenCredential) : this(
         provider = "GOOGLE",
         snsId = googleIdTokenCredential.id,
-        phoneNumber = googleIdTokenCredential.phoneNumber,
+        phoneNumber = googleIdTokenCredential.phoneNumber ?: "",
         name = googleIdTokenCredential.givenName,
         profileImage = googleIdTokenCredential.profilePictureUri.toString(),
     )
@@ -24,7 +31,7 @@ data class SignUpForm(
     constructor(kakaoUser: User) : this(
         provider = "KAKAO",
         snsId = kakaoUser.id.toString(),
-        phoneNumber = kakaoUser.kakaoAccount?.phoneNumber,
+        phoneNumber = kakaoUser.kakaoAccount?.phoneNumber ?: "",
         name = kakaoUser.kakaoAccount?.profile?.nickname,
         birthedAt = convertBirthedAt(kakaoUser.kakaoAccount?.birthyear, kakaoUser.kakaoAccount?.birthday),
         gender = kakaoUser.kakaoAccount?.gender.toString(),
@@ -34,7 +41,7 @@ data class SignUpForm(
     constructor(nidProfile: NidProfile) : this(
         provider = "NAVAER",
         snsId = nidProfile.id!!,
-        phoneNumber = nidProfile.mobile?.replace("-", ""),
+        phoneNumber = nidProfile.mobile?.replace("-", "") ?: "",
         name = nidProfile.nickname,
         birthedAt = convertBirthedAt(nidProfile.birthYear, nidProfile.birthday),
         gender = if (nidProfile.gender == "F") "FEMALE" else "MALE",

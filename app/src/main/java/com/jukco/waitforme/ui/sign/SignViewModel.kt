@@ -9,6 +9,7 @@ import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.AP
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
+import com.jukco.waitforme.R
 import com.jukco.waitforme.config.ApplicationClass
 import com.jukco.waitforme.data.network.model.LocalSignInRequest
 import com.jukco.waitforme.data.network.model.SocialSignInRequest
@@ -18,6 +19,7 @@ import com.jukco.waitforme.ui.sign.sign_in.SignInEvent
 import com.jukco.waitforme.ui.sign.sign_in.SignInForm
 import com.jukco.waitforme.ui.sign.sign_in.SignInState
 import com.jukco.waitforme.ui.sign.sign_in.SocialService
+import com.jukco.waitforme.ui.sign.sign_up.SignUpEvent
 import com.jukco.waitforme.ui.sign.sign_up.SignUpForm
 import com.jukco.waitforme.ui.util.ValidationChecker
 import kotlinx.coroutines.delay
@@ -34,6 +36,10 @@ class SignViewModel(
         private set
     var signInform by mutableStateOf(SignInForm())
         private set
+    var signUpForm by mutableStateOf(SignUpForm())
+        private set
+    var errorMessage by mutableStateOf<Int?>(null)
+        private set
 
     fun onSignInEvent(event: SignInEvent) {
         when (event) {
@@ -41,6 +47,34 @@ class SignViewModel(
             is SignInEvent.InputPassword -> { signInform = signInform.copy(password = event.password) }
             is SignInEvent.OnSignInClicked -> { onSignInClicked() }
             is SignInEvent.OnSocialSignInClicked -> { onSocialSignInClicked(event.user) }
+        }
+    }
+
+    fun onSignUpEvent(event: SignUpEvent) {
+        when (event) {
+            is SignUpEvent.InputPhoneNumber -> { signUpForm = signUpForm.copy(phoneNumber = event.phoneNum) }
+            is SignUpEvent.SubmitPhoneNumber -> {
+                signUpForm = signUpForm.copy(
+                    phoneNumberSubmitted = checkId(signUpForm.phoneNumber),
+                )
+            }
+            is SignUpEvent.InputVerificationCode -> { signUpForm = signUpForm.copy(verificationCode = event.code) }
+            is SignUpEvent.SubmitVerificationCode -> { signUpForm = signUpForm.copy(verificationCodeSubmitted = true) }
+            is SignUpEvent.InputPassword -> {
+                signUpForm = signUpForm.copy(
+                    password = event.password,
+                    passwordVerification = checkPassword(event.password),
+                )
+            }
+            is SignUpEvent.InputConfirmPassword -> {
+                val passwordConfirmed = (signUpForm.password == event.confirmPassword)
+
+                signUpForm = signUpForm.copy(
+                    confirmPassword = event.confirmPassword,
+                    passwordSubmitted = (signUpForm.passwordVerification == true) && passwordConfirmed,
+                )
+                errorMessage = if (passwordConfirmed) null else R.string.error_password_confirm
+            }
         }
     }
 
@@ -52,7 +86,7 @@ class SignViewModel(
         }
 
     private fun onSignInClicked() {
-        if (checkId() and checkPassword()) {
+        if (checkId(signInform.id) and checkPassword(signInform.password)) {
             signInform = signInform.copy(hasError = false)
             localSignIn(signInform.id, signInform.password)
         } else {
@@ -65,10 +99,6 @@ class SignViewModel(
             socialSignIn(user.provider, user.snsId)
         }
     }
-
-    private fun checkId(): Boolean = ValidationChecker.checkIdValidation(signInform.id).first
-
-    private fun checkPassword() = ValidationChecker.checkPasswordValidation(signInform.password).first
 
     private fun localSignIn(id: String, password: String) {
         viewModelScope.launch {
@@ -101,7 +131,7 @@ class SignViewModel(
                 val request = SocialSignInRequest(provider, snsId)
                 val response = signRepository.socialSignIn(request)
                 if (response.isSuccessful) {
-                    when(response.code()) {
+                    when (response.code()) {
                         200 -> {
                             // TODO : DataStore에 결과 저장
                             signInState = SignInState.MovingMain
@@ -120,6 +150,16 @@ class SignViewModel(
             }
         }
     }
+
+    private fun checkId(id: String): Boolean =
+        ValidationChecker.checkIdValidation(id).apply {
+            errorMessage = second
+        }.first
+
+    private fun checkPassword(password: String) =
+        ValidationChecker.checkPasswordValidation(password).apply {
+            errorMessage = second
+        }.first
 
     companion object {
         val Factory: ViewModelProvider.Factory = viewModelFactory {

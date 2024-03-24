@@ -14,7 +14,7 @@ import com.jukco.waitforme.ui.NoticeScreen
 import com.jukco.waitforme.ui.StoreManagementScreen
 import com.jukco.waitforme.ui.SearchScreen
 import com.jukco.waitforme.ui.sign.sign_in.SignInScreen
-import com.jukco.waitforme.ui.sign.sign_up.InputPhoneNumAndPwScreen
+import com.jukco.waitforme.ui.sign.sign_up.InputCredentialsScreen
 import com.jukco.waitforme.ui.WaitScreen
 import com.jukco.waitforme.ui.components.BottomNaviItem
 import com.jukco.waitforme.ui.sign.sign_up.CompleteScreen
@@ -94,7 +94,7 @@ fun NavigationGraph(
                 )
             }
             composable(Route.SignUpInputPhoneNumAndPw.name) {
-                InputPhoneNumAndPwScreen(
+                InputCredentialsScreen(
                     onNextButtonClicked = {
                         navController.navigate(Route.SignUpInputName.name)
                     }
@@ -104,10 +104,14 @@ fun NavigationGraph(
                 InputNameScreen()
             }
             composable(Route.SignUpSelectCustomerOwner.name) {
-                SelectCustomerOwnerScreen()
+                SelectCustomerOwnerScreen(
+                    onSignUpButtonClicked = {}
+                )
             }
             composable(Route.SignUpComplete.name) {
-                CompleteScreen()
+                CompleteScreen(
+                    onStartButtonClicked = {}
+                )
             }
         }
     }
