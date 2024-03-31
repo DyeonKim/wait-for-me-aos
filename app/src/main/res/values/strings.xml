@@ -69,7 +69,7 @@
     <string name="description_nickname_2">를 등록하면 닉네임으로 호출될 거에요!</string>
     <string name="i_am">저는...</string>
     <string name="customer_title">팝업스토어를 구경할 고객입니다</string>
-    <string name="customer_description">팝업 스토어 입장 대기 예약하거나 할 수 있습니다.</string>
+    <string name="customer_description">팝업 스토어 입장 대기 및 예약을 할 수 있습니다.</string>
     <string name="owner_title">팝업스토어를 관리할 점주입니다</string>
     <string name="owner_description">팝업 스토어를 운영할 수 있습니다.\n점주여도 입장 대기 및 예약을 할 수 있습니다.</string>
     <string name="success_sign_up">가입이 완료되었습니다\n환영합니다!</string>

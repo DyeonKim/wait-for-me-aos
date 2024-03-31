@@ -1,5 +1,6 @@
 package com.jukco.waitforme.ui.sign
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -35,6 +36,7 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.jukco.waitforme.R
@@ -44,6 +46,7 @@ import com.jukco.waitforme.ui.theme.MainBlue
 import com.jukco.waitforme.ui.theme.MainWhite
 import com.jukco.waitforme.ui.theme.NotoSansKR
 import com.jukco.waitforme.ui.theme.WaitForMeTheme
+import com.jukco.waitforme.ui.util.dpToSp
 
 @Preview(showBackground = true)
 @Composable
@@ -108,7 +111,7 @@ fun StepIndicators(
             if (step <= currentStep) {
                 PrevStepIndicator()
             } else {
-                NextStepIndicator(step.toString())
+                NextStepIndicator(step)
             }
             if (step != endStep) {
                 Ellipsis()
@@ -136,7 +139,7 @@ private fun PrevStepIndicator() {
 }
 
 @Composable
-private fun NextStepIndicator(step: String) {
+private fun NextStepIndicator(step: Int) {
     Box(
         contentAlignment = Alignment.Center,
         modifier = Modifier
@@ -145,7 +148,7 @@ private fun NextStepIndicator(step: String) {
             .background(Color(0xFFC2ED00)),
     ) {
         Text(
-            text = step,
+            text = step.toString(),
             style = TextStyle(
                 fontFamily = NotoSansKR,
                 fontWeight = FontWeight.Bold,
@@ -154,6 +157,7 @@ private fun NextStepIndicator(step: String) {
                 lineHeight = 14.sp,
                 platformStyle = PlatformTextStyle(includeFontPadding = false),
             ),
+            fontSize = dpToSp(dp = 14.dp),
         )
     }
 }

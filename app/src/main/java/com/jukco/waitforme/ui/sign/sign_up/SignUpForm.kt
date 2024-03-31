@@ -14,7 +14,7 @@ data class SignUpForm(
     val passwordVerification: Boolean? = null,
     val confirmPassword: String = "",
     val passwordSubmitted: Boolean = false,
-    val isOwner: Boolean? = null,
+    val isOwner: Boolean = false,
     val name: String = "",
     val nameSubmitted: Boolean = false,
     val birthedAt: String? = null,

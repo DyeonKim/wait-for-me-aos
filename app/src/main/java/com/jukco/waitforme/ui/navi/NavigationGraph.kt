@@ -60,7 +60,7 @@ fun NavigationGraph(
         composable(Route.MyInfo.name) {
             MyInfoScreen(
                 onSignInButtonClicked = { navController.navigate(Route.SignIn.name) },
-                onSignUpButtonClicked = { navController.navigate(Route.SignUpInputPhoneNumAndPw.name) },
+                onSignUpButtonClicked = { navController.navigate(Route.SignUpInputCredentials.name) },
             )
         }
         composable(Route.Notice.name) {
@@ -85,7 +85,7 @@ fun NavigationGraph(
         navigation(startDestination = Route.SignIn.name, route = Route.SignProgress.name) {
             composable(Route.SignIn.name) {
                 SignInScreen(
-                    goSignUp = { navController.navigate(Route.SignUpInputPhoneNumAndPw.name) },
+                    goSignUp = { navController.navigate(Route.SignUpInputCredentials.name) },
                     goMain = {
                         navController.navigate(Route.StoreList.name) {
                             popUpTo(Route.SignProgress.name) { inclusive = true }
@@ -93,7 +93,7 @@ fun NavigationGraph(
                     },
                 )
             }
-            composable(Route.SignUpInputPhoneNumAndPw.name) {
+            composable(Route.SignUpInputCredentials.name) {
                 InputCredentialsScreen(
                     onNextButtonClicked = {
                         navController.navigate(Route.SignUpInputName.name)
@@ -109,12 +109,20 @@ fun NavigationGraph(
             }
             composable(Route.SignUpSelectCustomerOwner.name) {
                 SelectCustomerOwnerScreen(
-                    onSignUpButtonClicked = {}
+                    onSignUpButtonClicked = {
+                        navController.navigate(Route.SignUpComplete.name) {
+                            popUpTo(Route.SignUpInputCredentials.name) { inclusive = true }
+                        }
+                    }
                 )
             }
             composable(Route.SignUpComplete.name) {
                 CompleteScreen(
-                    onStartButtonClicked = {}
+                    onStartButtonClicked = {
+                        navController.navigate(Route.StoreList.name) {
+                            popUpTo(Route.SignProgress.name) { inclusive = true }
+                        }
+                    }
                 )
             }
         }

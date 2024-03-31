@@ -19,6 +19,7 @@ import com.jukco.waitforme.ui.sign.sign_in.SignInEvent
 import com.jukco.waitforme.ui.sign.sign_in.SignInForm
 import com.jukco.waitforme.ui.sign.sign_in.SignInState
 import com.jukco.waitforme.ui.sign.sign_in.SocialService
+import com.jukco.waitforme.ui.sign.sign_up.CustomerOwner
 import com.jukco.waitforme.ui.sign.sign_up.SignUpEvent
 import com.jukco.waitforme.ui.sign.sign_up.SignUpForm
 import com.jukco.waitforme.ui.util.ValidationChecker
@@ -81,8 +82,14 @@ class SignViewModel(
                     nameSubmitted = checkName(event.name),
                 )
             }
+            is SignUpEvent.ChooseCustomerOrOwner -> { signUpForm = signUpForm.copy(isOwner = event.choice) }
         }
     }
+
+    fun getCustomerOwnerItem() = arrayOf(
+        CustomerOwner(R.string.customer_title, R.string.customer_description, false),
+        CustomerOwner(R.string.owner_title, R.string.owner_description, true),
+    )
 
     fun getSocialSign(service: SocialService) =
         when (service) {
