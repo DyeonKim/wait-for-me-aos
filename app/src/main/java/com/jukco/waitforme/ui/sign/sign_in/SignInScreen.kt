@@ -16,7 +16,6 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -25,7 +24,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -41,10 +39,10 @@ import com.jukco.waitforme.data.repository.AuthProvider
 import com.jukco.waitforme.data.repository.MockAuthProvider
 import com.jukco.waitforme.data.repository.MockSignRepository
 import com.jukco.waitforme.ui.components.SocialSignIconButton
+import com.jukco.waitforme.ui.navi.Route
 import com.jukco.waitforme.ui.sign.ErrorMessage
 import com.jukco.waitforme.ui.sign.SignGuide
 import com.jukco.waitforme.ui.sign.SignViewModel
-import com.jukco.waitforme.ui.theme.ErrorRed
 import com.jukco.waitforme.ui.theme.GreyAAA
 import com.jukco.waitforme.ui.theme.KakaoYellow
 import com.jukco.waitforme.ui.theme.MainWhite
@@ -54,29 +52,29 @@ import com.jukco.waitforme.ui.util.PhoneNumberVisualTransformation
 
 @Composable
 fun SignInScreen(
-    goSignUp: () -> Unit,
-    goMain: () -> Unit,
+    state: SignInState,
+    form: SignInForm,
+    socialSignIn: (SocialService) -> AuthProvider,
+    onEvent: (SignInEvent) -> Unit,
+    moveScreen: (Route) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val viewModel: SignViewModel = viewModel(factory = SignViewModel.Factory)
-
-    when (viewModel.signInState) {
+    when (state) {
         SignInState.Init -> {
             SignInLayout(
-                form = viewModel.signInform,
-                socialSignIn = viewModel::getSocialSign,
-                onEvent = viewModel::onSignInEvent,
-                goSignUp = goSignUp,
-                onNoSignClicked = goMain,
+                form = form,
+                socialSignIn = socialSignIn,
+                onEvent = onEvent,
+                moveScreen = moveScreen,
                 modifier = modifier,
             )
         }
         SignInState.Loading -> {
-            LoadingSignInLayout(form = viewModel.signInform, modifier = modifier)
+            LoadingSignInLayout(form = form, modifier = modifier)
         }
         SignInState.MovingMain -> {
             LaunchedEffect(Unit) {
-                goMain()
+                moveScreen(Route.StoreList)
             }
         }
     }
@@ -92,8 +90,7 @@ fun LoadingSignInLayout(
             form = form,
             socialSignIn = { MockAuthProvider },
             onEvent = {},
-            goSignUp = {},
-            onNoSignClicked = {},
+            moveScreen = {},
             modifier = modifier,
         )
         Dialog(
@@ -115,8 +112,7 @@ fun SignInLayout(
     form: SignInForm,
     socialSignIn: (SocialService) -> AuthProvider,
     onEvent: (SignInEvent) -> Unit,
-    goSignUp: () -> Unit,
-    onNoSignClicked: () -> Unit,
+    moveScreen: (Route) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -139,7 +135,7 @@ fun SignInLayout(
         )
         Spacer(modifier = Modifier.height(24.dp))
         OutlinedButton(
-            onClick = goSignUp,
+            onClick = { moveScreen(Route.SignUpInputCredentials) },
             modifier = Modifier.fillMaxWidth(),
         ) {
             Text(text = stringResource(R.string.sign_up))
@@ -151,7 +147,7 @@ fun SignInLayout(
             textDecoration = TextDecoration.Underline,
             modifier = Modifier
                 .fillMaxWidth()
-                .clickable { onNoSignClicked() },
+                .clickable { moveScreen(Route.StoreList) },
         )
     }
 }
@@ -244,8 +240,7 @@ private fun SignInLayoutPreview() {
             form = viewModel.signInform,
             socialSignIn = viewModel::getSocialSign,
             onEvent = viewModel::onSignInEvent,
-            goSignUp = {},
-            onNoSignClicked = {},
+            moveScreen = {},
         )
     }
 }

@@ -1,5 +1,6 @@
 package com.jukco.waitforme.ui.sign.sign_up
 
+import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -24,7 +25,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.jukco.waitforme.R
 import com.jukco.waitforme.data.repository.MockAuthProvider
 import com.jukco.waitforme.data.repository.MockSignRepository
@@ -39,15 +39,16 @@ import com.jukco.waitforme.ui.theme.WaitForMeTheme
 @Composable
 fun SelectCustomerOwnerScreen(
     onSignUpButtonClicked: () -> Unit,
+    form: SignUpForm,
+    customerOwner: Array<CustomerOwner>,
+    onEvent: (SignUpEvent) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val viewModel: SignViewModel = viewModel(factory = SignViewModel.Factory)
-
     SelectCustomerOwnerLayout(
         onSignUpButtonClicked = onSignUpButtonClicked,
-        form = viewModel.signUpForm,
-        customerOwnerItems = viewModel.getCustomerOwnerItem(),
-        onEvent = viewModel::onSignUpEvent,
+        form = form,
+        customerOwner = customerOwner,
+        onEvent = onEvent,
         modifier = modifier
     )
 }
@@ -56,7 +57,7 @@ fun SelectCustomerOwnerScreen(
 fun SelectCustomerOwnerLayout(
     onSignUpButtonClicked: () -> Unit,
     form: SignUpForm,
-    customerOwnerItems: Array<CustomerOwner>,
+    customerOwner: Array<CustomerOwner>,
     onEvent: (SignUpEvent) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -85,14 +86,17 @@ fun SelectCustomerOwnerLayout(
         )
         Spacer(modifier = Modifier.height(24.dp))
         CustomerOrOwner(
-            items = customerOwnerItems,
+            items = customerOwner,
             defaultSelected = form.isOwner,
             onItemSelected = { choice -> onEvent(SignUpEvent.ChooseCustomerOrOwner(choice)) },
             modifier = Modifier.fillMaxWidth(),
         )
         Spacer(modifier = Modifier.weight(1f))
         Button(
-            onClick = onSignUpButtonClicked,
+            onClick = {
+                Log.d("SelectCustomerOwnerLayout: ", "$form")
+                onSignUpButtonClicked()
+            },
             modifier = Modifier.fillMaxWidth(),
         ) {
             Text(text = stringResource(R.string.sign_up))
@@ -111,12 +115,12 @@ private fun CustomerOrOwner(
         verticalArrangement = Arrangement.spacedBy(16.dp),
         modifier = modifier,
     ) {
-        items.forEach { card ->
+        items.forEach { item ->
             OutlinedCard(
-                border = BorderStroke(2.dp, if (defaultSelected == card.value) MainBlue else GreyDDD),
+                border = BorderStroke(2.dp, if (defaultSelected == item.value) MainBlue else GreyDDD),
                 shape = RoundedCornerShape(12.dp),
                 modifier = modifier
-                    .clickable { onItemSelected(card.value) }
+                    .clickable { onItemSelected(item.value) }
                     .defaultMinSize(minHeight = 120.dp)
             ) {
                 Column(
@@ -126,7 +130,7 @@ private fun CustomerOrOwner(
                         .padding(top = 24.dp, bottom = 22.dp)
                 ) {
                     Text(
-                        text = stringResource(card.title),
+                        text = stringResource(item.title),
                         style = TextStyle(
                             fontFamily = NotoSansKR,
                             fontWeight = FontWeight.Bold,
@@ -138,7 +142,7 @@ private fun CustomerOrOwner(
                         ),
                     )
                     Text(
-                        text = stringResource(card.description),
+                        text = stringResource(item.description),
                         style = TextStyle(
                             fontFamily = NotoSansKR,
                             fontWeight = FontWeight.Normal,
@@ -167,7 +171,7 @@ private fun SelectCustomerOwnerLayoutPreview() {
         SelectCustomerOwnerLayout(
             onSignUpButtonClicked = {},
             form = viewModel.signUpForm,
-            customerOwnerItems = viewModel.getCustomerOwnerItem(),
+            customerOwner = SignViewModel.CUSTOMER_OWNER,
             onEvent = viewModel::onSignUpEvent
         )
     }

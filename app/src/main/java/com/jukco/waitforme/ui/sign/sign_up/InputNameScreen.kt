@@ -30,7 +30,6 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.jukco.waitforme.R
 import com.jukco.waitforme.data.repository.MockAuthProvider
 import com.jukco.waitforme.data.repository.MockSignRepository
@@ -45,22 +44,6 @@ import com.jukco.waitforme.ui.theme.WaitForMeTheme
 
 @Composable
 fun InputNameScreen(
-    onNextButtonClicked: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    val viewModel: SignViewModel = viewModel(factory = SignViewModel.Factory)
-
-    InputNameLayout(
-        onNextButtonClicked = onNextButtonClicked,
-        form = viewModel.signUpForm,
-        errorMessage = viewModel.errorMessage,
-        onEvent = viewModel::onSignUpEvent,
-        modifier = modifier,
-    )
-}
-
-@Composable
-fun InputNameLayout(
     onNextButtonClicked: () -> Unit,
     form: SignUpForm,
     @StringRes errorMessage: Int?,
@@ -154,7 +137,7 @@ private fun InputNameLayoutPreview() {
     }
 
     WaitForMeTheme {
-        InputNameLayout(
+        InputNameScreen(
             onNextButtonClicked = {},
             form = viewModel.signUpForm,
             errorMessage = viewModel.errorMessage,

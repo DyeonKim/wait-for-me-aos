@@ -86,11 +86,6 @@ class SignViewModel(
         }
     }
 
-    fun getCustomerOwnerItem() = arrayOf(
-        CustomerOwner(R.string.customer_title, R.string.customer_description, false),
-        CustomerOwner(R.string.owner_title, R.string.owner_description, true),
-    )
-
     fun getSocialSign(service: SocialService) =
         when (service) {
             is SocialService.Google -> { googleAuthProvider }
@@ -179,6 +174,11 @@ class SignViewModel(
     }.first
 
     companion object {
+        val CUSTOMER_OWNER = arrayOf(
+            CustomerOwner(R.string.customer_title, R.string.customer_description, false),
+            CustomerOwner(R.string.owner_title, R.string.owner_description, true),
+        )
+
         val Factory: ViewModelProvider.Factory = viewModelFactory {
             initializer {
                 val application = (this[APPLICATION_KEY] as ApplicationClass)

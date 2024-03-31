@@ -30,7 +30,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.jukco.waitforme.R
 import com.jukco.waitforme.data.repository.MockAuthProvider
 import com.jukco.waitforme.data.repository.MockSignRepository
@@ -47,15 +46,17 @@ import com.jukco.waitforme.ui.util.PhoneNumberVisualTransformation
 @Composable
 fun InputCredentialsScreen(
     onNextButtonClicked: () -> Unit,
+    form: SignUpForm,
+    @StringRes errorMessage: Int?,
+    onEvent: (SignUpEvent) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val viewModel: SignViewModel = viewModel(factory = SignViewModel.Factory)
 
     InputPhoneNumAndPasswordLayout(
         onNextButtonClicked = onNextButtonClicked,
-        form = viewModel.signUpForm,
-        errorMessage = viewModel.errorMessage,
-        onEvent = viewModel::onSignUpEvent,
+        form = form,
+        errorMessage = errorMessage,
+        onEvent = onEvent,
         modifier = modifier,
     )
 }
