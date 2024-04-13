@@ -3,6 +3,7 @@ package com.jukco.waitforme.repository
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import com.jukco.waitforme.data.network.api.SignApi
 import com.jukco.waitforme.data.network.model.LocalSignInRequest
+import com.jukco.waitforme.data.network.model.Provider
 import com.jukco.waitforme.data.network.model.SocialSignInRequest
 import com.jukco.waitforme.data.repository.SignRepository
 import com.jukco.waitforme.data.repository.SignRepositoryImplementation
@@ -63,7 +64,7 @@ class SignRepositoryTest {
         val res = MockResponse().setBody(json)
         server.enqueue(res)
 
-        val request = SocialSignInRequest("NAVER", "test123%23")
+        val request = SocialSignInRequest(Provider.NAVER, "test123%23")
         val actualRes = signRepository.socialSignIn(request)
         server.takeRequest()
 

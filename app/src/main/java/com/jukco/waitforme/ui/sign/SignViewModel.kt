@@ -12,6 +12,7 @@ import androidx.lifecycle.viewmodel.viewModelFactory
 import com.jukco.waitforme.R
 import com.jukco.waitforme.config.ApplicationClass
 import com.jukco.waitforme.data.network.model.LocalSignInRequest
+import com.jukco.waitforme.data.network.model.Provider
 import com.jukco.waitforme.data.network.model.SocialSignInRequest
 import com.jukco.waitforme.data.repository.AuthProvider
 import com.jukco.waitforme.data.repository.SignRepository
@@ -130,7 +131,7 @@ class SignViewModel(
         }
     }
 
-    private fun socialSignIn(provider: String, snsId: String) {
+    private fun socialSignIn(provider: Provider, snsId: String) {
         viewModelScope.launch {
             signInState = SignInState.Loading
             delay(3000) // TODO : 서버와 연결 후에는 지울 것. 기다리는 최대 시간이 있어야 한다.

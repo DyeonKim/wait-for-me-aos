@@ -11,6 +11,6 @@ data class LocalSignInRequest(
 
 @Serializable
 data class SocialSignInRequest(
-    @SerialName("provider") val provider: String,
+    @SerialName("provider") val provider: Provider,
     @SerialName("snsId") val snsId: String,
 )
