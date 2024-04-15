@@ -79,6 +79,22 @@
     <string name="success_sign_up">가입이 완료되었습니다\n환영합니다!</string>
     <string name="start">시작하기</string>
 
+    <string name="profile_img">프로필 사진</string>
+    <string name="change_profile_image">프로필 사진 변경</string>
+    <string name="save">저장하기</string>
+    <string name="edit">수정하기</string>
+    <string name="nickname">닉네임</string>
+    <string name="gender">성별</string>
+    <string name="gender_female">여성</string>
+    <string name="gender_male">남성</string>
+    <string name="gender_other">여성도 남성도 아님</string>
+    <string name="select_gender">성별 선택</string>
+    <string name="birthed_at">생년월일</string>
+    <string name="input_birthday">생년월일 입력</string>
+    <string name="desc_login_with_google">구글에 로그인하셨습니다.</string>
+    <string name="desc_login_with_kakao">카카오에 로그인하셨습니다.</string>
+    <string name="desc_login_with_naver">네이버에 로그인하셨습니다.</string>
+
     <string-array name="pops_filter_group">
         <item>최신순</item>
         <item>마감임박순</item>

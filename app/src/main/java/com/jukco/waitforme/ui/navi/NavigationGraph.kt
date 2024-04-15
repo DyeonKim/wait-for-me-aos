@@ -11,15 +11,15 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import androidx.navigation.navigation
 import com.jukco.waitforme.ui.BookmarkScreen
-import com.jukco.waitforme.ui.MyInfoScreen
 import com.jukco.waitforme.ui.NoticeScreen
 import com.jukco.waitforme.ui.StoreManagementScreen
 import com.jukco.waitforme.ui.SearchScreen
-import com.jukco.waitforme.ui.sign.sign_in.SignInScreen
-import com.jukco.waitforme.ui.sign.sign_up.InputCredentialsScreen
 import com.jukco.waitforme.ui.WaitScreen
 import com.jukco.waitforme.ui.components.BottomNaviItem
+import com.jukco.waitforme.ui.my_info.MyInfoScreen
 import com.jukco.waitforme.ui.sign.SignViewModel
+import com.jukco.waitforme.ui.sign.sign_in.SignInScreen
+import com.jukco.waitforme.ui.sign.sign_up.InputCredentialsScreen
 import com.jukco.waitforme.ui.sign.sign_up.CompleteScreen
 import com.jukco.waitforme.ui.sign.sign_up.InputNameScreen
 import com.jukco.waitforme.ui.sign.sign_up.SelectCustomerOwnerScreen
@@ -61,10 +61,7 @@ fun NavigationGraph(
             BookmarkScreen()
         }
         composable(Route.MyInfo.name) {
-            MyInfoScreen(
-                onSignInButtonClicked = { navController.navigate(Route.SignIn.name) },
-                onSignUpButtonClicked = { navController.navigate(Route.SignUpInputCredentials.name) },
-            )
+            MyInfoScreen()
         }
         composable(Route.Notice.name) {
             NoticeScreen(
