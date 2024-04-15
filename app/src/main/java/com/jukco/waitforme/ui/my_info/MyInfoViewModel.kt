@@ -22,6 +22,8 @@ class MyInfoViewModel(private val userRepository: UserRepository) : ViewModel() 
         private set
     var myInfo by mutableStateOf(UserInfo())
         private set
+    var openGenderDialog by mutableStateOf(false)
+        private set
 
     init {
         getMyInfo()
@@ -55,6 +57,12 @@ class MyInfoViewModel(private val userRepository: UserRepository) : ViewModel() 
                 )
                 /* TODO : 비밀번호와 일치 여부 확인 */
             }
+            is MyInfoEvent.ShowGenderDialog -> { openGenderDialog = true }
+            is MyInfoEvent.CloseGenderDialog -> {
+                myInfo = myInfo.copy(genderType = _myInfo.value.genderType)
+                openGenderDialog = false
+            }
+            is MyInfoEvent.SaveGender -> { openGenderDialog = false }
             is MyInfoEvent.Edit -> { state = MyInfoState.Edit }
             is MyInfoEvent.Save -> { save() }
             is MyInfoEvent.Cancel -> {

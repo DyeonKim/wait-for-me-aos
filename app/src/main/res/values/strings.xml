@@ -94,6 +94,8 @@
     <string name="desc_login_with_google">구글에 로그인하셨습니다.</string>
     <string name="desc_login_with_kakao">카카오에 로그인하셨습니다.</string>
     <string name="desc_login_with_naver">네이버에 로그인하셨습니다.</string>
+    <string name="dialog_gender_title">당신의 성별은?</string>
+    <string name="dialog_gender_desc">성별은 단순 이벤트 추천을 위해 사용됩니다.</string>
 
     <string-array name="pops_filter_group">
         <item>최신순</item>

@@ -48,6 +48,7 @@ import coil.request.ImageRequest
 import com.jukco.waitforme.R
 import com.jukco.waitforme.data.network.model.Provider
 import com.jukco.waitforme.data.repository.MockUserRepository
+import com.jukco.waitforme.ui.components.GenderDialog
 import com.jukco.waitforme.ui.theme.ErrorRed
 import com.jukco.waitforme.ui.theme.GreyDDD
 import com.jukco.waitforme.ui.theme.MainBlue
@@ -75,6 +76,14 @@ fun MyInfoScreen(
                 userInfo = viewModel.myInfo,
                 onEvent = viewModel::onEvent,
             )
+            if (viewModel.state == MyInfoState.Edit && viewModel.openGenderDialog) {
+                GenderDialog(
+                    selected = viewModel.myInfo.genderType,
+                    onSelectGender = { gender -> viewModel.onEvent(MyInfoEvent.SelectGender(gender)) },
+                    onDismissRequest = { viewModel.onEvent(MyInfoEvent.CloseGenderDialog) },
+                    onConfirmation = { viewModel.onEvent(MyInfoEvent.SaveGender) },
+                )
+            }
         }
     }
 }
@@ -233,7 +242,7 @@ fun ProfileInfoForm(
                 readOnly = true,
                 trailingIcon = {
                     if (isEdit) {
-                        IconButton(onClick = { /* TODO : 성별 다이얼로그 띄우고 선택 */ }) {
+                        IconButton(onClick = { onEvent(MyInfoEvent.ShowGenderDialog) }) {
                             Icon(
                                 imageVector = Icons.Outlined.Add,
                                 contentDescription = stringResource(R.string.select_gender),

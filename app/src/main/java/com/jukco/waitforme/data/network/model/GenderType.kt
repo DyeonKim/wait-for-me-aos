@@ -4,7 +4,7 @@ import androidx.annotation.StringRes
 import com.jukco.waitforme.R
 
 enum class GenderType(@StringRes val stringId: Int) {
-    FEMALE(R.string.gender_female),
     MALE(R.string.gender_male),
+    FEMALE(R.string.gender_female),
     OTHER(R.string.gender_other),
 }

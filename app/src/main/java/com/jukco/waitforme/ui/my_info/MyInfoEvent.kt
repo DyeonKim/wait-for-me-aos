@@ -10,6 +10,9 @@ sealed interface MyInfoEvent {
     data class InputProfileImage(val profileUri: String) : MyInfoEvent
     data class InputPassword(val password: String) : MyInfoEvent
     data class InputConfirmPassword(val confirmPassword: String) : MyInfoEvent
+    object ShowGenderDialog : MyInfoEvent
+    object CloseGenderDialog : MyInfoEvent
+    object SaveGender : MyInfoEvent
     object Edit : MyInfoEvent
     object Save : MyInfoEvent
     object Cancel : MyInfoEvent
