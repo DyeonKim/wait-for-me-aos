@@ -24,6 +24,8 @@ class MyInfoViewModel(private val userRepository: UserRepository) : ViewModel() 
         private set
     var openGenderDialog by mutableStateOf(false)
         private set
+    var openBirthDayPickerDialog by mutableStateOf(false)
+        private set
 
     init {
         getMyInfo()
@@ -40,7 +42,6 @@ class MyInfoViewModel(private val userRepository: UserRepository) : ViewModel() 
             is MyInfoEvent.CheckDuplicateName -> {
                 /* TODO : 이름 중복 체크 */
             }
-            is MyInfoEvent.InputBirthDay -> { /* TODO : 나중에... */ }
             is MyInfoEvent.SelectGender -> { myInfo = myInfo.copy(genderType = event.genderType) }
             is MyInfoEvent.InputProfileImage -> { myInfo = myInfo.copy(profileImage = event.profileUri) }
             is MyInfoEvent.InputPassword -> {
@@ -62,7 +63,13 @@ class MyInfoViewModel(private val userRepository: UserRepository) : ViewModel() 
                 myInfo = myInfo.copy(genderType = _myInfo.value.genderType)
                 openGenderDialog = false
             }
-            is MyInfoEvent.SaveGender -> { openGenderDialog = false }
+            is MyInfoEvent.ConfirmGender -> { openGenderDialog = false }
+            is MyInfoEvent.ShowBirthDayPickerDialog -> { openBirthDayPickerDialog = true }
+            is MyInfoEvent.CloseBirthDayPickerDialog -> { openBirthDayPickerDialog = false }
+            is MyInfoEvent.ConfirmBirthDayPickerDialog -> {
+                myInfo = myInfo.copy(birthedAt = event.date)
+                openBirthDayPickerDialog = false
+            }
             is MyInfoEvent.Edit -> { state = MyInfoState.Edit }
             is MyInfoEvent.Save -> { save() }
             is MyInfoEvent.Cancel -> {

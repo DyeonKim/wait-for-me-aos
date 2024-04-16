@@ -48,6 +48,7 @@ import coil.request.ImageRequest
 import com.jukco.waitforme.R
 import com.jukco.waitforme.data.network.model.Provider
 import com.jukco.waitforme.data.repository.MockUserRepository
+import com.jukco.waitforme.ui.components.CustomDatePickerDialog
 import com.jukco.waitforme.ui.components.GenderDialog
 import com.jukco.waitforme.ui.theme.ErrorRed
 import com.jukco.waitforme.ui.theme.GreyDDD
@@ -81,7 +82,14 @@ fun MyInfoScreen(
                     selected = viewModel.myInfo.genderType,
                     onSelectGender = { gender -> viewModel.onEvent(MyInfoEvent.SelectGender(gender)) },
                     onDismissRequest = { viewModel.onEvent(MyInfoEvent.CloseGenderDialog) },
-                    onConfirmation = { viewModel.onEvent(MyInfoEvent.SaveGender) },
+                    onConfirmation = { viewModel.onEvent(MyInfoEvent.ConfirmGender) },
+                )
+            }
+            if (viewModel.state == MyInfoState.Edit && viewModel.openBirthDayPickerDialog) {
+                CustomDatePickerDialog(
+                    selectedDate = viewModel.myInfo.birthedAt,
+                    onDismissRequest = { viewModel.onEvent(MyInfoEvent.CloseBirthDayPickerDialog) },
+                    onConfirmation = { date -> viewModel.onEvent(MyInfoEvent.ConfirmBirthDayPickerDialog(date)) }
                 )
             }
         }
@@ -261,7 +269,7 @@ fun ProfileInfoForm(
                 readOnly = true,
                 trailingIcon = {
                     if (isEdit) {
-                        IconButton(onClick = { /*TODO : 생년월일 캘린더 띄우고 선택 */ }) {
+                        IconButton(onClick = { onEvent(MyInfoEvent.ShowBirthDayPickerDialog) }) {
                             Icon(
                                 imageVector = Icons.Outlined.Add,
                                 contentDescription = stringResource(R.string.input_birthday),

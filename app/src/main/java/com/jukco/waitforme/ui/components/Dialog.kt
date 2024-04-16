@@ -1,5 +1,7 @@
 package com.jukco.waitforme.ui.components
 
+import android.icu.text.SimpleDateFormat
+import android.icu.util.TimeZone
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -15,17 +17,31 @@ import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
+import androidx.compose.material3.DatePicker
+import androidx.compose.material3.DatePickerDialog
+import androidx.compose.material3.DisplayMode
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.jukco.waitforme.R
 import com.jukco.waitforme.data.network.model.GenderType
 import com.jukco.waitforme.ui.theme.MainBlue
+import com.jukco.waitforme.ui.theme.WaitForMeTheme
+import com.jukco.waitforme.ui.util.DATE_FORMAT
+import java.time.LocalDate
+import java.util.Date
+import java.util.Locale
 
 @Composable
 fun GenderDialog(
@@ -103,3 +119,82 @@ fun GenderDialog(
         }
     }
 }
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun CustomDatePickerDialog(
+    selectedDate: String?,
+    onDismissRequest: () -> Unit,
+    onConfirmation: (String) -> Unit,
+) {
+    val currentYear = LocalDate.now().year
+    val datePickerState = rememberDatePickerState(
+        yearRange = (currentYear - 100)..currentYear,
+        initialDisplayMode = DisplayMode.Picker,
+        initialSelectedDateMillis = when (selectedDate) {
+            null -> System.currentTimeMillis()
+            else -> {
+                val formatter = SimpleDateFormat(DATE_FORMAT, Locale.getDefault()).apply {
+                    timeZone = TimeZone.getTimeZone("UTC")
+                }
+                formatter.parse(selectedDate)?.time ?: System.currentTimeMillis()
+            }
+        },
+    )
+
+    DatePickerDialog(
+        onDismissRequest = onDismissRequest,
+        confirmButton = {
+            TextButton(
+                onClick = {
+                    datePickerState.selectedDateMillis?.let { selectedDateMillis ->
+                        val formattedDate = SimpleDateFormat(
+                            DATE_FORMAT,
+                            Locale.getDefault()
+                        ).format(Date(selectedDateMillis))
+                        onConfirmation(formattedDate)
+                    }
+                }
+            ) {
+                Text(text = stringResource(R.string.ok))
+        } },
+        dismissButton = { TextButton(onClick = onDismissRequest) {
+            Text(text = stringResource(R.string.cancel))
+        } },
+    ) {
+        DatePicker(
+            state = datePickerState,
+            title = {},
+        )
+    }
+}
+
+@Preview(showSystemUi = true)
+@Composable
+fun GenderDialogPreview() {
+    WaitForMeTheme {
+        val selectedGender = remember {
+            mutableStateOf(GenderType.FEMALE)
+        }
+
+        GenderDialog(
+            selected = selectedGender.value,
+            onSelectGender = { gender -> selectedGender.value = gender },
+            onDismissRequest = {},
+            onConfirmation = {}
+        )
+    }
+}
+
+@Preview(showSystemUi = true)
+@Composable
+fun DatePickerDialogPreview() {
+    WaitForMeTheme {
+        CustomDatePickerDialog(
+            selectedDate = "2024-12-01",
+            onDismissRequest = {},
+            onConfirmation = {},
+        )
+    }
+}
+
