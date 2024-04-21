@@ -1,6 +1,9 @@
 package com.jukco.waitforme.ui.my_info
 
 import android.util.Log
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -176,6 +179,14 @@ fun ProfileImage(
     inputProfileImage: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val singlePhotoPickerLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.PickVisualMedia(),
+        onResult = { uri ->
+            if (uri != null)
+                inputProfileImage(uri.toString())
+        }
+    )
+
     Box(modifier = modifier) {
         AsyncImage(
             model = ImageRequest.Builder(context = LocalContext.current)
@@ -195,7 +206,11 @@ fun ProfileImage(
         )
         if (isEdit) {
             SmallFloatingActionButton(
-                onClick = { /*TODO*/ },
+                onClick = { singlePhotoPickerLauncher.launch(
+                    PickVisualMediaRequest(
+                        ActivityResultContracts.PickVisualMedia.ImageOnly
+                    )
+                ) },
                 shape = CircleShape,
                 modifier = Modifier
                     .fillMaxSize(0.25f)
