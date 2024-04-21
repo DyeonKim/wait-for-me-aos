@@ -33,7 +33,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.jukco.waitforme.R
 import com.jukco.waitforme.data.repository.AuthProvider
 import com.jukco.waitforme.data.repository.MockAuthProvider
@@ -135,7 +134,10 @@ fun SignInLayout(
         )
         Spacer(modifier = Modifier.height(24.dp))
         OutlinedButton(
-            onClick = { moveScreen(Route.SignUpInputCredentials) },
+            onClick = {
+                moveScreen(Route.SignUpInputCredentials)
+                onEvent(SignInEvent.Reset)
+            },
             modifier = Modifier.fillMaxWidth(),
         ) {
             Text(text = stringResource(R.string.sign_up))

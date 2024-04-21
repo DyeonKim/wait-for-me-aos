@@ -49,6 +49,7 @@ class SignViewModel(
             is SignInEvent.InputPassword -> { signInform = signInform.copy(password = event.password) }
             is SignInEvent.OnSignInClicked -> { onSignInClicked() }
             is SignInEvent.OnSocialSignInClicked -> { onSocialSignInClicked(event.user) }
+            is SignInEvent.Reset -> { reset() }
         }
     }
 
@@ -93,6 +94,12 @@ class SignViewModel(
             is SocialService.Kakao -> { kakaoAuthProvider }
             is SocialService.Naver -> { naverAuthProvider }
         }
+
+    private fun reset() {
+        signInform = SignInForm()
+        signUpForm = SignUpForm()
+        errorMessage = null
+    }
 
     private fun onSignInClicked() {
         if (checkId(signInform.id) and checkPassword(signInform.password)) {

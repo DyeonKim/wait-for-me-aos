@@ -6,9 +6,10 @@ import com.jukco.waitforme.data.network.model.Provider
 import com.kakao.sdk.user.model.Gender
 import com.kakao.sdk.user.model.User
 import com.navercorp.nid.profile.data.NidProfile
+
 data class SignUpForm(
-    val provider: Provider,
-    val snsId: String,
+    val provider: Provider = Provider.LOCAL,
+    val snsId: String = "",
     val phoneNumber: String = "",
     val phoneNumberSubmitted: Boolean = false,
     val verificationCode: String = "",
@@ -27,8 +28,8 @@ data class SignUpForm(
     constructor(googleIdTokenCredential: GoogleIdTokenCredential) : this(
         provider = Provider.GOOGLE,
         snsId = googleIdTokenCredential.id,
-        phoneNumber = googleIdTokenCredential.phoneNumber,
-        name = googleIdTokenCredential.givenName,
+        phoneNumber = googleIdTokenCredential.phoneNumber ?: "",
+        name = googleIdTokenCredential.givenName ?: "",
         profileImage = googleIdTokenCredential.profilePictureUri.toString(),
     )
 
@@ -50,8 +51,8 @@ data class SignUpForm(
     constructor(nidProfile: NidProfile) : this(
         provider = Provider.NAVER,
         snsId = nidProfile.id!!,
-        phoneNumber = nidProfile.mobile?.replace("-", ""),
-        name = nidProfile.nickname,
+        phoneNumber = nidProfile.mobile?.replace("-", "") ?: "",
+        name = nidProfile.nickname ?: "",
         birthedAt = convertBirthedAt(nidProfile.birthYear, nidProfile.birthday),
         genderType = when (nidProfile.gender) {
             "F" -> GenderType.FEMALE
@@ -65,7 +66,7 @@ data class SignUpForm(
 
 private fun convertBirthedAt(year: String?, monthDay: String?) =
     if (year != null && monthDay != null) {
-        "$year-$monthDay"
+        "$year-${monthDay.replace(Regex("^\\d"), "-")}"
     } else {
         null
     }

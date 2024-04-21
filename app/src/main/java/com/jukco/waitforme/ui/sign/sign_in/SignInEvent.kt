@@ -7,4 +7,5 @@ sealed interface SignInEvent {
     data class InputPassword(val password: String) : SignInEvent
     object OnSignInClicked : SignInEvent
     data class OnSocialSignInClicked(val user: SignUpForm?) : SignInEvent
+    object Reset : SignInEvent
 }
