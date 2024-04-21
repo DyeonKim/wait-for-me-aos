@@ -34,9 +34,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.jukco.waitforme.R
+import com.jukco.waitforme.data.mock.MockAuthProvider
+import com.jukco.waitforme.data.mock.MockSignRepository
 import com.jukco.waitforme.data.repository.AuthProvider
-import com.jukco.waitforme.data.repository.MockAuthProvider
-import com.jukco.waitforme.data.repository.MockSignRepository
 import com.jukco.waitforme.ui.components.SocialSignIconButton
 import com.jukco.waitforme.ui.navi.Route
 import com.jukco.waitforme.ui.sign.ErrorMessage

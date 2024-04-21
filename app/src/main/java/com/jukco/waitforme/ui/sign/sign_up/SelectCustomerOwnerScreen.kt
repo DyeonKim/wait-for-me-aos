@@ -26,8 +26,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.jukco.waitforme.R
-import com.jukco.waitforme.data.repository.MockAuthProvider
-import com.jukco.waitforme.data.repository.MockSignRepository
+import com.jukco.waitforme.data.mock.MockAuthProvider
+import com.jukco.waitforme.data.mock.MockSignRepository
 import com.jukco.waitforme.ui.sign.SignViewModel
 import com.jukco.waitforme.ui.sign.StepIndicators
 import com.jukco.waitforme.ui.theme.GreyDDD
