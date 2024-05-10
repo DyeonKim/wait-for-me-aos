@@ -21,4 +21,7 @@ interface SignApi {
 
     @POST("auth/sns/sign-up")
     suspend fun socialSignUp(@Body signUpReq: SocialSignUpRequest): Response<SignInResponse>
+
+    @POST("auth/check/name")
+    suspend fun checkDuplicateName(@Body name: String): Response<Boolean>
 }

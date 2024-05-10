@@ -16,6 +16,8 @@ interface SignRepository {
     suspend fun localSignUp(signUpReq: LocalSignUpRequest): Response<SignInResponse>
 
     suspend fun socialSignUp(signUpReq: SocialSignUpRequest): Response<SignInResponse>
+
+    suspend fun checkDuplicateName(name: String): Response<Boolean>
 }
 
 class SignRepositoryImplementation(
@@ -32,4 +34,7 @@ class SignRepositoryImplementation(
 
     override suspend fun socialSignUp(signUpReq: SocialSignUpRequest): Response<SignInResponse> =
         signApi.socialSignUp(signUpReq)
+
+    override suspend fun checkDuplicateName(name: String): Response<Boolean> =
+        signApi.checkDuplicateName(name)
 }

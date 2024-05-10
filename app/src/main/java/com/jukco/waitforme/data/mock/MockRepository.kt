@@ -22,4 +22,7 @@ object MockSignRepository : SignRepository {
     override suspend fun socialSignUp(signUpReq: SocialSignUpRequest): Response<SignInResponse> =
         Response.success(HttpURLConnection.HTTP_OK, MockDataSource.signInRes)
 
+    override suspend fun checkDuplicateName(name: String): Response<Boolean> =
+        Response.success(HttpURLConnection.HTTP_OK, true)
+
 }

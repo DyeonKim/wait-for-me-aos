@@ -128,4 +128,36 @@ class SignRepositoryTest {
         assertEquals(HttpURLConnection.HTTP_OK, actualRes.code())
         assertEquals(FakeDataSource.signInResponse, actualRes.body())
     }
+
+    @Test
+    fun signRepository_checkDuplicateName_success() = runTest {
+        val json = Json.encodeToJsonElement(true).toString()
+        val res = MockResponse()
+            .setResponseCode(HttpURLConnection.HTTP_OK)
+            .setBody(json)
+        server.enqueue(res)
+
+        val actualRes = signRepository.checkDuplicateName("test")
+        server.takeRequest()
+
+        assertTrue(actualRes.isSuccessful)
+        assertEquals(HttpURLConnection.HTTP_OK, actualRes.code())
+        assertEquals(true, actualRes.body())
+    }
+
+    @Test
+    fun signRepository_checkDuplicateName_fail() = runTest {
+        val json = Json.encodeToJsonElement(false).toString()
+        val res = MockResponse()
+            .setResponseCode(HttpURLConnection.HTTP_OK)
+            .setBody(json)
+        server.enqueue(res)
+
+        val actualRes = signRepository.checkDuplicateName("test")
+        server.takeRequest()
+
+        assertTrue(actualRes.isSuccessful)
+        assertEquals(HttpURLConnection.HTTP_OK, actualRes.code())
+        assertEquals(false, actualRes.body())
+    }
 }
