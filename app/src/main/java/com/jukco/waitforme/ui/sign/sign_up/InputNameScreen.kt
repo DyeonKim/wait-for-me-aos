@@ -48,17 +48,51 @@ fun InputNameScreen(
     form: SignUpForm,
     @StringRes errorMessage: Int?,
     onEvent: (SignUpEvent) -> Unit,
-    modifier: Modifier = Modifier,
 ) {
     Column(
-        modifier = modifier
+        modifier = Modifier
             .padding(horizontal = 20.dp, vertical = 36.dp),
     ) {
         StepIndicators(
             currentStep = 1,
             endStep = 2,
-            modifier = modifier.padding(bottom = 96.dp),
         )
+        InputNicknameForm(
+            form = form,
+            errorMessage = errorMessage,
+            onEvent = onEvent
+        )
+        Text(
+            text = stringResource(R.string.skip_input),
+            textAlign = TextAlign.Center,
+            textDecoration = TextDecoration.Underline,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 24.dp)
+                .clickable { onNextButtonClicked() }
+        )
+        NickNameGuide()
+        Spacer(modifier = Modifier.weight(1f))
+        Button(
+            onClick = { onEvent(SignUpEvent.CheckDuplicateName(form.name, onNextButtonClicked)) },
+            enabled = form.nameSubmitted,
+            modifier = Modifier.fillMaxWidth(),
+        ) {
+            Text(
+                text = stringResource(R.string.next_step),
+            )
+        }
+    }
+}
+
+@Composable
+fun InputNicknameForm(
+    form: SignUpForm,
+    @StringRes errorMessage: Int?,
+    onEvent: (SignUpEvent) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Column(modifier = modifier) {
         Text(
             text = stringResource(R.string.guide_sign_up_nickname),
             style = TextStyle(
@@ -83,49 +117,36 @@ fun InputNameScreen(
         errorMessage?.let {
             ErrorMessage(message = stringResource(it), Modifier.padding(top = 12.dp))
         }
+    }
+}
+
+@Composable
+fun NickNameGuide(
+    modifier: Modifier = Modifier,
+) {
+    Box(
+        contentAlignment = Alignment.Center,
+        modifier = modifier
+            .defaultMinSize(minHeight = 48.dp)
+            .fillMaxWidth()
+            .background(color = GreyEEE, shape = RoundedCornerShape(8.dp))
+    ) {
         Text(
-            text = stringResource(R.string.skip_input),
-            textAlign = TextAlign.Center,
-            textDecoration = TextDecoration.Underline,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 24.dp)
-                .clickable { onNextButtonClicked() }
+            text = buildAnnotatedString {
+                withStyle(style = SpanStyle(color = MainBlue, fontWeight = FontWeight.Bold)) {
+                    append(stringResource(R.string.description_nickname_1))
+                }
+                append(stringResource(R.string.description_nickname_2))
+            },
+            style = TextStyle(
+                fontFamily = NotoSansKR,
+                fontWeight = FontWeight.Medium,
+                fontSize = 13.sp,
+                color = MainBlack,
+                lineHeight = (19.24).sp,
+                platformStyle = PlatformTextStyle(includeFontPadding = false),
+            )
         )
-        Box(
-            contentAlignment = Alignment.Center,
-            modifier = Modifier
-                .defaultMinSize(minHeight = 48.dp)
-                .fillMaxWidth()
-                .background(color = GreyEEE, shape = RoundedCornerShape(8.dp))
-        ) {
-            Text(
-                text = buildAnnotatedString {
-                    withStyle(style = SpanStyle(color = MainBlue, fontWeight = FontWeight.Bold)) {
-                        append(stringResource(R.string.description_nickname_1))
-                    }
-                    append(stringResource(R.string.description_nickname_2))
-                },
-                style = TextStyle(
-                    fontFamily = NotoSansKR,
-                    fontWeight = FontWeight.Medium,
-                    fontSize = 13.sp,
-                    color = MainBlack,
-                    lineHeight = (19.24).sp,
-                    platformStyle = PlatformTextStyle(includeFontPadding = false),
-                )
-            )
-        }
-        Spacer(modifier = Modifier.weight(1f))
-        Button(
-            onClick = onNextButtonClicked,
-            enabled = form.nameSubmitted,
-            modifier = Modifier.fillMaxWidth(),
-        ) {
-            Text(
-                text = stringResource(R.string.next_step),
-            )
-        }
     }
 }
 

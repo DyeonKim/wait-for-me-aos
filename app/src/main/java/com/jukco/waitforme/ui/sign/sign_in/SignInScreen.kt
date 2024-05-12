@@ -59,21 +59,20 @@ fun SignInScreen(
     modifier: Modifier = Modifier,
 ) {
     when (state) {
-        SignInState.Init -> {
+        is SignInState.Init -> {
             SignInLayout(
                 form = form,
                 socialSignIn = socialSignIn,
                 onEvent = onEvent,
-                moveScreen = moveScreen,
                 modifier = modifier,
             )
         }
-        SignInState.Loading -> {
+        is SignInState.Loading -> {
             LoadingSignInLayout(form = form, modifier = modifier)
         }
-        SignInState.MovingMain -> {
+        is SignInState.Move -> {
             LaunchedEffect(Unit) {
-                moveScreen(Route.StoreList)
+                moveScreen(state.route)
             }
         }
     }
@@ -89,7 +88,6 @@ fun LoadingSignInLayout(
             form = form,
             socialSignIn = { MockAuthProvider },
             onEvent = {},
-            moveScreen = {},
             modifier = modifier,
         )
         Dialog(
@@ -111,7 +109,6 @@ fun SignInLayout(
     form: SignInForm,
     socialSignIn: (SocialService) -> AuthProvider,
     onEvent: (SignInEvent) -> Unit,
-    moveScreen: (Route) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -134,10 +131,7 @@ fun SignInLayout(
         )
         Spacer(modifier = Modifier.height(24.dp))
         OutlinedButton(
-            onClick = {
-                moveScreen(Route.SignUpInputCredentials)
-                onEvent(SignInEvent.Reset)
-            },
+            onClick = { onEvent(SignInEvent.MoveSignUp) },
             modifier = Modifier.fillMaxWidth(),
         ) {
             Text(text = stringResource(R.string.sign_up))
@@ -149,7 +143,7 @@ fun SignInLayout(
             textDecoration = TextDecoration.Underline,
             modifier = Modifier
                 .fillMaxWidth()
-                .clickable { moveScreen(Route.StoreList) },
+                .clickable { onEvent(SignInEvent.MoveMain) },
         )
     }
 }
@@ -242,7 +236,6 @@ private fun SignInLayoutPreview() {
             form = viewModel.signInform,
             socialSignIn = viewModel::getSocialSign,
             onEvent = viewModel::onSignInEvent,
-            moveScreen = {},
         )
     }
 }

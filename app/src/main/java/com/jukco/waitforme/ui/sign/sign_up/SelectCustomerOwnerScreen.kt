@@ -42,14 +42,12 @@ fun SelectCustomerOwnerScreen(
     form: SignUpForm,
     customerOwner: Array<CustomerOwner>,
     onEvent: (SignUpEvent) -> Unit,
-    modifier: Modifier = Modifier,
 ) {
     SelectCustomerOwnerLayout(
         onSignUpButtonClicked = onSignUpButtonClicked,
         form = form,
         customerOwner = customerOwner,
         onEvent = onEvent,
-        modifier = modifier
     )
 }
 
@@ -59,19 +57,16 @@ fun SelectCustomerOwnerLayout(
     form: SignUpForm,
     customerOwner: Array<CustomerOwner>,
     onEvent: (SignUpEvent) -> Unit,
-    modifier: Modifier = Modifier,
 ) {
     Column(
-        modifier
+        Modifier
             .fillMaxSize()
             .padding(horizontal = 20.dp, vertical = 36.dp),
     ) {
         StepIndicators(
             currentStep = 2,
             endStep = 2,
-            modifier = modifier,
         )
-        Spacer(modifier = Modifier.height(96.dp))
         Text(
             text = stringResource(R.string.i_am),
             style = TextStyle(

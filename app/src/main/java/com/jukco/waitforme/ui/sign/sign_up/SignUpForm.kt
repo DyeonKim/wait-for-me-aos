@@ -2,7 +2,9 @@ package com.jukco.waitforme.ui.sign.sign_up
 
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import com.jukco.waitforme.data.network.model.GenderType
+import com.jukco.waitforme.data.network.model.LocalSignUpRequest
 import com.jukco.waitforme.data.network.model.Provider
+import com.jukco.waitforme.data.network.model.SocialSignUpRequest
 import com.kakao.sdk.user.model.Gender
 import com.kakao.sdk.user.model.User
 import com.navercorp.nid.profile.data.NidProfile
@@ -70,3 +72,21 @@ private fun convertBirthedAt(year: String?, monthDay: String?) =
     } else {
         null
     }
+
+fun SignUpForm.toLocalReq() = LocalSignUpRequest(
+    phoneNumber = this.phoneNumber,
+    password = this.password,
+    name = this.name,
+    isOwner = this.isOwner,
+)
+
+fun SignUpForm.toSocialReq() = SocialSignUpRequest(
+    provider = this.provider,
+    snsId = this.snsId,
+    phoneNumber = this.phoneNumber,
+    isOwner = this.isOwner,
+    name = this.name,
+    birthedAt = this.birthedAt,
+    genderType = this.genderType,
+    profileImage = this.profileImage,
+)

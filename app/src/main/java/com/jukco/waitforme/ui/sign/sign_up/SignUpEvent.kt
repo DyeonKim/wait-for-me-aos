@@ -8,5 +8,6 @@ sealed interface SignUpEvent {
     data class InputPassword(val password: String) : SignUpEvent
     data class InputConfirmPassword(val confirmPassword: String) : SignUpEvent
     data class InputName(val name: String) : SignUpEvent
+    data class CheckDuplicateName(val name: String, val moveToNext: () -> Unit) : SignUpEvent
     data class ChooseCustomerOrOwner(val choice: Boolean) : SignUpEvent
 }

@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Wait For Me</string>
 
@@ -32,9 +33,11 @@
     <string name="share_info">[팝업스토어] %s</string>
     <string name="sharing_not_available">해당 팝업스토어를 공유할 수 없습니다.</string>
 
-    <string name="sign_announcement_1">웨잇포미는 </string>
-    <string name="sign_announcement_2">휴대폰 번호가 ID</string>
-    <string name="sign_announcement_3">에요.\n번호는 외부에 공개되지 않아요.</string>
+    <string name="local_sign_announcement_1">웨잇포미는 </string>
+    <string name="phone_number_is_id">휴대폰 번호가 ID</string>
+    <string name="local_sign_announcement_2">에요.\n </string>
+    <string name="social_sign_announcement">본인 인증을 진행해 주세요.\n</string>
+    <string name="sign_announcement">번호는 외부에 공개되지 않아요.</string>
 
     <string name="placeholder_input_id">-없이 입력해 주세요</string>
     <string name="placeholder_input_password">비밀번호를 입력해주세요</string>
@@ -64,6 +67,7 @@
     <string name="error_nickname_empty">닉네임이 비었습니다.</string>
     <string name="error_nickname_length">닉네임이 1자 이상 8자 이하여야 합니다.</string>
     <string name="error_nickname_format">닉네임의 형식이 올바르지 않습니다.</string>
+    <string name="error_nickname_duplicate">중복된 닉네임입니다.</string>
 
     <string name="description_nickname_1">현장 대기</string>
     <string name="description_nickname_2">를 등록하면 닉네임으로 호출될 거에요!</string>

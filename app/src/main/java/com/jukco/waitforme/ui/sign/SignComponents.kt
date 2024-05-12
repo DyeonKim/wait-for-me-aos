@@ -1,10 +1,10 @@
 package com.jukco.waitforme.ui.sign
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
@@ -36,7 +36,7 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.TextUnit
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.jukco.waitforme.R
@@ -56,11 +56,35 @@ fun SignGuide(
     Column(modifier) {
         Text(
             text = buildAnnotatedString {
-                append(stringResource(R.string.sign_announcement_1))
+                append(stringResource(R.string.local_sign_announcement_1))
                 withStyle(style = SpanStyle(fontWeight = FontWeight.Bold, color = MainBlue)) {
-                    append(stringResource(R.string.sign_announcement_2))
+                    append(stringResource(R.string.phone_number_is_id))
                 }
-                append(stringResource(R.string.sign_announcement_3))
+                append(stringResource(R.string.local_sign_announcement_2))
+                append(stringResource(R.string.sign_announcement))
+            },
+            style = TextStyle(
+                fontFamily = NotoSansKR,
+                fontWeight = FontWeight.Medium,
+                fontSize = 20.sp,
+                color = MainBlack,
+                lineHeight = 28.sp,
+                platformStyle = PlatformTextStyle(includeFontPadding = false),
+            ),
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun SocialSignGuide(
+    modifier: Modifier = Modifier,
+) {
+    Column(modifier) {
+        Text(
+            text = buildAnnotatedString {
+                append(stringResource(R.string.social_sign_announcement))
+                append(stringResource(R.string.sign_announcement))
             },
             style = TextStyle(
                 fontFamily = NotoSansKR,
@@ -100,12 +124,13 @@ fun ErrorMessage(
 fun StepIndicators(
     currentStep: Int,
     endStep: Int,
+    paddingValues: PaddingValues = PaddingValues(start = 0.dp, end = 0.dp, top = 0.dp, bottom = 96.dp),
     modifier: Modifier = Modifier,
 ) {
     Row(
         horizontalArrangement = Arrangement.spacedBy(8.dp),
         verticalAlignment = Alignment.CenterVertically,
-        modifier = modifier,
+        modifier = modifier.padding(paddingValues)
     ) {
         for (step in 1..endStep) {
             if (step <= currentStep) {
@@ -191,7 +216,7 @@ private fun Ellipsis() {
 @Composable
 fun TextFieldButtonForm(
     modifier: Modifier = Modifier,
-    textfield: @Composable RowScope.() -> Unit,
+    textField: @Composable RowScope.() -> Unit,
     buttons: @Composable RowScope.() -> Unit,
 ) {
     Row(
@@ -199,7 +224,7 @@ fun TextFieldButtonForm(
         horizontalArrangement = Arrangement.spacedBy(8.dp),
         modifier = modifier,
         content = {
-            textfield()
+            textField()
             buttons()
         },
     )
@@ -218,7 +243,7 @@ private fun StepIndicatorsPreview() {
 private fun TextFieldButtonFormPreview() {
     WaitForMeTheme {
         TextFieldButtonForm(
-            textfield = {
+            textField = {
                 OutlinedTextField(value = "", onValueChange = {}, modifier = Modifier.defaultMinSize(minWidth = 84.dp, minHeight = 48.dp))
             },
             buttons = {

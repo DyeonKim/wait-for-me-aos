@@ -33,14 +33,17 @@ import androidx.compose.ui.unit.sp
 import com.jukco.waitforme.R
 import com.jukco.waitforme.data.mock.MockAuthProvider
 import com.jukco.waitforme.data.mock.MockSignRepository
+import com.jukco.waitforme.data.network.model.Provider
 import com.jukco.waitforme.ui.sign.ErrorMessage
 import com.jukco.waitforme.ui.sign.SignGuide
 import com.jukco.waitforme.ui.sign.SignViewModel
+import com.jukco.waitforme.ui.sign.SocialSignGuide
 import com.jukco.waitforme.ui.sign.TextFieldButtonForm
 import com.jukco.waitforme.ui.theme.GreyDDD
 import com.jukco.waitforme.ui.theme.MainBlack
 import com.jukco.waitforme.ui.theme.NotoSansKR
 import com.jukco.waitforme.ui.theme.WaitForMeTheme
+import com.jukco.waitforme.ui.theme.signupLayoutModifier
 import com.jukco.waitforme.ui.util.PhoneNumberVisualTransformation
 
 @Composable
@@ -49,16 +52,22 @@ fun InputCredentialsScreen(
     form: SignUpForm,
     @StringRes errorMessage: Int?,
     onEvent: (SignUpEvent) -> Unit,
-    modifier: Modifier = Modifier,
 ) {
-
-    InputPhoneNumAndPasswordLayout(
-        onNextButtonClicked = onNextButtonClicked,
-        form = form,
-        errorMessage = errorMessage,
-        onEvent = onEvent,
-        modifier = modifier,
-    )
+    if (form.provider == Provider.LOCAL) {
+        InputPhoneNumAndPasswordLayout(
+            onNextButtonClicked = onNextButtonClicked,
+            form = form,
+            errorMessage = errorMessage,
+            onEvent = onEvent,
+        )
+    } else {
+        InputPhoneNumLayout(
+            onNextButtonClicked = onNextButtonClicked,
+            form = form,
+            errorMessage = errorMessage,
+            onEvent = onEvent
+        )
+    }
 }
 
 @Composable
@@ -67,23 +76,21 @@ fun InputPhoneNumAndPasswordLayout(
     form: SignUpForm,
     @StringRes errorMessage: Int?,
     onEvent: (SignUpEvent) -> Unit,
-    modifier: Modifier = Modifier,
 ) {
     Column(
         verticalArrangement = Arrangement.spacedBy(12.dp),
-        modifier = modifier
+        modifier = Modifier
             .fillMaxSize()
-            .padding(horizontal = 20.dp)
-            .padding(bottom = 36.dp),
+            .padding(horizontal = 20.dp, vertical = 36.dp),
     ) {
-        SignGuide(Modifier.padding(top = 72.dp, bottom = 58.dp))
+        SignGuide(Modifier.padding(top = 36.dp, bottom = 58.dp))
         errorMessage?.let {
             ErrorMessage(stringResource(it))
         }
         if (form.verificationCodeSubmitted) {
-            PasswordSetupForm(form, onEvent, modifier)
+            PasswordSetupForm(form, onEvent)
         }
-        PhoneNumberSetupForm(form, onEvent, modifier)
+        PhoneNumberSetupForm(form, onEvent)
         Spacer(modifier = Modifier.weight(1f))
         if (form.verificationCodeSubmitted) {
             Button(
@@ -101,8 +108,34 @@ fun InputPhoneNumAndPasswordLayout(
 
 @Composable
 fun InputPhoneNumLayout(
-    modifier: Modifier = Modifier,
+    onNextButtonClicked: () -> Unit,
+    form: SignUpForm,
+    @StringRes errorMessage: Int?,
+    onEvent: (SignUpEvent) -> Unit,
 ) {
+    Column(
+        verticalArrangement = Arrangement.spacedBy(12.dp),
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(horizontal = 20.dp, vertical = 36.dp),
+    ) {
+        SocialSignGuide(Modifier.padding(top = 36.dp, bottom = 58.dp))
+        errorMessage?.let {
+            ErrorMessage(stringResource(it))
+        }
+        PhoneNumberSetupForm(form, onEvent)
+        Spacer(modifier = Modifier.weight(1f))
+        if (form.verificationCodeSubmitted) {
+            Button(
+                onClick = onNextButtonClicked,
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                Text(
+                    text = stringResource(R.string.next_step),
+                )
+            }
+        }
+    }
 }
 
 @Composable
@@ -117,7 +150,7 @@ fun PhoneNumberSetupForm(
     ) {
         if (form.phoneNumberSubmitted) {
             TextFieldButtonForm(
-                textfield = {
+                textField = {
                     OutlinedTextField(
                         value = form.verificationCode,
                         onValueChange = { code -> onEvent(SignUpEvent.InputVerificationCode(code)) },
@@ -177,7 +210,7 @@ fun PhoneNumberSetupForm(
             )
         }
         TextFieldButtonForm(
-            textfield = {
+            textField = {
                 OutlinedTextField(
                     value = form.phoneNumber,
                     onValueChange = {phoneNum -> onEvent(SignUpEvent.InputPhoneNumber(phoneNum)) },

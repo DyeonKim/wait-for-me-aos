@@ -16,6 +16,7 @@ import com.jukco.waitforme.data.network.model.Provider
 import com.jukco.waitforme.data.network.model.SocialSignInRequest
 import com.jukco.waitforme.data.repository.AuthProvider
 import com.jukco.waitforme.data.repository.SignRepository
+import com.jukco.waitforme.ui.navi.Route
 import com.jukco.waitforme.ui.sign.sign_in.SignInEvent
 import com.jukco.waitforme.ui.sign.sign_in.SignInForm
 import com.jukco.waitforme.ui.sign.sign_in.SignInState
@@ -23,6 +24,8 @@ import com.jukco.waitforme.ui.sign.sign_in.SocialService
 import com.jukco.waitforme.ui.sign.sign_up.CustomerOwner
 import com.jukco.waitforme.ui.sign.sign_up.SignUpEvent
 import com.jukco.waitforme.ui.sign.sign_up.SignUpForm
+import com.jukco.waitforme.ui.sign.sign_up.toLocalReq
+import com.jukco.waitforme.ui.sign.sign_up.toSocialReq
 import com.jukco.waitforme.ui.util.ValidationChecker
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -42,6 +45,9 @@ class SignViewModel(
         private set
     var errorMessage by mutableStateOf<Int?>(null)
         private set
+    var isLoading by mutableStateOf(false)
+        private set
+
 
     fun onSignInEvent(event: SignInEvent) {
         when (event) {
@@ -49,7 +55,11 @@ class SignViewModel(
             is SignInEvent.InputPassword -> { signInform = signInform.copy(password = event.password) }
             is SignInEvent.OnSignInClicked -> { onSignInClicked() }
             is SignInEvent.OnSocialSignInClicked -> { onSocialSignInClicked(event.user) }
-            is SignInEvent.Reset -> { reset() }
+            is SignInEvent.MoveMain -> { signInState = SignInState.Move(Route.StoreList) }
+            is SignInEvent.MoveSignUp -> {
+                signInState = SignInState.Move(Route.SignUpInputCredentials)
+                reset()
+            }
         }
     }
 
@@ -57,9 +67,7 @@ class SignViewModel(
         when (event) {
             is SignUpEvent.InputPhoneNumber -> { signUpForm = signUpForm.copy(phoneNumber = event.phoneNum) }
             is SignUpEvent.SubmitPhoneNumber -> {
-                signUpForm = signUpForm.copy(
-                    phoneNumberSubmitted = checkId(signUpForm.phoneNumber),
-                )
+                signUpForm = signUpForm.copy(phoneNumberSubmitted = checkId(signUpForm.phoneNumber))
             }
             is SignUpEvent.InputVerificationCode -> { signUpForm = signUpForm.copy(verificationCode = event.code) }
             is SignUpEvent.SubmitVerificationCode -> { signUpForm = signUpForm.copy(verificationCodeSubmitted = true) }
@@ -84,6 +92,7 @@ class SignViewModel(
                     nameSubmitted = checkName(event.name),
                 )
             }
+            is SignUpEvent.CheckDuplicateName -> { checkDuplicateName(event.name, event.moveToNext) }
             is SignUpEvent.ChooseCustomerOrOwner -> { signUpForm = signUpForm.copy(isOwner = event.choice) }
         }
     }
@@ -112,7 +121,16 @@ class SignViewModel(
 
     private fun onSocialSignInClicked(user: SignUpForm?) {
         if (user != null) {
+            signUpForm = user
             socialSignIn(user.provider, user.snsId)
+        }
+    }
+
+    private fun onSignUpClicked(moveToSuccess: () -> Unit, moveToFail: () -> Unit) {
+        if (signUpForm.provider == Provider.LOCAL) {
+            localSignUp(moveToSuccess, moveToFail)
+        } else {
+            socialSignUp(moveToSuccess, moveToFail)
         }
     }
 
@@ -126,13 +144,13 @@ class SignViewModel(
                 val response = signRepository.localSignIn(request)
                 if (response.isSuccessful) {
                     // TODO : DataStore에 결과 저장
-                    signInState = SignInState.MovingMain
+                    signInState = SignInState.Move(Route.StoreList)
                     return@launch
                 }
-                // TODO
+                // TODO : 30X, 40X 오류 처리
                 signInState = SignInState.Init
             } catch (e: IOException) {
-                // TODO
+                // TODO : 50X 오류 처리
                 signInState = SignInState.Init
             }
         }
@@ -150,19 +168,108 @@ class SignViewModel(
                     when (response.code()) {
                         200 -> {
                             // TODO : DataStore에 결과 저장
-                            signInState = SignInState.MovingMain
+                            signInState = SignInState.Move(Route.StoreList)
                             return@launch
                         }
                         204 -> {
-                            // TODO : 회원가입
+                            signInState = when {
+                                signUpForm.phoneNumber.isBlank() -> {
+                                    SignInState.Move(Route.SignUpInputCredentials)
+                                }
+                                signUpForm.name.isBlank() -> {
+                                    SignInState.Move(Route.SignUpInputName)
+                                }
+                                else -> {
+                                    SignInState.Move(Route.SignUpSelectCustomerOwner)
+                                }
+                            }
+
                         }
                     }
                 }
-                // TODO
+                // TODO : 30X, 40X 오류 처리
                 signInState = SignInState.Init
             } catch (e: IOException) {
-                // TODO
+                // TODO : 50X 오류 처리
                 signInState = SignInState.Init
+            }
+        }
+    }
+
+    private fun localSignUp(moveToSuccess: () -> Unit, moveToFail: () -> Unit) {
+        viewModelScope.launch {
+            isLoading = true
+            delay(3000) // TODO : 서버와 연결 후에는 지울 것. 기다리는 최대 시간이 있어야 한다.
+
+            try {
+                val request = signUpForm.toLocalReq()
+                val response = signRepository.localSignUp(request)
+                if (response.isSuccessful) {
+                    // TODO : DataStore에 결과 저장
+                    moveToSuccess
+                    return@launch
+                }
+                // TODO : 30X, 40X 오류 처리
+                moveToFail
+            } catch (e: IOException) {
+                // TODO : 50X 오류 처리
+                moveToFail
+            } finally {
+                isLoading = false
+            }
+        }
+    }
+
+    private fun socialSignUp(moveToSuccess: () -> Unit, moveToFail: () -> Unit) {
+        viewModelScope.launch {
+            isLoading = true
+            delay(3000) // TODO : 서버와 연결 후에는 지울 것. 기다리는 최대 시간이 있어야 한다.
+
+            try {
+                val request = signUpForm.toSocialReq()
+                val response = signRepository.socialSignUp(request)
+                if (response.isSuccessful) {
+                    // TODO : DataStore에 결과 저장
+                    moveToSuccess
+                    return@launch
+                }
+                // TODO : 30X, 40X 오류 처리
+                moveToFail
+            } catch (e: IOException) {
+                // TODO : 50X 오류 처리
+                moveToFail
+            } finally {
+                isLoading = false
+            }
+        }
+    }
+
+    private fun checkDuplicateName(name: String, moveToNext: () -> Unit) {
+        viewModelScope.launch {
+            isLoading = true
+            delay(3000) // TODO : 서버와 연결 후에는 지울 것. 기다리는 최대 시간이 있어야 한다.
+
+            try {
+                val response = signRepository.checkDuplicateName(name)
+                if (response.isSuccessful) {
+                    response.body()?.also { isUnique ->
+                        if (isUnique) {
+                            errorMessage = null
+                            moveToNext
+                        } else {
+                            errorMessage = R.string.error_nickname_duplicate
+                            signUpForm = signUpForm.copy(
+                                nameSubmitted = false,
+                            )
+                        }
+                    }
+                    return@launch
+                }
+                // TODO : 30X, 40X 오류 처리
+            } catch (e: IOException) {
+                // TODO : 50X 오류 처리
+            } finally {
+                isLoading = false
             }
         }
     }
