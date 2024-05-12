@@ -10,13 +10,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.jukco.waitforme.data.mock.MockAuthProvider
 import com.jukco.waitforme.data.repository.AuthProvider
-import com.jukco.waitforme.ui.sign.sign_up.SignUpForm
+import com.jukco.waitforme.ui.sign.sign_up.SignUpDto
 import com.jukco.waitforme.ui.theme.WaitForMeTheme
 
 @Composable
 fun SocialSignIconButton(
     authProvider: AuthProvider,
-    onSignInClicked: (SignUpForm?) -> Unit,
+    onSignInClicked: (SignUpDto?) -> Unit,
     buttonBorder: BorderStroke? = null,
     buttonColors: ButtonColors = ButtonDefaults.buttonColors(),
     modifier: Modifier = Modifier,
