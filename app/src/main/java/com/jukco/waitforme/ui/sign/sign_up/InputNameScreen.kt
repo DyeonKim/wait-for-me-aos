@@ -15,6 +15,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -33,6 +34,7 @@ import androidx.compose.ui.unit.sp
 import com.jukco.waitforme.R
 import com.jukco.waitforme.data.mock.MockAuthProvider
 import com.jukco.waitforme.data.mock.MockSignRepository
+import com.jukco.waitforme.ui.LoadingDialogContainer
 import com.jukco.waitforme.ui.sign.ErrorMessage
 import com.jukco.waitforme.ui.sign.SignViewModel
 import com.jukco.waitforme.ui.sign.StepIndicators
@@ -44,6 +46,31 @@ import com.jukco.waitforme.ui.theme.WaitForMeTheme
 
 @Composable
 fun InputNameScreen(
+    onNextButtonClicked: () -> Unit,
+    dto: SignUpDto,
+    form: SignUpForm,
+    isLoading: Boolean,
+    @StringRes errorMessage: Int?,
+    onEvent: (SignUpEvent) -> Unit,
+) {
+    if (dto.name.isBlank()) {
+        LoadingDialogContainer(isLoading = isLoading) {
+            InputNameLayout(
+                onNextButtonClicked = onNextButtonClicked,
+                form = form,
+                errorMessage = errorMessage,
+                onEvent = onEvent
+            )
+        }
+    } else {
+        LaunchedEffect(Unit) {
+            onNextButtonClicked()
+        }
+    }
+}
+
+@Composable
+fun InputNameLayout(
     onNextButtonClicked: () -> Unit,
     form: SignUpForm,
     @StringRes errorMessage: Int?,
@@ -57,7 +84,7 @@ fun InputNameScreen(
             currentStep = 1,
             endStep = 2,
         )
-        InputNicknameForm(
+        NameForm(
             form = form,
             errorMessage = errorMessage,
             onEvent = onEvent
@@ -71,10 +98,10 @@ fun InputNameScreen(
                 .padding(vertical = 24.dp)
                 .clickable { onNextButtonClicked() }
         )
-        NickNameGuide()
+        NameGuide()
         Spacer(modifier = Modifier.weight(1f))
         Button(
-            onClick = { onEvent(SignUpEvent.CheckDuplicateName(form.name, onNextButtonClicked)) },
+            onClick = { onEvent(SignUpEvent.CheckDuplicateName) },
             enabled = form.nameSubmitted,
             modifier = Modifier.fillMaxWidth(),
         ) {
@@ -86,7 +113,7 @@ fun InputNameScreen(
 }
 
 @Composable
-fun InputNicknameForm(
+fun NameForm(
     form: SignUpForm,
     @StringRes errorMessage: Int?,
     onEvent: (SignUpEvent) -> Unit,
@@ -121,7 +148,7 @@ fun InputNicknameForm(
 }
 
 @Composable
-fun NickNameGuide(
+fun NameGuide(
     modifier: Modifier = Modifier,
 ) {
     Box(
@@ -160,8 +187,10 @@ private fun InputNameLayoutPreview() {
     WaitForMeTheme {
         InputNameScreen(
             onNextButtonClicked = {},
+            dto = viewModel.signUpDto,
             form = viewModel.signUpForm,
             errorMessage = viewModel.errorMessage,
+            isLoading = viewModel.isLoading,
             onEvent = viewModel::onSignUpEvent
         )
     }

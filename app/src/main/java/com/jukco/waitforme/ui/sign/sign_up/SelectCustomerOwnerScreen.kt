@@ -1,6 +1,5 @@
 package com.jukco.waitforme.ui.sign.sign_up
 
-import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -28,6 +27,7 @@ import androidx.compose.ui.unit.sp
 import com.jukco.waitforme.R
 import com.jukco.waitforme.data.mock.MockAuthProvider
 import com.jukco.waitforme.data.mock.MockSignRepository
+import com.jukco.waitforme.ui.LoadingDialogContainer
 import com.jukco.waitforme.ui.sign.SignViewModel
 import com.jukco.waitforme.ui.sign.StepIndicators
 import com.jukco.waitforme.ui.theme.GreyDDD
@@ -39,22 +39,25 @@ import com.jukco.waitforme.ui.theme.WaitForMeTheme
 @Composable
 fun SelectCustomerOwnerScreen(
     onSignUpButtonClicked: () -> Unit,
-    form: SignUpForm,
+    dto: SignUpDto,
     customerOwner: Array<CustomerOwner>,
+    isLoading: Boolean,
     onEvent: (SignUpEvent) -> Unit,
 ) {
-    SelectCustomerOwnerLayout(
-        onSignUpButtonClicked = onSignUpButtonClicked,
-        form = form,
-        customerOwner = customerOwner,
-        onEvent = onEvent,
-    )
+    LoadingDialogContainer(isLoading = isLoading) {
+        SelectCustomerOwnerLayout(
+            onSignUpButtonClicked = onSignUpButtonClicked,
+            dto = dto,
+            customerOwner = customerOwner,
+            onEvent = onEvent,
+        )
+    }
 }
 
 @Composable
 fun SelectCustomerOwnerLayout(
     onSignUpButtonClicked: () -> Unit,
-    form: SignUpForm,
+    dto: SignUpDto,
     customerOwner: Array<CustomerOwner>,
     onEvent: (SignUpEvent) -> Unit,
 ) {
@@ -82,15 +85,16 @@ fun SelectCustomerOwnerLayout(
         Spacer(modifier = Modifier.height(24.dp))
         CustomerOrOwner(
             items = customerOwner,
-            defaultSelected = form.isOwner,
+            defaultSelected = dto.isOwner,
             onItemSelected = { choice -> onEvent(SignUpEvent.ChooseCustomerOrOwner(choice)) },
             modifier = Modifier.fillMaxWidth(),
         )
         Spacer(modifier = Modifier.weight(1f))
         Button(
             onClick = {
-                Log.d("SelectCustomerOwnerLayout: ", "$form")
-                onSignUpButtonClicked()
+                onEvent(
+                    SignUpEvent.SignUp(onSignUpButtonClicked)
+                )
             },
             modifier = Modifier.fillMaxWidth(),
         ) {
@@ -165,7 +169,7 @@ private fun SelectCustomerOwnerLayoutPreview() {
     WaitForMeTheme {
         SelectCustomerOwnerLayout(
             onSignUpButtonClicked = {},
-            form = viewModel.signUpForm,
+            dto = viewModel.signUpDto,
             customerOwner = SignViewModel.CUSTOMER_OWNER,
             onEvent = viewModel::onSignUpEvent
         )

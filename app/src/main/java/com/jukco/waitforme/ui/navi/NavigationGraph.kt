@@ -91,16 +91,16 @@ fun NavigationGraph(
                 val signViewModel: SignViewModel = viewModel(viewModelStoreOwner = signBackStackEntry, factory = SignViewModel.Factory)
 
                 SignInScreen(
-                    state = signViewModel.signInState,
                     form = signViewModel.signInform,
+                    isLoading = signViewModel.isLoading,
                     socialSignIn = signViewModel::getSocialSign,
                     onEvent = signViewModel::onSignInEvent,
-                    moveScreen = { route ->
-                        navController.navigate(route.name) {
-                            if (route == Route.StoreList)
-                                popUpTo(Route.SignProgress.name) { inclusive = true }
+                    goMain = {
+                        navController.navigate(Route.StoreList.name) {
+                            popUpTo(Route.SignProgress.name) { inclusive = true }
                         }
-                    }
+                    },
+                    goSignUp = { navController.navigate(Route.SignUpInputCredentials.name) },
                 )
             }
             composable(Route.SignUpInputCredentials.name) { navBackStackEntry ->
@@ -109,6 +109,7 @@ fun NavigationGraph(
 
                 InputCredentialsScreen(
                     onNextButtonClicked = { navController.navigate(Route.SignUpInputName.name) },
+                    dto = signViewModel.signUpDto,
                     form = signViewModel.signUpForm,
                     errorMessage = signViewModel.errorMessage,
                     onEvent = signViewModel::onSignUpEvent,
@@ -120,8 +121,10 @@ fun NavigationGraph(
 
                 InputNameScreen(
                     onNextButtonClicked = { navController.navigate(Route.SignUpSelectCustomerOwner.name) },
+                    dto = signViewModel.signUpDto,
                     form = signViewModel.signUpForm,
                     errorMessage = signViewModel.errorMessage,
+                    isLoading = signViewModel.isLoading,
                     onEvent = signViewModel::onSignUpEvent,
                 )
             }
@@ -135,8 +138,9 @@ fun NavigationGraph(
                             popUpTo(Route.SignUpInputCredentials.name) { inclusive = true }
                         }
                     },
-                    form = signViewModel.signUpForm,
+                    dto = signViewModel.signUpDto,
                     customerOwner = SignViewModel.CUSTOMER_OWNER,
+                    isLoading = signViewModel.isLoading,
                     onEvent = signViewModel::onSignUpEvent,
                 )
             }

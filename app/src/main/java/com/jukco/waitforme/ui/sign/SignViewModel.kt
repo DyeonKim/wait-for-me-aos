@@ -16,14 +16,13 @@ import com.jukco.waitforme.data.network.model.Provider
 import com.jukco.waitforme.data.network.model.SocialSignInRequest
 import com.jukco.waitforme.data.repository.AuthProvider
 import com.jukco.waitforme.data.repository.SignRepository
-import com.jukco.waitforme.ui.navi.Route
 import com.jukco.waitforme.ui.sign.sign_in.SignInEvent
 import com.jukco.waitforme.ui.sign.sign_in.SignInForm
-import com.jukco.waitforme.ui.sign.sign_in.SignInState
 import com.jukco.waitforme.ui.sign.sign_in.SocialService
+import com.jukco.waitforme.ui.sign.sign_up.SignUpForm
 import com.jukco.waitforme.ui.sign.sign_up.CustomerOwner
 import com.jukco.waitforme.ui.sign.sign_up.SignUpEvent
-import com.jukco.waitforme.ui.sign.sign_up.SignUpForm
+import com.jukco.waitforme.ui.sign.sign_up.SignUpDto
 import com.jukco.waitforme.ui.sign.sign_up.toLocalReq
 import com.jukco.waitforme.ui.sign.sign_up.toSocialReq
 import com.jukco.waitforme.ui.util.ValidationChecker
@@ -37,9 +36,9 @@ class SignViewModel(
     private val kakaoAuthProvider: AuthProvider,
     private val naverAuthProvider: AuthProvider,
 ) : ViewModel() {
-    var signInState by mutableStateOf<SignInState>(SignInState.Init)
-        private set
     var signInform by mutableStateOf(SignInForm())
+        private set
+    var signUpDto by mutableStateOf(SignUpDto())
         private set
     var signUpForm by mutableStateOf(SignUpForm())
         private set
@@ -53,13 +52,9 @@ class SignViewModel(
         when (event) {
             is SignInEvent.InputId -> { signInform = signInform.copy(id = event.id) }
             is SignInEvent.InputPassword -> { signInform = signInform.copy(password = event.password) }
-            is SignInEvent.OnSignInClicked -> { onSignInClicked() }
-            is SignInEvent.OnSocialSignInClicked -> { onSocialSignInClicked(event.user) }
-            is SignInEvent.MoveMain -> { signInState = SignInState.Move(Route.StoreList) }
-            is SignInEvent.MoveSignUp -> {
-                signInState = SignInState.Move(Route.SignUpInputCredentials)
-                reset()
-            }
+            is SignInEvent.OnSignInClicked -> { onSignInClicked(event.success) }
+            is SignInEvent.OnSocialSignInClicked -> { onSocialSignInClicked(event.user, event.success, event.register) }
+            is SignInEvent.Reset -> { reset() }
         }
     }
 
@@ -86,14 +81,16 @@ class SignViewModel(
                 )
                 errorMessage = if (passwordConfirmed) null else R.string.error_password_confirm
             }
+            is SignUpEvent.SubmitCredentials -> { signUpDto = signUpDto.copy(phoneNumber = signUpForm.phoneNumber) }
             is SignUpEvent.InputName -> {
                 signUpForm = signUpForm.copy(
                     name = event.name,
                     nameSubmitted = checkName(event.name),
                 )
             }
-            is SignUpEvent.CheckDuplicateName -> { checkDuplicateName(event.name, event.moveToNext) }
-            is SignUpEvent.ChooseCustomerOrOwner -> { signUpForm = signUpForm.copy(isOwner = event.choice) }
+            is SignUpEvent.CheckDuplicateName -> { checkDuplicateName() }
+            is SignUpEvent.ChooseCustomerOrOwner -> { signUpDto = signUpDto.copy(isOwner = event.choice) }
+            is SignUpEvent.SignUp -> { onSignUpClicked(event.success, { /*TODO : Fail */ }) }
         }
     }
 
@@ -106,37 +103,37 @@ class SignViewModel(
 
     private fun reset() {
         signInform = SignInForm()
-        signUpForm = SignUpForm()
+        signUpDto = SignUpDto()
         errorMessage = null
     }
 
-    private fun onSignInClicked() {
+    private fun onSignInClicked(success: () -> Unit) {
         if (checkId(signInform.id) and checkPassword(signInform.password)) {
             signInform = signInform.copy(hasError = false)
-            localSignIn(signInform.id, signInform.password)
+            localSignIn(signInform.id, signInform.password, success)
         } else {
             signInform = signInform.copy(hasError = true)
         }
     }
 
-    private fun onSocialSignInClicked(user: SignUpForm?) {
+    private fun onSocialSignInClicked(user: SignUpDto?, success: () -> Unit, register: () -> Unit) {
         if (user != null) {
-            signUpForm = user
-            socialSignIn(user.provider, user.snsId)
+            signUpDto = user
+            socialSignIn(user.provider, user.snsId, success, register)
         }
     }
 
-    private fun onSignUpClicked(moveToSuccess: () -> Unit, moveToFail: () -> Unit) {
-        if (signUpForm.provider == Provider.LOCAL) {
-            localSignUp(moveToSuccess, moveToFail)
+    private fun onSignUpClicked(success: () -> Unit, fail: () -> Unit) {
+        if (signUpDto.provider == Provider.LOCAL) {
+            localSignUp(success, fail)
         } else {
-            socialSignUp(moveToSuccess, moveToFail)
+            socialSignUp(success, fail)
         }
     }
 
-    private fun localSignIn(id: String, password: String) {
+    private fun localSignIn(id: String, password: String, success: () -> Unit) {
         viewModelScope.launch {
-            signInState = SignInState.Loading
+            isLoading = true
             delay(3000) // TODO : 서버와 연결 후에는 지울 것. 기다리는 최대 시간이 있어야 한다.
 
             try {
@@ -144,21 +141,21 @@ class SignViewModel(
                 val response = signRepository.localSignIn(request)
                 if (response.isSuccessful) {
                     // TODO : DataStore에 결과 저장
-                    signInState = SignInState.Move(Route.StoreList)
+                    success()
                     return@launch
                 }
                 // TODO : 30X, 40X 오류 처리
-                signInState = SignInState.Init
             } catch (e: IOException) {
                 // TODO : 50X 오류 처리
-                signInState = SignInState.Init
+            } finally {
+                isLoading = false
             }
         }
     }
 
-    private fun socialSignIn(provider: Provider, snsId: String) {
+    private fun socialSignIn(provider: Provider, snsId: String, success: () -> Unit, register: () -> Unit) {
         viewModelScope.launch {
-            signInState = SignInState.Loading
+            isLoading = true
             delay(3000) // TODO : 서버와 연결 후에는 지울 것. 기다리는 최대 시간이 있어야 한다.
 
             try {
@@ -168,94 +165,81 @@ class SignViewModel(
                     when (response.code()) {
                         200 -> {
                             // TODO : DataStore에 결과 저장
-                            signInState = SignInState.Move(Route.StoreList)
-                            return@launch
+                            success()
                         }
-                        204 -> {
-                            signInState = when {
-                                signUpForm.phoneNumber.isBlank() -> {
-                                    SignInState.Move(Route.SignUpInputCredentials)
-                                }
-                                signUpForm.name.isBlank() -> {
-                                    SignInState.Move(Route.SignUpInputName)
-                                }
-                                else -> {
-                                    SignInState.Move(Route.SignUpSelectCustomerOwner)
-                                }
-                            }
-
-                        }
+                        204 -> { register() }
                     }
+                    return@launch
                 }
                 // TODO : 30X, 40X 오류 처리
-                signInState = SignInState.Init
             } catch (e: IOException) {
                 // TODO : 50X 오류 처리
-                signInState = SignInState.Init
+            } finally {
+                isLoading = false
             }
         }
     }
 
-    private fun localSignUp(moveToSuccess: () -> Unit, moveToFail: () -> Unit) {
+    private fun localSignUp(success: () -> Unit, fail: () -> Unit) {
         viewModelScope.launch {
             isLoading = true
             delay(3000) // TODO : 서버와 연결 후에는 지울 것. 기다리는 최대 시간이 있어야 한다.
 
             try {
-                val request = signUpForm.toLocalReq()
+                val request = signUpDto.toLocalReq()
                 val response = signRepository.localSignUp(request)
                 if (response.isSuccessful) {
                     // TODO : DataStore에 결과 저장
-                    moveToSuccess
+                    success()
                     return@launch
                 }
                 // TODO : 30X, 40X 오류 처리
-                moveToFail
+                fail()
             } catch (e: IOException) {
                 // TODO : 50X 오류 처리
-                moveToFail
+                fail()
             } finally {
                 isLoading = false
             }
         }
     }
 
-    private fun socialSignUp(moveToSuccess: () -> Unit, moveToFail: () -> Unit) {
+    private fun socialSignUp(success: () -> Unit, fail: () -> Unit) {
         viewModelScope.launch {
             isLoading = true
             delay(3000) // TODO : 서버와 연결 후에는 지울 것. 기다리는 최대 시간이 있어야 한다.
 
             try {
-                val request = signUpForm.toSocialReq()
+                val request = signUpDto.toSocialReq()
                 val response = signRepository.socialSignUp(request)
                 if (response.isSuccessful) {
                     // TODO : DataStore에 결과 저장
-                    moveToSuccess
+                    success()
                     return@launch
                 }
                 // TODO : 30X, 40X 오류 처리
-                moveToFail
+                fail()
             } catch (e: IOException) {
                 // TODO : 50X 오류 처리
-                moveToFail
+                fail()
             } finally {
                 isLoading = false
             }
         }
     }
 
-    private fun checkDuplicateName(name: String, moveToNext: () -> Unit) {
+    private fun checkDuplicateName() {
         viewModelScope.launch {
             isLoading = true
             delay(3000) // TODO : 서버와 연결 후에는 지울 것. 기다리는 최대 시간이 있어야 한다.
 
             try {
-                val response = signRepository.checkDuplicateName(name)
+                val response = signRepository.checkDuplicateName(signUpForm.name)
                 if (response.isSuccessful) {
                     response.body()?.also { isUnique ->
                         if (isUnique) {
                             errorMessage = null
-                            moveToNext
+                            signUpDto = signUpDto.copy(name = signUpForm.name)
                         } else {
                             errorMessage = R.string.error_nickname_duplicate
                             signUpForm = signUpForm.copy(

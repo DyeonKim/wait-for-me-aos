@@ -18,6 +18,7 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -43,36 +44,37 @@ import com.jukco.waitforme.ui.theme.GreyDDD
 import com.jukco.waitforme.ui.theme.MainBlack
 import com.jukco.waitforme.ui.theme.NotoSansKR
 import com.jukco.waitforme.ui.theme.WaitForMeTheme
-import com.jukco.waitforme.ui.theme.signupLayoutModifier
 import com.jukco.waitforme.ui.util.PhoneNumberVisualTransformation
 
 @Composable
 fun InputCredentialsScreen(
     onNextButtonClicked: () -> Unit,
+    dto: SignUpDto,
     form: SignUpForm,
     @StringRes errorMessage: Int?,
     onEvent: (SignUpEvent) -> Unit,
 ) {
-    if (form.provider == Provider.LOCAL) {
+    if (dto.provider == Provider.LOCAL) {
         InputPhoneNumAndPasswordLayout(
-            onNextButtonClicked = onNextButtonClicked,
             form = form,
             errorMessage = errorMessage,
             onEvent = onEvent,
         )
-    } else {
+    } else if (dto.phoneNumber.isBlank()) {
         InputPhoneNumLayout(
-            onNextButtonClicked = onNextButtonClicked,
             form = form,
             errorMessage = errorMessage,
             onEvent = onEvent
         )
+    } else {
+        LaunchedEffect(Unit) {
+            onNextButtonClicked()
+        }
     }
 }
 
 @Composable
 fun InputPhoneNumAndPasswordLayout(
-    onNextButtonClicked: () -> Unit,
     form: SignUpForm,
     @StringRes errorMessage: Int?,
     onEvent: (SignUpEvent) -> Unit,
@@ -94,7 +96,7 @@ fun InputPhoneNumAndPasswordLayout(
         Spacer(modifier = Modifier.weight(1f))
         if (form.verificationCodeSubmitted) {
             Button(
-                onClick = onNextButtonClicked,
+                onClick = { onEvent(SignUpEvent.SubmitCredentials) },
                 enabled = form.passwordSubmitted,
                 modifier = Modifier.fillMaxWidth(),
                 ) {
@@ -108,7 +110,6 @@ fun InputPhoneNumAndPasswordLayout(
 
 @Composable
 fun InputPhoneNumLayout(
-    onNextButtonClicked: () -> Unit,
     form: SignUpForm,
     @StringRes errorMessage: Int?,
     onEvent: (SignUpEvent) -> Unit,
@@ -127,7 +128,7 @@ fun InputPhoneNumLayout(
         Spacer(modifier = Modifier.weight(1f))
         if (form.verificationCodeSubmitted) {
             Button(
-                onClick = onNextButtonClicked,
+                onClick = { onEvent(SignUpEvent.SubmitCredentials) },
                 modifier = Modifier.fillMaxWidth(),
             ) {
                 Text(
@@ -332,8 +333,9 @@ fun InputPhoneNumAndPwScreenPreview() {
     }
 
     WaitForMeTheme {
-        InputPhoneNumAndPasswordLayout(
+        InputCredentialsScreen(
             onNextButtonClicked = {},
+            dto = viewModel.signUpDto,
             form = viewModel.signUpForm,
             errorMessage = viewModel.errorMessage,
             onEvent = viewModel::onSignUpEvent,
