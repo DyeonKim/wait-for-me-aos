@@ -27,6 +27,7 @@ import androidx.compose.ui.unit.sp
 import com.jukco.waitforme.R
 import com.jukco.waitforme.data.mock.MockAuthProvider
 import com.jukco.waitforme.data.mock.MockSignRepository
+import com.jukco.waitforme.data.mock.MockTokenManager
 import com.jukco.waitforme.ui.LoadingDialogContainer
 import com.jukco.waitforme.ui.sign.SignViewModel
 import com.jukco.waitforme.ui.sign.StepIndicators
@@ -163,7 +164,7 @@ private fun CustomerOrOwner(
 @Composable
 private fun SelectCustomerOwnerLayoutPreview() {
     val viewModel = remember {
-        SignViewModel(MockSignRepository, MockAuthProvider, MockAuthProvider, MockAuthProvider)
+        SignViewModel(MockSignRepository, MockAuthProvider, MockAuthProvider, MockAuthProvider, MockTokenManager)
     }
 
     WaitForMeTheme {

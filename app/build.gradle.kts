@@ -21,6 +21,9 @@ android {
         versionCode = 1
         versionName = "1.0"
 
+        // Required when setting minSdkVersion to 20 or lower
+        multiDexEnabled = true
+
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
             useSupportLibrary = true
@@ -44,6 +47,9 @@ android {
         }
     }
     compileOptions {
+        // Flag to enable support for the new language APIs
+        isCoreLibraryDesugaringEnabled = true
+
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
     }
@@ -65,6 +71,7 @@ android {
 }
 
 dependencies {
+    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.3")
 
     implementation(platform("androidx.compose:compose-bom:2023.06.01"))
     implementation("androidx.activity:activity-compose:1.7.2")
@@ -85,6 +92,8 @@ dependencies {
     implementation("com.squareup.okhttp3:okhttp:4.11.0")
     // Coil
     implementation("io.coil-kt:coil-compose:2.4.0")
+    // DataStore
+    implementation("androidx.datastore:datastore-preferences:1.1.1")
     // Google SignIn
     implementation("androidx.credentials:credentials:1.2.1")
     implementation("androidx.credentials:credentials-play-services-auth:1.2.1")

@@ -12,14 +12,29 @@ import okhttp3.MediaType.Companion.toMediaType
 import retrofit2.Retrofit
 
 interface AppContainer {
-    val signRepository: SignRepository
-    val storeRepository: StoreRepository
+    val tokenManager: TokenManager
     val googleAuthProvider: AuthProvider
     val kakaoAuthProvider: AuthProvider
     val naverAuthProvider: AuthProvider
+    val signRepository: SignRepository
+    val storeRepository: StoreRepository
 }
 
 class DefaultContainer(context: Context) : AppContainer {
+    override val tokenManager: TokenManager by lazy {
+        TokenManagerImplementation(context.signInData)
+    }
+
+    override val googleAuthProvider: AuthProvider by lazy {
+        GoogleAuthProvider(credentialManager, BuildConfig.GOOGLE_SERVER_CLIENT_ID)
+    }
+    override val kakaoAuthProvider: AuthProvider by lazy {
+        KakaoAuthProvider()
+    }
+    override val naverAuthProvider: AuthProvider by lazy {
+        NaverAuthProvider()
+    }
+
     private val retrofit = Retrofit.Builder()
         .addConverterFactory(Json.asConverterFactory("application/json".toMediaType()))
         .baseUrl(BuildConfig.SERVER_URL)
@@ -41,14 +56,5 @@ class DefaultContainer(context: Context) : AppContainer {
     override val storeRepository: StoreRepository by lazy {
 //        StoreRepositoryImplementation(storeApi)
         MockStoreRepository()
-    }
-    override val googleAuthProvider: AuthProvider by lazy {
-        GoogleAuthProvider(credentialManager, BuildConfig.GOOGLE_SERVER_CLIENT_ID)
-    }
-    override val kakaoAuthProvider: AuthProvider by lazy {
-        KakaoAuthProvider()
-    }
-    override val naverAuthProvider: AuthProvider by lazy {
-        NaverAuthProvider()
     }
 }

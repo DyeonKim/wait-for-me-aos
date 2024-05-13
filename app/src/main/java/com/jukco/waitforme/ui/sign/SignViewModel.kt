@@ -16,6 +16,7 @@ import com.jukco.waitforme.data.network.model.Provider
 import com.jukco.waitforme.data.network.model.SocialSignInRequest
 import com.jukco.waitforme.data.repository.AuthProvider
 import com.jukco.waitforme.data.repository.SignRepository
+import com.jukco.waitforme.data.repository.TokenManager
 import com.jukco.waitforme.ui.sign.sign_in.SignInEvent
 import com.jukco.waitforme.ui.sign.sign_in.SignInForm
 import com.jukco.waitforme.ui.sign.sign_in.SocialService
@@ -26,8 +27,10 @@ import com.jukco.waitforme.ui.sign.sign_up.SignUpDto
 import com.jukco.waitforme.ui.sign.sign_up.toLocalReq
 import com.jukco.waitforme.ui.sign.sign_up.toSocialReq
 import com.jukco.waitforme.ui.util.ValidationChecker
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.io.IOException
 
 class SignViewModel(
@@ -35,6 +38,7 @@ class SignViewModel(
     private val googleAuthProvider: AuthProvider,
     private val kakaoAuthProvider: AuthProvider,
     private val naverAuthProvider: AuthProvider,
+    private val tokenManager: TokenManager,
 ) : ViewModel() {
     var signInform by mutableStateOf(SignInForm())
         private set
@@ -140,7 +144,9 @@ class SignViewModel(
                 val request = LocalSignInRequest(id, password)
                 val response = signRepository.localSignIn(request)
                 if (response.isSuccessful) {
-                    // TODO : DataStore에 결과 저장
+                    withContext(Dispatchers.IO) {
+                        tokenManager.saveToken(Provider.LOCAL, response.body()!!)
+                    }
                     success()
                     return@launch
                 }
@@ -164,7 +170,9 @@ class SignViewModel(
                 if (response.isSuccessful) {
                     when (response.code()) {
                         200 -> {
-                            // TODO : DataStore에 결과 저장
+                            withContext(Dispatchers.IO) {
+                                tokenManager.saveToken(provider, response.body()!!)
+                            }
                             success()
                         }
                         204 -> { register() }
@@ -189,7 +197,9 @@ class SignViewModel(
                 val request = signUpDto.toLocalReq()
                 val response = signRepository.localSignUp(request)
                 if (response.isSuccessful) {
-                    // TODO : DataStore에 결과 저장
+                    withContext(Dispatchers.IO) {
+                        tokenManager.saveToken(Provider.LOCAL, response.body()!!)
+                    }
                     success()
                     return@launch
                 }
@@ -213,7 +223,9 @@ class SignViewModel(
                 val request = signUpDto.toSocialReq()
                 val response = signRepository.socialSignUp(request)
                 if (response.isSuccessful) {
-                    // TODO : DataStore에 결과 저장
+                    withContext(Dispatchers.IO) {
+                        tokenManager.saveToken(request.provider, response.body()!!)
+                    }
                     success()
                     return@launch
                 }
@@ -285,8 +297,9 @@ class SignViewModel(
                 val googleAuthProvider = application.container.googleAuthProvider
                 val kakaoAuthProvider = application.container.kakaoAuthProvider
                 val naverAuthProvider = application.container.naverAuthProvider
+                val tokenManager = application.container.tokenManager
 
-                SignViewModel(signRepository, googleAuthProvider, kakaoAuthProvider, naverAuthProvider)
+                SignViewModel(signRepository, googleAuthProvider, kakaoAuthProvider, naverAuthProvider, tokenManager)
             }
         }
     }
