@@ -53,18 +53,24 @@ fun InputCredentialsScreen(
     dto: SignUpDto,
     form: SignUpForm,
     @StringRes errorMessage: Int?,
+    currentLimitTime: String,
+    enabledReRequestVerificationCode: Boolean,
     onEvent: (SignUpEvent) -> Unit,
 ) {
     if (dto.provider == Provider.LOCAL) {
         InputPhoneNumAndPasswordLayout(
             form = form,
             errorMessage = errorMessage,
+            currentLimitTime = currentLimitTime,
+            enabledReRequestVerificationCode = enabledReRequestVerificationCode,
             onEvent = onEvent,
         )
     } else if (dto.phoneNumber.isBlank()) {
         InputPhoneNumLayout(
             form = form,
             errorMessage = errorMessage,
+            currentLimitTime = currentLimitTime,
+            enabledReRequestVerificationCode = enabledReRequestVerificationCode,
             onEvent = onEvent
         )
     } else {
@@ -78,6 +84,8 @@ fun InputCredentialsScreen(
 fun InputPhoneNumAndPasswordLayout(
     form: SignUpForm,
     @StringRes errorMessage: Int?,
+    currentLimitTime: String,
+    enabledReRequestVerificationCode: Boolean,
     onEvent: (SignUpEvent) -> Unit,
 ) {
     Column(
@@ -90,17 +98,22 @@ fun InputPhoneNumAndPasswordLayout(
         errorMessage?.let {
             ErrorMessage(stringResource(it))
         }
-        if (form.verificationCodeSubmitted) {
-            PasswordSetupForm(form, onEvent)
+        if (form.authenticationNumSubmitted) {
+            PasswordSetupForm(form = form, onEvent = onEvent)
         }
-        PhoneNumberSetupForm(form, onEvent)
+        PhoneNumberSetupForm(
+            form = form,
+            currentLimitTime = currentLimitTime,
+            enabledReRequestVerificationCode = enabledReRequestVerificationCode,
+            onEvent = onEvent,
+        )
         Spacer(modifier = Modifier.weight(1f))
-        if (form.verificationCodeSubmitted) {
+        if (form.authenticationNumSubmitted) {
             Button(
                 onClick = { onEvent(SignUpEvent.SubmitCredentials) },
                 enabled = form.passwordSubmitted,
                 modifier = Modifier.fillMaxWidth(),
-                ) {
+            ) {
                 Text(
                     text = stringResource(R.string.next_step),
                 )
@@ -113,6 +126,8 @@ fun InputPhoneNumAndPasswordLayout(
 fun InputPhoneNumLayout(
     form: SignUpForm,
     @StringRes errorMessage: Int?,
+    currentLimitTime: String,
+    enabledReRequestVerificationCode: Boolean,
     onEvent: (SignUpEvent) -> Unit,
 ) {
     Column(
@@ -125,9 +140,14 @@ fun InputPhoneNumLayout(
         errorMessage?.let {
             ErrorMessage(stringResource(it))
         }
-        PhoneNumberSetupForm(form, onEvent)
+        PhoneNumberSetupForm(
+            form = form,
+            currentLimitTime = currentLimitTime,
+            enabledReRequestVerificationCode = enabledReRequestVerificationCode,
+            onEvent = onEvent,
+        )
         Spacer(modifier = Modifier.weight(1f))
-        if (form.verificationCodeSubmitted) {
+        if (form.authenticationNumSubmitted) {
             Button(
                 onClick = { onEvent(SignUpEvent.SubmitCredentials) },
                 modifier = Modifier.fillMaxWidth(),
@@ -142,9 +162,11 @@ fun InputPhoneNumLayout(
 
 @Composable
 fun PhoneNumberSetupForm(
-    form: SignUpForm,
-    onEvent: (SignUpEvent) -> Unit,
     modifier: Modifier = Modifier,
+    form: SignUpForm,
+    currentLimitTime: String,
+    enabledReRequestVerificationCode: Boolean,
+    onEvent: (SignUpEvent) -> Unit,
 ) {
     Column(
         verticalArrangement = Arrangement.spacedBy(12.dp),
@@ -154,9 +176,9 @@ fun PhoneNumberSetupForm(
             TextFieldButtonForm(
                 textField = {
                     OutlinedTextField(
-                        value = form.verificationCode,
-                        onValueChange = { code -> onEvent(SignUpEvent.InputVerificationCode(code)) },
-                        readOnly = form.verificationCodeSubmitted,
+                        value = form.authenticationNum,
+                        onValueChange = { code -> onEvent(SignUpEvent.InputAuthnNum(code)) },
+                        readOnly = form.authenticationNumSubmitted,
                         textStyle = TextStyle(
                             fontFamily = NotoSansKR,
                             fontWeight = FontWeight.Medium,
@@ -180,7 +202,6 @@ fun PhoneNumberSetupForm(
                         },
                         singleLine = true,
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                        trailingIcon = { Text(text = "3:00") },
                         modifier = Modifier
                             .defaultMinSize(minWidth = 208.dp, minHeight = 48.dp)
                             .weight(2f),
@@ -188,9 +209,9 @@ fun PhoneNumberSetupForm(
                 },
                 buttons = {
                     Button(
-                        onClick = { onEvent(SignUpEvent.SubmitVerificationCode) },
+                        onClick = { onEvent(SignUpEvent.SubmitAuthnNum) },
                         shape = RoundedCornerShape(8.dp),
-                        enabled = !form.verificationCodeSubmitted,
+                        enabled = !form.authenticationNumSubmitted,
                         modifier = Modifier
                             .defaultMinSize(minWidth = 104.dp, minHeight = 48.dp)
                             .weight(1f),
@@ -215,12 +236,13 @@ fun PhoneNumberSetupForm(
             textField = {
                 OutlinedTextField(
                     value = form.phoneNumber,
-                    onValueChange = {phoneNum -> onEvent(SignUpEvent.InputPhoneNumber(phoneNum)) },
-                    readOnly = form.verificationCodeSubmitted,
+                    onValueChange = { phoneNum -> onEvent(SignUpEvent.InputPhoneNumber(phoneNum)) },
+                    readOnly = form.authenticationNumSubmitted,
                     placeholder = { Text(text = stringResource(R.string.placeholder_input_id)) },
                     singleLine = true,
                     visualTransformation = PhoneNumberVisualTransformation(),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
+                    trailingIcon = if (form.phoneNumberSubmitted) { { Text(text = currentLimitTime) } } else null,
                     modifier = Modifier
                         .defaultMinSize(minWidth = 208.dp, minHeight = 48.dp)
                         .weight(2f),
@@ -229,14 +251,15 @@ fun PhoneNumberSetupForm(
             buttons = {
                 when (form.phoneNumberSubmitted) {
                     true -> {
-                        val enabled = !form.verificationCodeSubmitted
-
                         OutlinedButton(
-                            onClick = { /*TODO*/ },
+                            onClick = { onEvent(SignUpEvent.ReRequestAuthnNum) },
                             shape = RoundedCornerShape(8.dp),
-                            colors = ButtonDefaults.outlinedButtonColors(contentColor = MainBlack, disabledContentColor = GreyDDD),
-                            border = BorderStroke(1.dp, if (enabled) MainBlack else GreyDDD),
-                            enabled = enabled,
+                            colors = ButtonDefaults.outlinedButtonColors(
+                                contentColor = MainBlack,
+                                disabledContentColor = GreyDDD
+                            ),
+                            border = BorderStroke(1.dp, if (enabledReRequestVerificationCode) MainBlack else GreyDDD),
+                            enabled = enabledReRequestVerificationCode,
                             modifier = Modifier
                                 .defaultMinSize(minWidth = 104.dp, minHeight = 48.dp)
                                 .weight(1f),
@@ -254,6 +277,7 @@ fun PhoneNumberSetupForm(
                             )
                         }
                     }
+
                     false -> {
                         Button(
                             onClick = { onEvent(SignUpEvent.SubmitPhoneNumber) },
@@ -285,9 +309,9 @@ fun PhoneNumberSetupForm(
 
 @Composable
 fun PasswordSetupForm(
+    modifier: Modifier = Modifier,
     form: SignUpForm,
     onEvent: (SignUpEvent) -> Unit,
-    modifier: Modifier = Modifier,
 ) {
     Column(
         verticalArrangement = Arrangement.spacedBy(12.dp),
@@ -316,7 +340,13 @@ fun PasswordSetupForm(
         )
         OutlinedTextField(
             value = form.confirmPassword,
-            onValueChange = { confirmPassword -> onEvent(SignUpEvent.InputConfirmPassword(confirmPassword)) },
+            onValueChange = { confirmPassword ->
+                onEvent(
+                    SignUpEvent.InputConfirmPassword(
+                        confirmPassword
+                    )
+                )
+            },
             placeholder = { Text(text = stringResource(R.string.placeholder_input_confirm_password)) },
             singleLine = true,
             visualTransformation = PasswordVisualTransformation(),
@@ -330,7 +360,13 @@ fun PasswordSetupForm(
 @Composable
 fun InputPhoneNumAndPwScreenPreview() {
     val viewModel = remember {
-        SignViewModel(MockSignRepository, MockAuthProvider, MockAuthProvider, MockAuthProvider, MockTokenManager)
+        SignViewModel(
+            MockSignRepository,
+            MockAuthProvider,
+            MockAuthProvider,
+            MockAuthProvider,
+            MockTokenManager
+        )
     }
 
     WaitForMeTheme {
@@ -339,6 +375,8 @@ fun InputPhoneNumAndPwScreenPreview() {
             dto = viewModel.signUpDto,
             form = viewModel.signUpForm,
             errorMessage = viewModel.errorMessage,
+            currentLimitTime = viewModel.currentLimitTime,
+            enabledReRequestVerificationCode = viewModel.enabledReRequestAuthnNum,
             onEvent = viewModel::onSignUpEvent,
         )
     }

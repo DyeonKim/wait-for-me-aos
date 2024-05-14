@@ -2,6 +2,7 @@ package com.jukco.waitforme.data.mock
 
 import com.jukco.waitforme.data.network.model.LocalSignInRequest
 import com.jukco.waitforme.data.network.model.LocalSignUpRequest
+import com.jukco.waitforme.data.network.model.PhoneNumCheckRequest
 import com.jukco.waitforme.data.network.model.Provider
 import com.jukco.waitforme.data.network.model.SignInResponse
 import com.jukco.waitforme.data.network.model.SocialSignInRequest
@@ -45,5 +46,11 @@ object MockSignRepository : SignRepository {
 
     override suspend fun checkDuplicateName(name: String): Response<Boolean> =
         Response.success(HttpURLConnection.HTTP_OK, false)
+
+    override suspend fun requestAuthnNum(phoneNum: String): Response<Boolean> =
+        Response.success(HttpURLConnection.HTTP_OK, true)
+
+    override suspend fun checkPhoneNumberValidity(request: PhoneNumCheckRequest): Response<Boolean> =
+        Response.success(HttpURLConnection.HTTP_OK, true)
 
 }

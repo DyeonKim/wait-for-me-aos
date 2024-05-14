@@ -3,6 +3,7 @@ package com.jukco.waitforme.data.repository
 import com.jukco.waitforme.data.network.api.SignApi
 import com.jukco.waitforme.data.network.model.LocalSignInRequest
 import com.jukco.waitforme.data.network.model.LocalSignUpRequest
+import com.jukco.waitforme.data.network.model.PhoneNumCheckRequest
 import com.jukco.waitforme.data.network.model.SignInResponse
 import com.jukco.waitforme.data.network.model.SocialSignInRequest
 import com.jukco.waitforme.data.network.model.SocialSignUpRequest
@@ -18,6 +19,10 @@ interface SignRepository {
     suspend fun socialSignUp(signUpReq: SocialSignUpRequest): Response<SignInResponse>
 
     suspend fun checkDuplicateName(name: String): Response<Boolean>
+
+    suspend fun requestAuthnNum(phoneNum: String): Response<Boolean>
+
+    suspend fun checkPhoneNumberValidity(request: PhoneNumCheckRequest): Response<Boolean>
 }
 
 class SignRepositoryImplementation(
@@ -37,4 +42,10 @@ class SignRepositoryImplementation(
 
     override suspend fun checkDuplicateName(name: String): Response<Boolean> =
         signApi.checkDuplicateName(name)
+
+    override suspend fun requestAuthnNum(phoneNum: String): Response<Boolean> =
+        signApi.requestAuthnNum(phoneNum)
+
+    override suspend fun checkPhoneNumberValidity(request: PhoneNumCheckRequest): Response<Boolean> =
+        signApi.checkPhoneNumberValidity(request)
 }
