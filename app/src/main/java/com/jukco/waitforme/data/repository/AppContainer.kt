@@ -5,6 +5,7 @@ import androidx.credentials.CredentialManager
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import com.jukco.waitforme.BuildConfig
 import com.jukco.waitforme.data.mock.MockSignRepository
+import com.jukco.waitforme.data.mock.MockUserRepository
 import com.jukco.waitforme.data.network.api.SignApi
 import com.jukco.waitforme.data.network.api.StoreApi
 import com.jukco.waitforme.data.network.api.UserApi

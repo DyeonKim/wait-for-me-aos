@@ -1,7 +1,10 @@
 package com.jukco.waitforme.data.mock
 
+import com.jukco.waitforme.data.network.model.GenderType
+import com.jukco.waitforme.data.network.model.Provider
 import com.jukco.waitforme.data.network.model.SignInResponse
 import com.jukco.waitforme.data.network.model.Token
+import com.jukco.waitforme.data.network.model.UserInfoRes
 
 object MockDataSource {
     val accessToken = Token(
@@ -20,5 +23,15 @@ object MockDataSource {
         isOwner = false,
         accessToken = accessToken,
         refreshToken = refreshToken,
+    )
+
+    val userInfoRes = UserInfoRes(
+        provider = Provider.LOCAL,
+        phoneNumber = "01012345678",
+        name = "테스트입니다.",
+        isOwner = false,
+        birthedAt = null,
+        genderType = GenderType.OTHER,
+        profileImage = null,
     )
 }

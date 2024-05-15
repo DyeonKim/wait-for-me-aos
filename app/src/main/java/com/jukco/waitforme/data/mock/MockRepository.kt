@@ -1,5 +1,7 @@
 package com.jukco.waitforme.data.mock
 
+import com.jukco.waitforme.data.mock.MockDataSource.signInRes
+import com.jukco.waitforme.data.mock.MockDataSource.userInfoRes
 import com.jukco.waitforme.data.network.model.LocalSignInRequest
 import com.jukco.waitforme.data.network.model.LocalSignUpRequest
 import com.jukco.waitforme.data.network.model.PhoneNumCheckRequest
@@ -7,8 +9,11 @@ import com.jukco.waitforme.data.network.model.Provider
 import com.jukco.waitforme.data.network.model.SignInResponse
 import com.jukco.waitforme.data.network.model.SocialSignInRequest
 import com.jukco.waitforme.data.network.model.SocialSignUpRequest
+import com.jukco.waitforme.data.network.model.UserInfoRequest
+import com.jukco.waitforme.data.network.model.UserInfoRes
 import com.jukco.waitforme.data.repository.SignRepository
 import com.jukco.waitforme.data.repository.TokenManager
+import com.jukco.waitforme.data.repository.UserRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import retrofit2.Response
@@ -52,5 +57,18 @@ object MockSignRepository : SignRepository {
 
     override suspend fun checkPhoneNumberValidity(request: PhoneNumCheckRequest): Response<Boolean> =
         Response.success(HttpURLConnection.HTTP_OK, true)
+}
 
+object MockUserRepository : UserRepository {
+    override suspend fun getUserInfo(): Response<UserInfoRes> = Response.success(MockDataSource.userInfoRes)
+
+    override suspend fun editUserInfo(userInfoReq: UserInfoRequest): Response<UserInfoRes> =
+        Response.success(
+            userInfoRes.copy(
+                name = userInfoReq.name,
+                birthedAt = userInfoReq.birthedAt,
+                genderType = userInfoReq.genderType,
+                profileImage = userInfoReq.profileImag
+            )
+        )
 }
