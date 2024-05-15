@@ -53,6 +53,7 @@ import com.jukco.waitforme.data.mock.MockAuthProvider
 import com.jukco.waitforme.data.mock.MockSignRepository
 import com.jukco.waitforme.data.mock.MockUserRepository
 import com.jukco.waitforme.data.network.model.Provider
+import com.jukco.waitforme.ui.LoadingDialogContainer
 import com.jukco.waitforme.ui.components.CustomDatePickerDialog
 import com.jukco.waitforme.ui.components.ErrorMessage
 import com.jukco.waitforme.ui.components.GenderDialog
@@ -67,36 +68,32 @@ fun MyInfoScreen(
     val viewModel: MyInfoViewModel = viewModel(factory = MyInfoViewModel.Factory)
 
     when (viewModel.state) {
-        MyInfoState.Loading -> {
-            /* TODO : 화면 위에 로딩 중 표시를 띄움 */
-        }
         MyInfoState.Fail -> {
-            /* TODO : 오류메시지를 스낵바로 띄움 */
-        }
-        MyInfoState.Error -> {
             /* TODO : 오류 페이지를 띄움 */
         }
-        else -> {
-            MyInfoLayout(
-                isEdit = (viewModel.state == MyInfoState.Edit),
-                myInfo = viewModel.myInfo,
-                errorMessage = viewModel.errorMessage,
-                onEvent = viewModel::onEvent,
-            )
-            if (viewModel.state == MyInfoState.Edit && viewModel.openGenderDialog) {
-                GenderDialog(
-                    selected = viewModel.myInfo.genderType,
-                    onSelectGender = { gender -> viewModel.onEvent(MyInfoEvent.SelectGender(gender)) },
-                    onDismissRequest = { viewModel.onEvent(MyInfoEvent.CloseGenderDialog) },
-                    onConfirmation = { viewModel.onEvent(MyInfoEvent.ConfirmGender) },
+        MyInfoState.Success -> {
+            LoadingDialogContainer(isLoading = viewModel.showLoadingDialog) {
+                MyInfoLayout(
+                    isEdit = viewModel.isEdit,
+                    myInfo = viewModel.myInfo,
+                    errorMessage = viewModel.errorMessage,
+                    onEvent = viewModel::onEvent,
                 )
-            }
-            if (viewModel.state == MyInfoState.Edit && viewModel.openBirthDayPickerDialog) {
-                CustomDatePickerDialog(
-                    selectedDate = viewModel.myInfo.birthedAt,
-                    onDismissRequest = { viewModel.onEvent(MyInfoEvent.CloseBirthDayPickerDialog) },
-                    onConfirmation = { date -> viewModel.onEvent(MyInfoEvent.ConfirmBirthDayPickerDialog(date)) }
-                )
+                if (viewModel.isEdit && viewModel.openGenderDialog) {
+                    GenderDialog(
+                        selected = viewModel.myInfo.genderType,
+                        onSelectGender = { gender -> viewModel.onEvent(MyInfoEvent.SelectGender(gender)) },
+                        onDismissRequest = { viewModel.onEvent(MyInfoEvent.CloseGenderDialog) },
+                        onConfirmation = { viewModel.onEvent(MyInfoEvent.ConfirmGender) },
+                    )
+                }
+                if (viewModel.isEdit && viewModel.openBirthDayPickerDialog) {
+                    CustomDatePickerDialog(
+                        selectedDate = viewModel.myInfo.birthedAt,
+                        onDismissRequest = { viewModel.onEvent(MyInfoEvent.CloseBirthDayPickerDialog) },
+                        onConfirmation = { date -> viewModel.onEvent(MyInfoEvent.ConfirmBirthDayPickerDialog(date)) }
+                    )
+                }
             }
         }
     }
@@ -351,7 +348,7 @@ fun MyInfoLayoutPreview() {
 
     WaitForMeTheme {
         MyInfoLayout(
-            isEdit = (viewModel.state == MyInfoState.Edit),
+            isEdit = viewModel.isEdit,
             myInfo = viewModel.myInfo,
             errorMessage = viewModel.errorMessage,
             onEvent = viewModel::onEvent,

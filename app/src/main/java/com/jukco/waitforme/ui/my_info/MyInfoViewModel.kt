@@ -31,9 +31,11 @@ class MyInfoViewModel(
     private val naverAuthProvider: AuthProvider,
 ) : ViewModel() {
     private val _oldMyInfo = MutableStateFlow(UserInfoRes())
-    var state by mutableStateOf<MyInfoState>(MyInfoState.Loading)
+    var state by mutableStateOf<MyInfoState>(MyInfoState.Success)
         private set
     var myInfo by mutableStateOf(UserInfoDto())
+        private set
+    var isEdit by mutableStateOf(false)
         private set
     var errorMessage by mutableStateOf<Int?>(null)
         private set
@@ -90,11 +92,11 @@ class MyInfoViewModel(
                 myInfo = myInfo.copy(birthedAt = event.date)
                 openBirthDayPickerDialog = false
             }
-            is MyInfoEvent.Edit -> { state = MyInfoState.Edit }
+            is MyInfoEvent.Edit -> { isEdit = true }
             is MyInfoEvent.Save -> { save() }
             is MyInfoEvent.Cancel -> {
                 reset()
-                state = MyInfoState.Read
+                isEdit = false
             }
         }
     }
@@ -115,7 +117,8 @@ class MyInfoViewModel(
 
     private fun getMyInfo() {
         viewModelScope.launch {
-            state = MyInfoState.Loading
+            showLoadingDialog = true
+            delay(3000) // TODO : 서버와 연결 후에는 지울 것. 기다리는 최대 시간이 있어야 한다.
 
             try {
                 val response = userRepository.getUserInfo()
@@ -125,17 +128,18 @@ class MyInfoViewModel(
 
                     _oldMyInfo.value = userInfoRes
                     myInfo = UserInfoDto(userInfoRes)
-                    state = MyInfoState.Read
+//                    state = MyInfoState.Read
                     return@launch
                 }
                 // TODO : 30X, 40X 처리
                 // TODO : 로그인이 안 되어 있다면 로그인페이지로 이동
-                state = MyInfoState.Error
+                state = MyInfoState.Fail
             } catch (e: IOException) {
                 // TODO : 네트워크 오류 처리
-                state = MyInfoState.Error
+                state = MyInfoState.Fail
+            } finally {
+                showLoadingDialog = false
             }
-
         }
     }
 
@@ -143,7 +147,7 @@ class MyInfoViewModel(
         viewModelScope.launch {
             showLoadingDialog = true
             if (myInfo.equalsTo(_oldMyInfo.value)) {
-                state = MyInfoState.Read
+                isEdit = false
                 showLoadingDialog = false
                 return@launch
             }
@@ -176,10 +180,7 @@ class MyInfoViewModel(
             }
 
             val userInfoReq = myInfo.toUserInfoRequest()
-            val isSuccess = editMyInfo(userInfoReq)
-            if (isSuccess) {
-                state = MyInfoState.Read
-            }
+            isEdit = !editMyInfo(userInfoReq)
             showLoadingDialog = false
         }
 
