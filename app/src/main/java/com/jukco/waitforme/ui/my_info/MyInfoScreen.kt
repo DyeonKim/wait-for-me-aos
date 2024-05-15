@@ -1,6 +1,7 @@
 package com.jukco.waitforme.ui.my_info
 
 import android.util.Log
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
@@ -63,6 +64,7 @@ import com.jukco.waitforme.ui.theme.WaitForMeTheme
 
 @Composable
 fun MyInfoScreen(
+    onBackButtonPressed: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val viewModel: MyInfoViewModel = viewModel(factory = MyInfoViewModel.Factory)
@@ -72,6 +74,13 @@ fun MyInfoScreen(
             /* TODO : 오류 페이지를 띄움 */
         }
         MyInfoState.Success -> {
+            BackHandler {
+                if (viewModel.isEdit) {
+                    viewModel.onEvent(MyInfoEvent.Cancel)
+                } else {
+                    onBackButtonPressed()
+                }
+            }
             LoadingDialogContainer(isLoading = viewModel.showLoadingDialog) {
                 MyInfoLayout(
                     isEdit = viewModel.isEdit,

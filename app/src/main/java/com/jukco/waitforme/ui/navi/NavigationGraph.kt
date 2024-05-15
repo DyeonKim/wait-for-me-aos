@@ -61,7 +61,9 @@ fun NavigationGraph(
             BookmarkScreen()
         }
         composable(Route.MyInfo.name) {
-            MyInfoScreen()
+            MyInfoScreen(
+                onBackButtonPressed = { navController.navigateUp() }
+            )
         }
         composable(Route.Notice.name) {
             NoticeScreen(
