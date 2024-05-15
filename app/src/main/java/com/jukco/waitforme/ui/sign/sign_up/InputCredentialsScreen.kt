@@ -36,7 +36,7 @@ import com.jukco.waitforme.data.mock.MockAuthProvider
 import com.jukco.waitforme.data.mock.MockSignRepository
 import com.jukco.waitforme.data.mock.MockTokenManager
 import com.jukco.waitforme.data.network.model.Provider
-import com.jukco.waitforme.ui.sign.ErrorMessage
+import com.jukco.waitforme.ui.components.ErrorMessage
 import com.jukco.waitforme.ui.sign.SignGuide
 import com.jukco.waitforme.ui.sign.SignViewModel
 import com.jukco.waitforme.ui.sign.SocialSignGuide

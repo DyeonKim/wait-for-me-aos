@@ -15,7 +15,7 @@ data class UserInfoDto(
     val genderType: GenderType = GenderType.OTHER,
     val profileImage: String? = null,
     val password: String = "",
-    val isValidPasswordFormat: Boolean? = null,
+    val isValidPasswordFormat: Boolean = true,
     val confirmPassword: String = "",
     val passwordSubmitted: Boolean? = null,
 ) {
@@ -37,4 +37,16 @@ fun UserInfoDto.toUserInfoRequest() = UserInfoRequest(
     profileImage = this.profileImage,
     password = this.password.trim().ifBlank { null } // fixme: trim 불필요한지 체크
 )
+
+fun UserInfoDto.equalsTo(res: UserInfoRes): Boolean {
+    return when {
+        name != res.name -> false
+        (birthedAt ?: "") != (res.birthedAt ?: "") -> false
+        genderType != res.genderType -> false
+        (profileImage ?: "") != (res.profileImage ?: "") -> false
+        password.isNotBlank() -> false
+        confirmPassword.isNotBlank() -> false
+        else -> true
+    }
+}
 

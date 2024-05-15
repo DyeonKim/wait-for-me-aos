@@ -27,7 +27,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.PlatformTextStyle
 import androidx.compose.ui.text.SpanStyle
@@ -36,11 +35,9 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.jukco.waitforme.R
-import com.jukco.waitforme.ui.theme.ErrorRed
 import com.jukco.waitforme.ui.theme.MainBlack
 import com.jukco.waitforme.ui.theme.MainBlue
 import com.jukco.waitforme.ui.theme.MainWhite
@@ -99,33 +96,11 @@ fun SocialSignGuide(
 }
 
 @Composable
-fun ErrorMessage(
-    message: String,
-    modifier: Modifier = Modifier,
-) {
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = modifier,
-    ){
-        Icon(
-            painter = painterResource(R.drawable.ic_error),
-            contentDescription = null,
-            tint = ErrorRed,
-        )
-        Spacer(modifier = Modifier.width(4.dp))
-        Text(
-            text = message,
-            color = ErrorRed,
-        )
-    }
-}
-
-@Composable
 fun StepIndicators(
+    modifier: Modifier = Modifier,
     currentStep: Int,
     endStep: Int,
     paddingValues: PaddingValues = PaddingValues(start = 0.dp, end = 0.dp, top = 0.dp, bottom = 96.dp),
-    modifier: Modifier = Modifier,
 ) {
     Row(
         horizontalArrangement = Arrangement.spacedBy(8.dp),

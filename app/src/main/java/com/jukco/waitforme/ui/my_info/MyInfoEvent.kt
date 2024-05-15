@@ -4,7 +4,6 @@ import com.jukco.waitforme.data.network.model.GenderType
 
 sealed interface MyInfoEvent {
     data class InputName(val name: String) : MyInfoEvent
-    object CheckDuplicateName : MyInfoEvent
     data class SelectGender(val genderType: GenderType) : MyInfoEvent
     data class InputProfileImage(val profileUri: String) : MyInfoEvent
     data class InputPassword(val password: String) : MyInfoEvent

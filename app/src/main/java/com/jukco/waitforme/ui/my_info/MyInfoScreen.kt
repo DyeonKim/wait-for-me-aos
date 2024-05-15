@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.StringRes
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -15,7 +16,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardOptions
@@ -49,11 +49,13 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.jukco.waitforme.R
+import com.jukco.waitforme.data.mock.MockAuthProvider
+import com.jukco.waitforme.data.mock.MockSignRepository
 import com.jukco.waitforme.data.mock.MockUserRepository
 import com.jukco.waitforme.data.network.model.Provider
 import com.jukco.waitforme.ui.components.CustomDatePickerDialog
+import com.jukco.waitforme.ui.components.ErrorMessage
 import com.jukco.waitforme.ui.components.GenderDialog
-import com.jukco.waitforme.ui.theme.ErrorRed
 import com.jukco.waitforme.ui.theme.GreyDDD
 import com.jukco.waitforme.ui.theme.MainBlue
 import com.jukco.waitforme.ui.theme.WaitForMeTheme
@@ -78,6 +80,7 @@ fun MyInfoScreen(
             MyInfoLayout(
                 isEdit = (viewModel.state == MyInfoState.Edit),
                 myInfo = viewModel.myInfo,
+                errorMessage = viewModel.errorMessage,
                 onEvent = viewModel::onEvent,
             )
             if (viewModel.state == MyInfoState.Edit && viewModel.openGenderDialog) {
@@ -105,6 +108,7 @@ fun MyInfoScreen(
 fun MyInfoLayout(
     isEdit: Boolean,
     myInfo: UserInfoDto,
+    @StringRes errorMessage: Int?,
     onEvent: (MyInfoEvent) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -146,6 +150,7 @@ fun MyInfoLayout(
             ProfileInfoForm(
                 isEdit = isEdit,
                 form = myInfo,
+                errorMessage = errorMessage,
                 onEvent = onEvent,
                 modifier = Modifier.fillMaxWidth(),
             )
@@ -230,6 +235,7 @@ fun ProfileImage(
 fun ProfileInfoForm(
     isEdit: Boolean,
     form: UserInfoDto,
+    @StringRes errorMessage: Int?,
     onEvent: (MyInfoEvent) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -300,7 +306,7 @@ fun ProfileInfoForm(
             OutlinedTextField(
                 value = form.password,
                 onValueChange = { password -> onEvent(MyInfoEvent.InputPassword(password)) },
-                placeholder = { Text(text = "8자 이상의 영문, 숫자, 특수문자를 입력해 주세요") },
+                placeholder = { Text(text = stringResource(R.string.placeholder_input_sign_up_password)) },
                 singleLine = true,
                 visualTransformation = PasswordVisualTransformation(),
                 keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Password),
@@ -309,26 +315,14 @@ fun ProfileInfoForm(
             OutlinedTextField(
                 value = form.confirmPassword,
                 onValueChange = { confirmPW -> onEvent(MyInfoEvent.InputConfirmPassword(confirmPW)) },
-                placeholder = { Text(text = "비밀번호를 다시 입력해주세요") },
+                placeholder = { Text(text = stringResource(R.string.placeholder_input_confirm_password)) },
                 singleLine = true,
                 visualTransformation = PasswordVisualTransformation(),
                 keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Password),
                 modifier = Modifier.fillMaxWidth()
             )
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = modifier.padding(top = 4.dp),
-            ) {
-                Icon(
-                    painter = painterResource(R.drawable.ic_error),
-                    contentDescription = null,
-                    tint = ErrorRed,
-                )
-                Spacer(modifier = Modifier.width(4.dp))
-                Text(
-                    text = "비밀번호가 일치하지 않습니다.",
-                    color = ErrorRed,
-                )
+            errorMessage?.let {
+                ErrorMessage(message = stringResource(errorMessage))
             }
         }
         Row(
@@ -352,13 +346,14 @@ fun ProfileInfoForm(
 @Composable
 fun MyInfoLayoutPreview() {
     val viewModel = remember {
-        MyInfoViewModel(MockUserRepository)
+        MyInfoViewModel(MockUserRepository, MockSignRepository, MockAuthProvider, MockAuthProvider, MockAuthProvider)
     }
 
     WaitForMeTheme {
         MyInfoLayout(
             isEdit = (viewModel.state == MyInfoState.Edit),
             myInfo = viewModel.myInfo,
+            errorMessage = viewModel.errorMessage,
             onEvent = viewModel::onEvent,
         )
     }

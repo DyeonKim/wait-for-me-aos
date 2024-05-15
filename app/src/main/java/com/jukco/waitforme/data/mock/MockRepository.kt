@@ -62,14 +62,15 @@ object MockSignRepository : SignRepository {
 object MockUserRepository : UserRepository {
     override suspend fun getUserInfo(): Response<UserInfoRes> = Response.success(MockDataSource.userInfoRes)
 
-    override suspend fun editUserInfo(userInfoReq: UserInfoRequest): Response<UserInfoRes>
-            = Response.success(
-        userInfoRes.copy(
-            name = userInfoReq.name,
-            birthedAt = userInfoReq.birthedAt,
-            genderType = userInfoReq.genderType,
-            profileImage = userInfoReq.profileImage
+    override suspend fun editUserInfo(userInfoReq: UserInfoRequest): Response<UserInfoRes> =
+        Response.success(
+            HttpURLConnection.HTTP_OK,
+            userInfoRes.copy(
+                name = userInfoReq.name,
+                birthedAt = userInfoReq.birthedAt,
+                genderType = userInfoReq.genderType,
+                profileImage = userInfoReq.profileImage
+            )
         )
-    )
 
 }
