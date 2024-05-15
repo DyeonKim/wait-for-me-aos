@@ -137,7 +137,7 @@ class SignRepositoryTest {
             .setBody(json)
         server.enqueue(res)
 
-        val actualRes = signRepository.checkDuplicateName("test")
+        val actualRes = signRepository.checkUniqueName("test")
         server.takeRequest()
 
         assertTrue(actualRes.isSuccessful)
@@ -153,7 +153,7 @@ class SignRepositoryTest {
             .setBody(json)
         server.enqueue(res)
 
-        val actualRes = signRepository.checkDuplicateName("test")
+        val actualRes = signRepository.checkUniqueName("test")
         server.takeRequest()
 
         assertTrue(actualRes.isSuccessful)

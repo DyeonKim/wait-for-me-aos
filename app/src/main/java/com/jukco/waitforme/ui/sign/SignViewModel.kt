@@ -348,7 +348,7 @@ class SignViewModel(
             delay(3000) // TODO : 서버와 연결 후에는 지울 것. 기다리는 최대 시간이 있어야 한다.
 
             try {
-                val response = signRepository.checkDuplicateName(signUpForm.name)
+                val response = signRepository.checkUniqueName(signUpForm.name)
                 if (response.isSuccessful) {
                     response.body()?.also { isUnique ->
                         if (isUnique) {
