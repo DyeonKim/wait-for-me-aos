@@ -109,7 +109,8 @@ fun NavigationGraph(
 
                 InputCredentialsScreen(
                     onNextButtonClicked = { navController.navigate(Route.SignUpInputName.name) },
-                    dto = signViewModel.signUpDto,
+                    hasPhoneNumber = signViewModel.signUpDto.phoneNumber.isNotBlank(),
+                    provider = signViewModel.signUpDto.provider,
                     form = signViewModel.signUpForm,
                     errorMessage = signViewModel.errorMessage,
                     currentLimitTime = signViewModel.currentLimitTime,

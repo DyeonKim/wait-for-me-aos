@@ -50,32 +50,38 @@ import com.jukco.waitforme.ui.util.PhoneNumberVisualTransformation
 @Composable
 fun InputCredentialsScreen(
     onNextButtonClicked: () -> Unit,
-    dto: SignUpDto,
+    hasPhoneNumber: Boolean,
+    provider: Provider,
     form: SignUpForm,
     @StringRes errorMessage: Int?,
     currentLimitTime: String,
     enabledReRequestVerificationCode: Boolean,
     onEvent: (SignUpEvent) -> Unit,
 ) {
-    if (dto.provider == Provider.LOCAL) {
-        InputPhoneNumAndPasswordLayout(
-            form = form,
-            errorMessage = errorMessage,
-            currentLimitTime = currentLimitTime,
-            enabledReRequestVerificationCode = enabledReRequestVerificationCode,
-            onEvent = onEvent,
-        )
-    } else if (dto.phoneNumber.isBlank()) {
-        InputPhoneNumLayout(
-            form = form,
-            errorMessage = errorMessage,
-            currentLimitTime = currentLimitTime,
-            enabledReRequestVerificationCode = enabledReRequestVerificationCode,
-            onEvent = onEvent
-        )
-    } else {
+    if (hasPhoneNumber) {
         LaunchedEffect(Unit) {
             onNextButtonClicked()
+        }
+    } else {
+        when(provider) {
+            Provider.LOCAL -> {
+                InputPhoneNumAndPasswordLayout(
+                    form = form,
+                    errorMessage = errorMessage,
+                    currentLimitTime = currentLimitTime,
+                    enabledReRequestVerificationCode = enabledReRequestVerificationCode,
+                    onEvent = onEvent,
+                )
+            }
+            else -> {
+                InputPhoneNumLayout(
+                    form = form,
+                    errorMessage = errorMessage,
+                    currentLimitTime = currentLimitTime,
+                    enabledReRequestVerificationCode = enabledReRequestVerificationCode,
+                    onEvent = onEvent
+                )
+            }
         }
     }
 }
@@ -372,7 +378,8 @@ fun InputPhoneNumAndPwScreenPreview() {
     WaitForMeTheme {
         InputCredentialsScreen(
             onNextButtonClicked = {},
-            dto = viewModel.signUpDto,
+            hasPhoneNumber = viewModel.signUpDto.phoneNumber.isNotBlank(),
+            provider = viewModel.signUpDto.provider,
             form = viewModel.signUpForm,
             errorMessage = viewModel.errorMessage,
             currentLimitTime = viewModel.currentLimitTime,
