@@ -11,16 +11,17 @@ import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.jukco.waitforme.config.ApplicationClass
 import com.jukco.waitforme.data.network.model.UserInfoRequest
+import com.jukco.waitforme.data.network.model.UserInfoRes
 import com.jukco.waitforme.data.repository.UserRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import java.io.IOException
 
-class MyInfoViewModel(private val userRepository: UserRepository) : ViewModel() {
-    private val _myInfo = MutableStateFlow(UserInfo())
+class MyInfoViewModel(private val userRepository: UserRepository, ) : ViewModel() {
+    private val _oldMyInfo = MutableStateFlow(UserInfoRes())
     var state by mutableStateOf<MyInfoState>(MyInfoState.Loading)
         private set
-    var myInfo by mutableStateOf(UserInfo())
+    var myInfo by mutableStateOf(UserInfoDto())
         private set
     var openGenderDialog by mutableStateOf(false)
         private set
@@ -36,7 +37,7 @@ class MyInfoViewModel(private val userRepository: UserRepository) : ViewModel() 
             is MyInfoEvent.InputName -> {
                 myInfo = myInfo.copy(
                     name = event.name,
-                    nameSubmitted = (event.name == _myInfo.value.name)
+                    isValidNameFormat = checkName(event.name)
                 )
             }
             is MyInfoEvent.CheckDuplicateName -> {
@@ -47,20 +48,20 @@ class MyInfoViewModel(private val userRepository: UserRepository) : ViewModel() 
             is MyInfoEvent.InputPassword -> {
                 myInfo = myInfo.copy(
                     password = event.password,
-                    passwordSubmitted = event.password.isNotBlank() && (event.password == myInfo.confirmPassword)
+                    isValidPasswordFormat = checkPassword(event.password)
                 )
-                /* TODO : 비밀번호 규칙 확인 및 확인과 일치 여부 확인 */
             }
             is MyInfoEvent.InputConfirmPassword -> {
+                val passwordConfirmed = (myInfo.password == event.confirmPassword)
+
                 myInfo = myInfo.copy(
                     confirmPassword = event.confirmPassword,
-                    passwordSubmitted = (event.confirmPassword == myInfo.password)
+                    passwordSubmitted = (myInfo.isValidPasswordFormat == true) && passwordConfirmed
                 )
-                /* TODO : 비밀번호와 일치 여부 확인 */
             }
             is MyInfoEvent.ShowGenderDialog -> { openGenderDialog = true }
             is MyInfoEvent.CloseGenderDialog -> {
-                myInfo = myInfo.copy(genderType = _myInfo.value.genderType)
+                myInfo = myInfo.copy(genderType = _oldMyInfo.value.genderType)
                 openGenderDialog = false
             }
             is MyInfoEvent.ConfirmGender -> { openGenderDialog = false }
@@ -79,27 +80,18 @@ class MyInfoViewModel(private val userRepository: UserRepository) : ViewModel() 
         }
     }
 
-    private fun save() {
-        if (myInfo.nameSubmitted == false) {
-            // TODO : 이름 중복 확인을 해달라는 오류 메시지
-            return
-        }
-        if (myInfo.passwordSubmitted == false){
-            return
-        }
+    private fun checkName(name: String): Boolean {
+        /* TODO : 이름규칙 확인 */
+        return true
+    }
 
-        val userInfoReq = UserInfoRequest(
-            name = if (myInfo.nameSubmitted == true) myInfo.name else _myInfo.value.name,
-            birthedAt = myInfo.birthedAt,
-            genderType = myInfo.genderType,
-            profileImage = myInfo.profileImage,
-            password = if (myInfo.passwordSubmitted == true) myInfo.password else null
-        )
-        editMyInfo(userInfoReq)
+    private fun checkPassword(password: String): Boolean {
+        /* TODO : 비밀번호 규칙 확인 */
+        return true
     }
 
     private fun reset() {
-        myInfo = _myInfo.value
+        myInfo = UserInfoDto(_oldMyInfo.value)
     }
 
     private fun getMyInfo() {
@@ -110,20 +102,46 @@ class MyInfoViewModel(private val userRepository: UserRepository) : ViewModel() 
                 val response = userRepository.getUserInfo()
 
                 if (response.isSuccessful) {
-                    val userInfo = UserInfo(response.body()!!)
-                    _myInfo.value = userInfo
-                    myInfo = userInfo
+                    val userInfoRes = response.body()!!
+
+                    _oldMyInfo.value = userInfoRes
+                    myInfo = UserInfoDto(userInfoRes)
                     state = MyInfoState.Read
                     return@launch
                 }
-                // TODO : 다른 오류 처리
-                state = MyInfoState.Fail
+                // TODO : 30X, 40X 처리
+                // TODO : 로그인이 안 되어 있다면 로그인페이지로 이동
+                state = MyInfoState.Error
             } catch (e: IOException) {
                 // TODO : 네트워크 오류 처리
                 state = MyInfoState.Error
             }
 
         }
+    }
+
+    private fun save() {
+        // 1. 이름 변경 있는지 체크 (변경이 있으면 2번, 3번)
+        if (myInfo.name != _oldMyInfo.value.name) {
+            // 2. 이름 규칙 지켰는지 체크
+            if (myInfo.isValidNameFormat) {
+                // 3. 이름 중복 체크 (이름 중복 확인을 해달라는 오류 메시지)
+            } else {
+                return
+            }
+        }
+
+        // 4. 비밀번호 변경하려는 지 체크 (변경이 있으면 5번, 6번)
+        if (myInfo.password.isNotBlank() || myInfo.confirmPassword.isNotBlank()) {
+            // 5. 비밀번호 규칙 체크
+            // 6. 비밀번호 확인 일치 체크
+            if (myInfo.isValidPasswordFormat == false || myInfo.passwordSubmitted == false) {
+                return
+            }
+        }
+
+        val userInfoReq = myInfo.toUserInfoRequest()
+        editMyInfo(userInfoReq)
     }
 
     private fun editMyInfo(userInfoReq: UserInfoRequest) {
@@ -134,9 +152,9 @@ class MyInfoViewModel(private val userRepository: UserRepository) : ViewModel() 
                 val response = userRepository.editUserInfo(userInfoReq)
 
                 if (response.isSuccessful) {
-                    val userInfo = UserInfo(response.body()!!)
-                    _myInfo.value = userInfo
-                    myInfo = userInfo
+                    val userInfoRes = response.body()!!
+                    _oldMyInfo.value = userInfoRes
+                    myInfo = UserInfoDto(userInfoRes)
                     state = MyInfoState.Read
                     return@launch
                 }

@@ -49,8 +49,8 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.jukco.waitforme.R
+import com.jukco.waitforme.data.mock.MockUserRepository
 import com.jukco.waitforme.data.network.model.Provider
-import com.jukco.waitforme.data.repository.MockUserRepository
 import com.jukco.waitforme.ui.components.CustomDatePickerDialog
 import com.jukco.waitforme.ui.components.GenderDialog
 import com.jukco.waitforme.ui.theme.ErrorRed
@@ -77,7 +77,7 @@ fun MyInfoScreen(
         else -> {
             MyInfoLayout(
                 isEdit = (viewModel.state == MyInfoState.Edit),
-                userInfo = viewModel.myInfo,
+                myInfo = viewModel.myInfo,
                 onEvent = viewModel::onEvent,
             )
             if (viewModel.state == MyInfoState.Edit && viewModel.openGenderDialog) {
@@ -104,7 +104,7 @@ fun MyInfoScreen(
 @Composable
 fun MyInfoLayout(
     isEdit: Boolean,
-    userInfo: UserInfo,
+    myInfo: UserInfoDto,
     onEvent: (MyInfoEvent) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -137,7 +137,7 @@ fun MyInfoLayout(
         ) {
             ProfileImage(
                 isEdit = isEdit,
-                image = userInfo.profileImage,
+                image = myInfo.profileImage,
                 inputProfileImage = { imageUri -> onEvent(MyInfoEvent.InputProfileImage(imageUri)) },
                 modifier = Modifier
                     .padding(vertical = 24.dp)
@@ -145,7 +145,7 @@ fun MyInfoLayout(
             )
             ProfileInfoForm(
                 isEdit = isEdit,
-                form = userInfo,
+                form = myInfo,
                 onEvent = onEvent,
                 modifier = Modifier.fillMaxWidth(),
             )
@@ -229,7 +229,7 @@ fun ProfileImage(
 @Composable
 fun ProfileInfoForm(
     isEdit: Boolean,
-    form: UserInfo,
+    form: UserInfoDto,
     onEvent: (MyInfoEvent) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -358,7 +358,7 @@ fun MyInfoLayoutPreview() {
     WaitForMeTheme {
         MyInfoLayout(
             isEdit = (viewModel.state == MyInfoState.Edit),
-            userInfo = viewModel.myInfo,
+            myInfo = viewModel.myInfo,
             onEvent = viewModel::onEvent,
         )
     }
