@@ -17,4 +17,8 @@ sealed interface MyInfoEvent {
     object Edit : MyInfoEvent
     object Save : MyInfoEvent
     object Cancel : MyInfoEvent
+    object SignOut : MyInfoEvent
+    object OnWithdrawalBtnClick : MyInfoEvent
+    object CancelWithdrawal : MyInfoEvent
+    object Withdraw : MyInfoEvent
 }

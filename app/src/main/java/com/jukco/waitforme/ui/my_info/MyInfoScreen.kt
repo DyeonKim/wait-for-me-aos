@@ -8,6 +8,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.StringRes
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -15,6 +16,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
@@ -24,6 +26,8 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.outlined.Add
+import androidx.compose.material.icons.outlined.Warning
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -33,6 +37,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SmallFloatingActionButton
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -44,6 +49,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -101,6 +107,25 @@ fun MyInfoScreen(
                         selectedDate = viewModel.myInfo.birthedAt,
                         onDismissRequest = { viewModel.onEvent(MyInfoEvent.CloseBirthDayPickerDialog) },
                         onConfirmation = { date -> viewModel.onEvent(MyInfoEvent.ConfirmBirthDayPickerDialog(date)) }
+                    )
+                }
+                // fixme : 탈퇴하기 대화상자는 임시 디자인, 상의 후 이후에 리팩토링할 것.
+                if (viewModel.isEdit && viewModel.openWithdrawalAlertDialog) {
+                    AlertDialog(
+                        onDismissRequest = { viewModel.onEvent(MyInfoEvent.CancelWithdrawal) },
+                        icon = { Icon(imageVector = Icons.Outlined.Warning, contentDescription = null) },
+                        title = { Text(text = "정말 탈퇴하시겠습니까?") },
+                        text = { Text(text = "탈퇴하시면 모든 정보가 삭제됩니다.") },
+                        dismissButton = { 
+                            TextButton(onClick = { viewModel.onEvent(MyInfoEvent.CancelWithdrawal) }) {
+                                Text(text = stringResource(R.string.cancel))
+                            }
+                        },
+                        confirmButton = {
+                            TextButton(onClick = { viewModel.onEvent(MyInfoEvent.Withdraw) }) {
+                                Text(text = stringResource(R.string.ok))
+                            }
+                        },
                     )
                 }
             }
@@ -161,8 +186,15 @@ fun MyInfoLayout(
                 modifier = Modifier.fillMaxWidth(),
             )
             Spacer(modifier = Modifier.weight(1f))
+
             when (isEdit) {
                 true -> {
+                    Text(
+                        text = stringResource(R.string.withdraw),
+                        textDecoration = TextDecoration.Underline,
+                        modifier = Modifier.clickable { onEvent(MyInfoEvent.OnWithdrawalBtnClick) },
+                    )
+                    Spacer(modifier = Modifier.height(16.dp))
                     Button(
                         onClick = { onEvent(MyInfoEvent.Save) },
                         modifier = Modifier.fillMaxWidth()
@@ -171,6 +203,12 @@ fun MyInfoLayout(
                     }
                 }
                 false -> {
+                    Text(
+                        text = stringResource(R.string.sign_out),
+                        textDecoration = TextDecoration.Underline,
+                        modifier = Modifier.clickable { onEvent(MyInfoEvent.SignOut) },
+                    )
+                    Spacer(modifier = Modifier.height(16.dp))
                     Button(
                         onClick = { onEvent(MyInfoEvent.Edit) },
                         modifier = Modifier.fillMaxWidth()

@@ -82,6 +82,8 @@
 
     <string name="profile_img">프로필 사진</string>
     <string name="change_profile_image">프로필 사진 변경</string>
+    <string name="sign_out">로그아웃</string>
+    <string name="withdraw">탈퇴하기</string>
     <string name="save">저장하기</string>
     <string name="edit">수정하기</string>
     <string name="nickname">닉네임</string>

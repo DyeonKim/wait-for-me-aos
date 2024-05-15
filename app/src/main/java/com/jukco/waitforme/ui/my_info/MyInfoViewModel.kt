@@ -11,6 +11,7 @@ import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.jukco.waitforme.R
 import com.jukco.waitforme.config.ApplicationClass
+import com.jukco.waitforme.data.network.model.Provider
 import com.jukco.waitforme.data.network.model.UserInfoRequest
 import com.jukco.waitforme.data.network.model.UserInfoRes
 import com.jukco.waitforme.data.repository.AuthProvider
@@ -44,6 +45,8 @@ class MyInfoViewModel(
     var openGenderDialog by mutableStateOf(false)
         private set
     var openBirthDayPickerDialog by mutableStateOf(false)
+        private set
+    var openWithdrawalAlertDialog by mutableStateOf(false)
         private set
 
     init {
@@ -98,6 +101,10 @@ class MyInfoViewModel(
                 reset()
                 isEdit = false
             }
+            is MyInfoEvent.SignOut -> { signOut() }
+            is MyInfoEvent.OnWithdrawalBtnClick -> { openWithdrawalAlertDialog = true }
+            is MyInfoEvent.CancelWithdrawal -> { openWithdrawalAlertDialog = false }
+            is MyInfoEvent.Withdraw -> { withdraw() }
         }
     }
 
@@ -184,6 +191,28 @@ class MyInfoViewModel(
             showLoadingDialog = false
         }
 
+    }
+
+    private fun signOut() {
+        viewModelScope.launch {
+            // TODO : Token 삭제 작성
+            when (_oldMyInfo.value.provider) {
+                Provider.GOOGLE -> {
+                    googleAuthProvider.signOut()
+                }
+                Provider.NAVER -> {
+                    naverAuthProvider.signOut()
+                }
+                Provider.KAKAO -> {
+                    kakaoAuthProvider.signOut()
+                }
+                Provider.LOCAL -> {}
+            }
+        }
+    }
+
+    private fun withdraw() {
+        // TODO : 일반과 소셜 모두 회원탈퇴 작성해야함.
     }
 
     private suspend fun checkUniqueName(): Boolean {
