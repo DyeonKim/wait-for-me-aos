@@ -34,7 +34,6 @@ import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -48,7 +47,6 @@ class SignViewModel(
     private val tokenManager: TokenManager,
 ) : ViewModel() {
     private var _currentLimitSec = INPUT_LIMIT_SEC_MAX
-    private var _authnNumInputTimer: Job = makeAuthnNumInputTimer()
 
     var signInform by mutableStateOf(SignInForm())
         private set
@@ -63,6 +61,9 @@ class SignViewModel(
     var currentLimitTime by mutableStateOf(_currentLimitSec.convertSecToMinSecFormat())
         private set
     var enabledReRequestAuthnNum by mutableStateOf(true)
+        private set
+    var authnNumInputTimer by mutableStateOf<Job>(makeAuthnNumInputTimer())
+        private set
 
     fun onSignInEvent(event: SignInEvent) {
         when (event) {
@@ -99,7 +100,7 @@ class SignViewModel(
                     viewModelScope.launch {
                         if (requestAuthnNum(signUpForm.phoneNumber)) {
                             signUpForm = signUpForm.copy(phoneNumberSubmitted = true)
-                            _authnNumInputTimer.start()
+                            authnNumInputTimer.start()
                         } else {
                             // TODO : 인증번호 발송에 실패했다 안내
                         }
@@ -116,7 +117,7 @@ class SignViewModel(
                     if (requestAuthnNum(signUpForm.phoneNumber)) {
                         signUpForm = signUpForm.copy(phoneNumberSubmitted = true)
                         resetAuthnNumInputTimer()
-                        _authnNumInputTimer.start()
+                        authnNumInputTimer.start()
 
                         enabledReRequestAuthnNum = false
                         delay(15000L)
@@ -445,9 +446,9 @@ class SignViewModel(
     }
 
     private fun resetAuthnNumInputTimer() {
-        _authnNumInputTimer.cancel()
+        authnNumInputTimer.cancel()
         _currentLimitSec = INPUT_LIMIT_SEC_MAX
-        _authnNumInputTimer = makeAuthnNumInputTimer()
+        authnNumInputTimer = makeAuthnNumInputTimer()
     }
 
     companion object {

@@ -115,6 +115,7 @@ fun NavigationGraph(
                     errorMessage = signViewModel.errorMessage,
                     currentLimitTime = signViewModel.currentLimitTime,
                     enabledReRequestVerificationCode = signViewModel.enabledReRequestAuthnNum,
+                    authnNumInputTimer = signViewModel.authnNumInputTimer,
                     onEvent = signViewModel::onSignUpEvent,
                 )
             }

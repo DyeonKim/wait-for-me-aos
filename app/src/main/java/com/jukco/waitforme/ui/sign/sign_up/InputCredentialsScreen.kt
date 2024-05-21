@@ -46,6 +46,7 @@ import com.jukco.waitforme.ui.theme.MainBlack
 import com.jukco.waitforme.ui.theme.NotoSansKR
 import com.jukco.waitforme.ui.theme.WaitForMeTheme
 import com.jukco.waitforme.ui.util.PhoneNumberVisualTransformation
+import kotlinx.coroutines.Job
 
 @Composable
 fun InputCredentialsScreen(
@@ -56,6 +57,7 @@ fun InputCredentialsScreen(
     @StringRes errorMessage: Int?,
     currentLimitTime: String,
     enabledReRequestVerificationCode: Boolean,
+    authnNumInputTimer: Job,
     onEvent: (SignUpEvent) -> Unit,
 ) {
     if (hasPhoneNumber) {
@@ -70,6 +72,7 @@ fun InputCredentialsScreen(
                     errorMessage = errorMessage,
                     currentLimitTime = currentLimitTime,
                     enabledReRequestVerificationCode = enabledReRequestVerificationCode,
+                    authnNumInputTimer = authnNumInputTimer,
                     onEvent = onEvent,
                 )
             }
@@ -79,6 +82,7 @@ fun InputCredentialsScreen(
                     errorMessage = errorMessage,
                     currentLimitTime = currentLimitTime,
                     enabledReRequestVerificationCode = enabledReRequestVerificationCode,
+                    authnNumInputTimer = authnNumInputTimer,
                     onEvent = onEvent
                 )
             }
@@ -92,6 +96,7 @@ fun InputPhoneNumAndPasswordLayout(
     @StringRes errorMessage: Int?,
     currentLimitTime: String,
     enabledReRequestVerificationCode: Boolean,
+    authnNumInputTimer: Job,
     onEvent: (SignUpEvent) -> Unit,
 ) {
     Column(
@@ -111,6 +116,7 @@ fun InputPhoneNumAndPasswordLayout(
             form = form,
             currentLimitTime = currentLimitTime,
             enabledReRequestVerificationCode = enabledReRequestVerificationCode,
+            authnNumInputTimer = authnNumInputTimer,
             onEvent = onEvent,
         )
         Spacer(modifier = Modifier.weight(1f))
@@ -134,6 +140,7 @@ fun InputPhoneNumLayout(
     @StringRes errorMessage: Int?,
     currentLimitTime: String,
     enabledReRequestVerificationCode: Boolean,
+    authnNumInputTimer: Job,
     onEvent: (SignUpEvent) -> Unit,
 ) {
     Column(
@@ -150,6 +157,7 @@ fun InputPhoneNumLayout(
             form = form,
             currentLimitTime = currentLimitTime,
             enabledReRequestVerificationCode = enabledReRequestVerificationCode,
+            authnNumInputTimer = authnNumInputTimer,
             onEvent = onEvent,
         )
         Spacer(modifier = Modifier.weight(1f))
@@ -172,6 +180,7 @@ fun PhoneNumberSetupForm(
     form: SignUpForm,
     currentLimitTime: String,
     enabledReRequestVerificationCode: Boolean,
+    authnNumInputTimer: Job,
     onEvent: (SignUpEvent) -> Unit,
 ) {
     Column(
@@ -217,7 +226,7 @@ fun PhoneNumberSetupForm(
                     Button(
                         onClick = { onEvent(SignUpEvent.SubmitAuthnNum) },
                         shape = RoundedCornerShape(8.dp),
-                        enabled = !form.authenticationNumSubmitted,
+                        enabled = (!form.authenticationNumSubmitted && authnNumInputTimer.isActive),
                         modifier = Modifier
                             .defaultMinSize(minWidth = 104.dp, minHeight = 48.dp)
                             .weight(1f),
@@ -384,6 +393,7 @@ fun InputPhoneNumAndPwScreenPreview() {
             errorMessage = viewModel.errorMessage,
             currentLimitTime = viewModel.currentLimitTime,
             enabledReRequestVerificationCode = viewModel.enabledReRequestAuthnNum,
+            authnNumInputTimer = viewModel.authnNumInputTimer,
             onEvent = viewModel::onSignUpEvent,
         )
     }
