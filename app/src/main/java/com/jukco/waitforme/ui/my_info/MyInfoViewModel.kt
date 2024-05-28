@@ -16,12 +16,15 @@ import com.jukco.waitforme.data.network.model.UserInfoRequest
 import com.jukco.waitforme.data.network.model.UserInfoRes
 import com.jukco.waitforme.data.repository.AuthProvider
 import com.jukco.waitforme.data.repository.SignRepository
+import com.jukco.waitforme.data.repository.TokenManager
 import com.jukco.waitforme.data.repository.UserRepository
 import com.jukco.waitforme.ui.util.ValidationChecker
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.io.IOException
 
 class MyInfoViewModel(
@@ -30,6 +33,7 @@ class MyInfoViewModel(
     private val googleAuthProvider: AuthProvider,
     private val kakaoAuthProvider: AuthProvider,
     private val naverAuthProvider: AuthProvider,
+    private val tokenManager: TokenManager,
 ) : ViewModel() {
     private val _oldMyInfo = MutableStateFlow(UserInfoRes())
     var state by mutableStateOf<MyInfoState>(MyInfoState.Success)
@@ -104,7 +108,10 @@ class MyInfoViewModel(
             is MyInfoEvent.SignOut -> { signOut() }
             is MyInfoEvent.OnWithdrawalBtnClick -> { openWithdrawalAlertDialog = true }
             is MyInfoEvent.CancelWithdrawal -> { openWithdrawalAlertDialog = false }
-            is MyInfoEvent.Withdraw -> { withdraw() }
+            is MyInfoEvent.Withdraw -> {
+                openWithdrawalAlertDialog = false
+                withdraw()
+            }
         }
     }
 
@@ -135,7 +142,6 @@ class MyInfoViewModel(
 
                     _oldMyInfo.value = userInfoRes
                     myInfo = UserInfoDto(userInfoRes)
-//                    state = MyInfoState.Read
                     return@launch
                 }
                 // TODO : 30X, 40X 처리
@@ -152,6 +158,7 @@ class MyInfoViewModel(
 
     private fun save() {
         viewModelScope.launch {
+
             showLoadingDialog = true
             if (myInfo.equalsTo(_oldMyInfo.value)) {
                 isEdit = false
@@ -195,7 +202,14 @@ class MyInfoViewModel(
 
     private fun signOut() {
         viewModelScope.launch {
-            // TODO : Token 삭제 작성
+            try {
+                withContext(Dispatchers.IO) {
+                    tokenManager.clearToken(_oldMyInfo.value.provider)
+                }
+            } catch (e: IOException) {
+                // TODO : 오류 처리
+            }
+
             when (_oldMyInfo.value.provider) {
                 Provider.GOOGLE -> {
                     googleAuthProvider.signOut()
@@ -212,7 +226,35 @@ class MyInfoViewModel(
     }
 
     private fun withdraw() {
-        // TODO : 일반과 소셜 모두 회원탈퇴 작성해야함.
+        viewModelScope.launch {
+            try {
+                val response = userRepository.withdraw("")
+
+                if (response.isSuccessful) {
+                    if (response.body() == true) {
+                        withContext(Dispatchers.IO) {
+                            tokenManager.removeAll()
+                        }
+                        when (_oldMyInfo.value.provider) {
+                            Provider.GOOGLE -> {
+                                googleAuthProvider.withdraw()
+                            }
+                            Provider.NAVER -> {
+                                naverAuthProvider.withdraw()
+                            }
+                            Provider.KAKAO -> {
+                                kakaoAuthProvider.withdraw()
+                            }
+                            Provider.LOCAL -> {}
+                        }
+                    }
+                    // TODO: 실패 시 오류처리
+                }
+            } catch (e: IOException) {
+                // TODO : 네트워크 및 datastore 오류 처리
+            }
+        }
+
     }
 
     private suspend fun checkUniqueName(): Boolean {
@@ -265,8 +307,16 @@ class MyInfoViewModel(
                 val googleAuthProvider = application.container.googleAuthProvider
                 val kakaoAuthProvider = application.container.kakaoAuthProvider
                 val naverAuthProvider = application.container.naverAuthProvider
+                val tokenManager = application.container.tokenManager
 
-                MyInfoViewModel(userRepository, signRepository, googleAuthProvider, kakaoAuthProvider, naverAuthProvider)
+                MyInfoViewModel(
+                    userRepository,
+                    signRepository,
+                    googleAuthProvider,
+                    kakaoAuthProvider,
+                    naverAuthProvider,
+                    tokenManager,
+                )
             }
         }
     }

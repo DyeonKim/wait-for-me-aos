@@ -29,6 +29,10 @@ interface TokenManager {
     val refreshTokenExpiredTimeFlow: Flow<LocalDateTime?>
 
     suspend fun saveToken(provider: Provider, signInResponse: SignInResponse)
+
+    suspend fun clearToken(provider: Provider)
+
+    suspend fun removeAll()
 }
 
 class TokenManagerImplementation (
@@ -87,6 +91,19 @@ class TokenManagerImplementation (
             signInData[REFRESH_TOKEN_KEY] = signInResponse.refreshToken.token
             signInData[REFRESH_TOKEN_CREATED_TIME_KEY] = signInResponse.refreshToken.createdAt
             signInData[REFRESH_TOKEN_EXPIRED_TIME_KEY] = signInResponse.refreshToken.expiredAt
+        }
+    }
+
+    override suspend fun clearToken(provider: Provider) {
+        dataStore.edit { signInData ->
+            signInData.clear()
+            signInData[PROVIDER_KEY] = provider.name
+        }
+    }
+
+    override suspend fun removeAll() {
+        dataStore.edit { signInData ->
+            signInData.clear()
         }
     }
 

@@ -1,6 +1,5 @@
 package com.jukco.waitforme.data.mock
 
-import com.jukco.waitforme.data.mock.MockDataSource.signInRes
 import com.jukco.waitforme.data.mock.MockDataSource.userInfoRes
 import com.jukco.waitforme.data.network.model.LocalSignInRequest
 import com.jukco.waitforme.data.network.model.LocalSignUpRequest
@@ -32,7 +31,9 @@ object MockTokenManager : TokenManager {
     override val refreshTokenCreatedTimeFlow: Flow<LocalDateTime?> = MutableStateFlow(null)
     override val refreshTokenExpiredTimeFlow: Flow<LocalDateTime?> = MutableStateFlow(null)
 
-    override suspend fun saveToken(provider: Provider, signInResponse: SignInResponse) {}
+    override suspend fun saveToken(provider: Provider, signInResponse: SignInResponse) = Unit
+    override suspend fun clearToken(provider: Provider) = Unit
+    override suspend fun removeAll() = Unit
 
 }
 
@@ -60,7 +61,8 @@ object MockSignRepository : SignRepository {
 }
 
 object MockUserRepository : UserRepository {
-    override suspend fun getUserInfo(): Response<UserInfoRes> = Response.success(MockDataSource.userInfoRes)
+    override suspend fun getUserInfo(): Response<UserInfoRes> =
+        Response.success(HttpURLConnection.HTTP_OK, userInfoRes)
 
     override suspend fun editUserInfo(userInfoReq: UserInfoRequest): Response<UserInfoRes> =
         Response.success(
@@ -73,4 +75,6 @@ object MockUserRepository : UserRepository {
             )
         )
 
+    override suspend fun withdraw(reason: String): Response<Boolean> =
+        Response.success(HttpURLConnection.HTTP_OK, true)
 }

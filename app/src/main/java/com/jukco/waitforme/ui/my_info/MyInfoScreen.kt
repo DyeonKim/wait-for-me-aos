@@ -58,6 +58,7 @@ import coil.request.ImageRequest
 import com.jukco.waitforme.R
 import com.jukco.waitforme.data.mock.MockAuthProvider
 import com.jukco.waitforme.data.mock.MockSignRepository
+import com.jukco.waitforme.data.mock.MockTokenManager
 import com.jukco.waitforme.data.mock.MockUserRepository
 import com.jukco.waitforme.data.network.model.Provider
 import com.jukco.waitforme.ui.LoadingDialogContainer
@@ -71,7 +72,6 @@ import com.jukco.waitforme.ui.theme.WaitForMeTheme
 @Composable
 fun MyInfoScreen(
     onBackButtonPressed: () -> Unit,
-    modifier: Modifier = Modifier,
 ) {
     val viewModel: MyInfoViewModel = viewModel(factory = MyInfoViewModel.Factory)
 
@@ -94,39 +94,43 @@ fun MyInfoScreen(
                     errorMessage = viewModel.errorMessage,
                     onEvent = viewModel::onEvent,
                 )
-                if (viewModel.isEdit && viewModel.openGenderDialog) {
-                    GenderDialog(
-                        selected = viewModel.myInfo.genderType,
-                        onSelectGender = { gender -> viewModel.onEvent(MyInfoEvent.SelectGender(gender)) },
-                        onDismissRequest = { viewModel.onEvent(MyInfoEvent.CloseGenderDialog) },
-                        onConfirmation = { viewModel.onEvent(MyInfoEvent.ConfirmGender) },
-                    )
-                }
-                if (viewModel.isEdit && viewModel.openBirthDayPickerDialog) {
-                    CustomDatePickerDialog(
-                        selectedDate = viewModel.myInfo.birthedAt,
-                        onDismissRequest = { viewModel.onEvent(MyInfoEvent.CloseBirthDayPickerDialog) },
-                        onConfirmation = { date -> viewModel.onEvent(MyInfoEvent.ConfirmBirthDayPickerDialog(date)) }
-                    )
-                }
-                // fixme : 탈퇴하기 대화상자는 임시 디자인, 상의 후 이후에 리팩토링할 것.
-                if (viewModel.isEdit && viewModel.openWithdrawalAlertDialog) {
-                    AlertDialog(
-                        onDismissRequest = { viewModel.onEvent(MyInfoEvent.CancelWithdrawal) },
-                        icon = { Icon(imageVector = Icons.Outlined.Warning, contentDescription = null) },
-                        title = { Text(text = "정말 탈퇴하시겠습니까?") },
-                        text = { Text(text = "탈퇴하시면 모든 정보가 삭제됩니다.") },
-                        dismissButton = { 
-                            TextButton(onClick = { viewModel.onEvent(MyInfoEvent.CancelWithdrawal) }) {
-                                Text(text = stringResource(R.string.cancel))
-                            }
-                        },
-                        confirmButton = {
-                            TextButton(onClick = { viewModel.onEvent(MyInfoEvent.Withdraw) }) {
-                                Text(text = stringResource(R.string.ok))
-                            }
-                        },
-                    )
+                if (viewModel.isEdit) {
+                    when {
+                        viewModel.openGenderDialog -> {
+                            GenderDialog(
+                                selected = viewModel.myInfo.genderType,
+                                onSelectGender = { gender -> viewModel.onEvent(MyInfoEvent.SelectGender(gender)) },
+                                onDismissRequest = { viewModel.onEvent(MyInfoEvent.CloseGenderDialog) },
+                                onConfirmation = { viewModel.onEvent(MyInfoEvent.ConfirmGender) },
+                            )
+                        }
+                        viewModel.openBirthDayPickerDialog -> {
+                            CustomDatePickerDialog(
+                                selectedDate = viewModel.myInfo.birthedAt,
+                                onDismissRequest = { viewModel.onEvent(MyInfoEvent.CloseBirthDayPickerDialog) },
+                                onConfirmation = { date -> viewModel.onEvent(MyInfoEvent.ConfirmBirthDayPickerDialog(date)) }
+                            )
+                        }
+                        viewModel.openWithdrawalAlertDialog -> {
+                            // fixme : 탈퇴하기 대화상자는 임시 디자인, 상의 후 이후에 리팩토링할 것.
+                            AlertDialog(
+                                onDismissRequest = { viewModel.onEvent(MyInfoEvent.CancelWithdrawal) },
+                                icon = { Icon(imageVector = Icons.Outlined.Warning, contentDescription = null) },
+                                title = { Text(text = "정말 탈퇴하시겠습니까?") },
+                                text = { Text(text = "탈퇴하시면 모든 정보가 삭제됩니다.") },
+                                dismissButton = {
+                                    TextButton(onClick = { viewModel.onEvent(MyInfoEvent.CancelWithdrawal) }) {
+                                        Text(text = stringResource(R.string.cancel))
+                                    }
+                                },
+                                confirmButton = {
+                                    TextButton(onClick = { viewModel.onEvent(MyInfoEvent.Withdraw) }) {
+                                        Text(text = stringResource(R.string.ok))
+                                    }
+                                },
+                            )
+                        }
+                    }
                 }
             }
         }
@@ -390,7 +394,7 @@ fun ProfileInfoForm(
 @Composable
 fun MyInfoLayoutPreview() {
     val viewModel = remember {
-        MyInfoViewModel(MockUserRepository, MockSignRepository, MockAuthProvider, MockAuthProvider, MockAuthProvider)
+        MyInfoViewModel(MockUserRepository, MockSignRepository, MockAuthProvider, MockAuthProvider, MockAuthProvider, MockTokenManager)
     }
 
     WaitForMeTheme {

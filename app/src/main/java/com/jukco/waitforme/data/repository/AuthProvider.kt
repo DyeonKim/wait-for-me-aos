@@ -8,4 +8,6 @@ interface AuthProvider {
     fun getUiProvider(): AuthUiProvider
 
     suspend fun signOut()
+
+    suspend fun withdraw()
 }

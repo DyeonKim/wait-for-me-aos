@@ -9,6 +9,8 @@ interface UserRepository {
     suspend fun getUserInfo(): Response<UserInfoRes>
 
     suspend fun editUserInfo(userInfoReq: UserInfoRequest): Response<UserInfoRes>
+
+    suspend fun withdraw(reason: String): Response<Boolean>
 }
 
 class UserRepositoryImplementation(
@@ -18,4 +20,5 @@ class UserRepositoryImplementation(
 
     override suspend fun editUserInfo(userInfoReq: UserInfoRequest): Response<UserInfoRes> = userApi.editUserInfo(userInfoReq)
 
+    override suspend fun withdraw(reason: String): Response<Boolean> = userApi.withdraw(reason)
 }
