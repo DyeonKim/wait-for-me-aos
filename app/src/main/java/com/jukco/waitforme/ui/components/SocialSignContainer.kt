@@ -6,7 +6,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import com.jukco.waitforme.data.repository.AuthProvider
-import com.jukco.waitforme.ui.sign.sign_up.SignUpForm
+import com.jukco.waitforme.ui.sign.sign_up.SignUpDto
 import kotlinx.coroutines.launch
 
 interface SocialSignContainerScope {
@@ -16,7 +16,7 @@ interface SocialSignContainerScope {
 @Composable
 fun SocialSignContainer(
     authProvider: AuthProvider,
-    onSignInResult: (SignUpForm?) -> Unit,
+    onSignInResult: (SignUpDto?) -> Unit,
     modifier: Modifier = Modifier,
     content: @Composable SocialSignContainerScope.() -> Unit,
 ) {

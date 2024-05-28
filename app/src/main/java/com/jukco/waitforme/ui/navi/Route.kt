@@ -1,6 +1,6 @@
 package com.jukco.waitforme.ui.navi
 
-enum class Route() {
+enum class Route {
     StoreManagement,
     StoreList,
     WaitInfo,
@@ -11,7 +11,7 @@ enum class Route() {
     PopupStore,
     SignProgress,
     SignIn,
-    SignUpInputPhoneNumAndPw,
+    SignUpInputCredentials,
     SignUpInputName,
     SignUpSelectCustomerOwner,
     SignUpComplete,

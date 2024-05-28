@@ -10,10 +10,3 @@ interface AuthProvider {
 
     suspend fun signOut()
 }
-
-object MockAuthProvider : AuthProvider {
-    @Composable
-    override fun getUiProvider(): AuthUiProvider = MockAuthUiProvider
-
-    override suspend fun signOut() = Unit
-}

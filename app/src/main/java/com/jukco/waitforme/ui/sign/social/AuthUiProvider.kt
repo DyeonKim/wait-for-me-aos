@@ -1,11 +1,11 @@
 package com.jukco.waitforme.ui.sign.social
 
-import com.jukco.waitforme.ui.sign.sign_up.SignUpForm
+import com.jukco.waitforme.ui.sign.sign_up.SignUpDto
 
 interface AuthUiProvider {
-    suspend fun signIn(): SignUpForm?
+    suspend fun signIn(): SignUpDto?
 }
 
 object MockAuthUiProvider : AuthUiProvider {
-    override suspend fun signIn(): SignUpForm? = null
+    override suspend fun signIn(): SignUpDto? = null
 }

@@ -2,7 +2,7 @@ package com.jukco.waitforme.ui.sign.social
 
 import android.content.Context
 import android.util.Log
-import com.jukco.waitforme.ui.sign.sign_up.SignUpForm
+import com.jukco.waitforme.ui.sign.sign_up.SignUpDto
 import com.kakao.sdk.auth.model.OAuthToken
 import com.kakao.sdk.common.model.ClientError
 import com.kakao.sdk.common.model.ClientErrorCause
@@ -14,7 +14,7 @@ class KakaoAuthUiProvider(
     private val activityContext: Context,
 ) : AuthUiProvider {
 
-    override suspend fun signIn(): SignUpForm? =
+    override suspend fun signIn(): SignUpDto? =
         if (signInAndCheckSuccess()) {
             getUserInfo()
         } else {
@@ -59,13 +59,13 @@ class KakaoAuthUiProvider(
         }
     }
 
-    private suspend fun getUserInfo(): SignUpForm? = suspendCancellableCoroutine { continuation ->
+    private suspend fun getUserInfo(): SignUpDto? = suspendCancellableCoroutine { continuation ->
         UserApiClient.instance.me { user, error ->
             if (error != null) {
                 Log.e(TAG, "사용자 정보 요청 실패", error)
                 continuation.resume(null)
             } else if (user != null) {
-                continuation.resume(SignUpForm(user))
+                continuation.resume(SignUpDto(user))
             }
         }
     }

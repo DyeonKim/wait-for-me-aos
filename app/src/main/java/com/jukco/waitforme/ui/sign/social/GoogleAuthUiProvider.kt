@@ -10,14 +10,14 @@ import androidx.credentials.exceptions.GetCredentialException
 import com.google.android.libraries.identity.googleid.GetGoogleIdOption
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import com.google.android.libraries.identity.googleid.GoogleIdTokenParsingException
-import com.jukco.waitforme.ui.sign.sign_up.SignUpForm
+import com.jukco.waitforme.ui.sign.sign_up.SignUpDto
 
 class GoogleAuthUiProvider(
     private val activityContext: Context,
     private val credentialManager: CredentialManager,
     private val serverClientId: String,
 ) : AuthUiProvider {
-    override suspend fun signIn(): SignUpForm? {
+    override suspend fun signIn(): SignUpDto? {
         return try {
             val credential = credentialManager.getCredential(
                 context = activityContext,
@@ -30,7 +30,7 @@ class GoogleAuthUiProvider(
         }
     }
 
-    private suspend fun signUp(): SignUpForm? {
+    private suspend fun signUp(): SignUpDto? {
         return try {
             val credential = credentialManager.getCredential(
                 context = activityContext,
@@ -43,14 +43,14 @@ class GoogleAuthUiProvider(
         }
     }
 
-    private fun getGoogleUserFromCredential(credential: Credential): SignUpForm? {
+    private fun getGoogleUserFromCredential(credential: Credential): SignUpDto? {
         return when {
             credential is CustomCredential &&
                     credential.type == GoogleIdTokenCredential.TYPE_GOOGLE_ID_TOKEN_CREDENTIAL -> {
                 try {
                     val googleIdTokenCredential = GoogleIdTokenCredential
                         .createFrom(credential.data)
-                    SignUpForm(googleIdTokenCredential)
+                    SignUpDto(googleIdTokenCredential)
                 } catch (e: GoogleIdTokenParsingException) {
                     Log.e(TAG, "Received an invalid google id token response", e)
                     null

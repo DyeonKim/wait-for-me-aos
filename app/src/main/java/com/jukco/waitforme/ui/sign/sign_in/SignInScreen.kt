@@ -3,11 +3,9 @@ package com.jukco.waitforme.ui.sign.sign_in
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -16,17 +14,12 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -34,109 +27,79 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.Dialog
-import androidx.compose.ui.window.DialogProperties
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.jukco.waitforme.R
+import com.jukco.waitforme.data.mock.MockAuthProvider
+import com.jukco.waitforme.data.mock.MockSignRepository
+import com.jukco.waitforme.data.mock.MockTokenManager
 import com.jukco.waitforme.data.repository.AuthProvider
-import com.jukco.waitforme.data.repository.MockAuthProvider
-import com.jukco.waitforme.data.repository.MockSignRepository
+import com.jukco.waitforme.ui.LoadingDialogContainer
 import com.jukco.waitforme.ui.components.SocialSignIconButton
+import com.jukco.waitforme.ui.sign.ErrorMessage
 import com.jukco.waitforme.ui.sign.SignGuide
-import com.jukco.waitforme.ui.theme.ErrorRed
+import com.jukco.waitforme.ui.sign.SignViewModel
 import com.jukco.waitforme.ui.theme.GreyAAA
 import com.jukco.waitforme.ui.theme.KakaoYellow
 import com.jukco.waitforme.ui.theme.MainWhite
 import com.jukco.waitforme.ui.theme.NaverGreen
+import com.jukco.waitforme.ui.theme.WaitForMeTheme
 import com.jukco.waitforme.ui.util.PhoneNumberVisualTransformation
 
 @Composable
 fun SignInScreen(
-    goSignUp: () -> Unit,
-    goMain: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    val viewModel: SignInViewModel = viewModel(factory = SignInViewModel.Factory)
-
-    when (viewModel.signInState) {
-        SignInState.Init -> {
-            SignInLayout(
-                form = viewModel.form,
-                socialSignIn = viewModel::getSocialSign,
-                onEvent = viewModel::onEvent,
-                goSignUp = goSignUp,
-                onNoSignClicked = goMain,
-                modifier = modifier,
-            )
-        }
-        SignInState.Loading -> {
-            LoadingSignInLayout(form = viewModel.form, modifier = modifier.fillMaxSize())
-        }
-        SignInState.MovingMain -> {
-            LaunchedEffect(Unit) {
-                goMain()
-            }
-        }
-    }
-}
-
-@Composable
-fun LoadingSignInLayout(
     form: SignInForm,
-    modifier: Modifier = Modifier,
+    isLoading: Boolean,
+    socialSignIn: (SocialService) -> AuthProvider,
+    onEvent: (SignInEvent) -> Unit,
+    goMain: () -> Unit,
+    goSignUp: () -> Unit,
 ) {
-    Box(modifier) {
+    LoadingDialogContainer(isLoading = isLoading) {
         SignInLayout(
             form = form,
-            socialSignIn = { MockAuthProvider },
-            onEvent = {},
-            goSignUp = {},
-            onNoSignClicked = {},
+            socialSignIn = socialSignIn,
+            onEvent = onEvent,
+            goMain = goMain,
+            goSignUp = goSignUp,
         )
-        Dialog(
-            onDismissRequest = { },
-            properties = DialogProperties(dismissOnBackPress = false, dismissOnClickOutside = false),
-        ) {
-            Box(
-                contentAlignment = Alignment.Center,
-                modifier = Modifier.size(100.dp),
-            ) {
-                CircularProgressIndicator()
-            }
-        }
     }
 }
 
 @Composable
 fun SignInLayout(
+    modifier: Modifier = Modifier,
     form: SignInForm,
     socialSignIn: (SocialService) -> AuthProvider,
     onEvent: (SignInEvent) -> Unit,
+    goMain: () -> Unit,
     goSignUp: () -> Unit,
-    onNoSignClicked: () -> Unit,
-    modifier: Modifier = Modifier,
 ) {
     Column(
-        modifier = Modifier
-            .fillMaxSize()
+        modifier = modifier
+            .fillMaxWidth()
             .padding(horizontal = 20.dp)
             .padding(bottom = 56.dp),
     ) {
-        SignGuide(modifier)
+        SignGuide(Modifier.padding(top = 72.dp, bottom = 70.dp))
         SignInForm(
-            form,
-            onEvent,
+            form = form,
+            onEvent = onEvent,
+            goMain = goMain,
             modifier = modifier.fillMaxWidth(),
         )
         Spacer(modifier = Modifier.weight(1f))
         SocialSignInButtons(
-            socialSignIn,
-            onEvent,
+            socialSignIn = socialSignIn,
+            onEvent = onEvent,
+            goMain = goMain,
+            goSignUp = goSignUp,
             modifier = modifier.fillMaxWidth(),
         )
         Spacer(modifier = Modifier.height(24.dp))
         OutlinedButton(
-            onClick = goSignUp,
+            onClick = {
+                goSignUp()
+                onEvent(SignInEvent.Reset)
+            },
             modifier = Modifier.fillMaxWidth(),
         ) {
             Text(text = stringResource(R.string.sign_up))
@@ -148,16 +111,17 @@ fun SignInLayout(
             textDecoration = TextDecoration.Underline,
             modifier = Modifier
                 .fillMaxWidth()
-                .clickable { onNoSignClicked() },
+                .clickable { goMain() },
         )
     }
 }
 
 @Composable
 fun SignInForm(
+    modifier: Modifier = Modifier,
     form: SignInForm,
     onEvent: (SignInEvent) -> Unit,
-    modifier: Modifier = Modifier,
+    goMain: () -> Unit,
 ) {
     Column(modifier) {
         OutlinedTextField(
@@ -180,25 +144,18 @@ fun SignInForm(
             modifier = Modifier.fillMaxWidth(),
         )
         if (form.hasError == true) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
+            ErrorMessage(
+                message = stringResource(R.string.error_id_password),
                 modifier = Modifier.padding(top = 12.dp),
-            ){
-                Icon(
-                    painter = painterResource(R.drawable.ic_error),
-                    contentDescription = null,
-                    tint = ErrorRed,
-                )
-                Spacer(modifier = Modifier.width(4.dp))
-                Text(
-                    text = stringResource(R.string.error_id_password),
-                    color = ErrorRed,
-                )
-            }
+            )
         }
         Spacer(modifier = Modifier.height(24.dp))
         Button(
-            onClick = { onEvent(SignInEvent.OnSignInClicked) },
+            onClick = {
+                onEvent(
+                    SignInEvent.OnSignInClicked(goMain)
+                )
+            },
             modifier = Modifier.fillMaxWidth(),
         ) {
             Text(text = stringResource(R.string.sign_in))
@@ -208,9 +165,11 @@ fun SignInForm(
 
 @Composable
 fun SocialSignInButtons(
+    modifier: Modifier = Modifier,
     socialSignIn: (SocialService) -> AuthProvider,
     onEvent: (SignInEvent) -> Unit,
-    modifier: Modifier = Modifier,
+    goMain: () -> Unit,
+    goSignUp: () -> Unit,
 ) {
     Row(
         horizontalArrangement = Arrangement.Center,
@@ -218,21 +177,21 @@ fun SocialSignInButtons(
     ) {
         SocialSignIconButton(
             authProvider = socialSignIn(SocialService.Kakao),
-            onSignInClicked = { user -> onEvent(SignInEvent.OnSocialSignInClicked(user)) },
+            onSignInClicked = { user -> onEvent(SignInEvent.OnSocialSignInClicked(user, goMain, goSignUp)) },
             buttonColors = ButtonDefaults.buttonColors(containerColor = KakaoYellow),
             modifier = Modifier.size(48.dp),
         )
         Spacer(modifier = Modifier.width(16.dp))
         SocialSignIconButton(
             authProvider = socialSignIn(SocialService.Naver),
-            onSignInClicked = { user -> onEvent(SignInEvent.OnSocialSignInClicked(user)) },
+            onSignInClicked = { user -> onEvent(SignInEvent.OnSocialSignInClicked(user, goMain, goSignUp)) },
             buttonColors = ButtonDefaults.buttonColors(containerColor = NaverGreen),
             modifier = Modifier.size(48.dp),
         )
         Spacer(modifier = Modifier.width(16.dp))
         SocialSignIconButton(
             authProvider = socialSignIn(SocialService.Google),
-            onSignInClicked = { user -> onEvent(SignInEvent.OnSocialSignInClicked(user)) },
+            onSignInClicked = { user -> onEvent(SignInEvent.OnSocialSignInClicked(user, goMain, goSignUp)) },
             buttonBorder = BorderStroke(1.dp, GreyAAA),
             buttonColors = ButtonDefaults.buttonColors(containerColor = MainWhite),
             modifier = Modifier.size(48.dp),
@@ -244,14 +203,16 @@ fun SocialSignInButtons(
 @Composable
 private fun SignInLayoutPreview() {
     val viewModel = remember {
-        SignInViewModel(MockSignRepository, MockAuthProvider, MockAuthProvider, MockAuthProvider)
+        SignViewModel(MockSignRepository, MockAuthProvider, MockAuthProvider, MockAuthProvider, MockTokenManager)
     }
 
-    SignInLayout(
-        form = viewModel.form,
-        socialSignIn = viewModel::getSocialSign,
-        onEvent = viewModel::onEvent,
-        goSignUp = {},
-        onNoSignClicked = {},
-    )
+    WaitForMeTheme {
+        SignInLayout(
+            form = viewModel.signInform,
+            socialSignIn = viewModel::getSocialSign,
+            onEvent = viewModel::onSignInEvent,
+            goMain = {},
+            goSignUp = {},
+        )
+    }
 }
