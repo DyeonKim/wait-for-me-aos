@@ -20,6 +20,7 @@ val GreyAAA = Color(0xFFAAAAAA)
 val GreyCCC = Color(0xFFCCCCCC)
 val GreyDDD = Color(0xFFDDDDDD)
 val GreyEEE = Color(0xFFEEEEEE)
+val GreyF5 = Color(0xFFF5F5F5)
 val MainWhite = Color(0xFFFFFFFF)
 val ErrorRed = Color(0xFFFF0E0E)
 
