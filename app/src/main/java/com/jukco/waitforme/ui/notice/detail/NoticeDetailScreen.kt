@@ -34,6 +34,7 @@ import com.jukco.waitforme.ui.theme.GreyF5
 import com.jukco.waitforme.ui.theme.MainBlack
 import com.jukco.waitforme.ui.theme.NotoSansKR
 import com.jukco.waitforme.ui.theme.WaitForMeTheme
+import com.jukco.waitforme.ui.util.convertDefaultFormat
 
 @Composable
 fun NoticeDetailScreen(
@@ -81,7 +82,7 @@ fun NoticeDetailLayout(
                 .fillMaxSize()
                 .padding(scaffoldPadding)
         ) {
-            NoticeItem(title = notice.title, createdAt = notice.createdDate)
+            NoticeItem(title = notice.title, createdAt = notice.createdDate.convertDefaultFormat())
             Text(
                 text = notice.contents,
                 style = TextStyle(

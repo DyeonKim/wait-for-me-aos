@@ -29,6 +29,7 @@ import com.jukco.waitforme.data.network.model.NoticeResponse
 import com.jukco.waitforme.ui.notice.NoticeItem
 import com.jukco.waitforme.ui.theme.GreyEEE
 import com.jukco.waitforme.ui.theme.WaitForMeTheme
+import com.jukco.waitforme.ui.util.convertDefaultFormat
 import kotlinx.coroutines.flow.MutableStateFlow
 
 @Composable
@@ -88,7 +89,7 @@ fun NoticeLayout(
                 ) { notice ->
                     NoticeItem(
                         title = notice.title,
-                        createdAt = notice.createdAt,
+                        createdAt = notice.createdAt.convertDefaultFormat(),
                         onItemClicked = { onNoticeItemClicked(notice.id) },
                         modifier = Modifier.fillMaxWidth(),
                     )

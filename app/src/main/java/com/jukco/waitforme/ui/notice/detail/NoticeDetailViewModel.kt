@@ -16,13 +16,14 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
 import java.io.IOException
+import java.time.LocalDateTime
 
 class NoticeDetailViewModel(
     private val savedStateHandle: SavedStateHandle,
     private val noticeRepository: NoticeRepository,
 ) : ViewModel() {
     private val noticeId: Int? by lazy { savedStateHandle["noticeId"] }
-    private val emptyResponse = NoticeDetailResponse(-1, "", "", "")
+    private val emptyResponse = NoticeDetailResponse(-1, "", "", LocalDateTime.now())
     private val _notice = MutableStateFlow(emptyResponse)
     val notice: StateFlow<NoticeDetailResponse> get() = _notice.asStateFlow()
 
