@@ -11,15 +11,15 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import androidx.navigation.navigation
 import com.jukco.waitforme.ui.BookmarkScreen
-import com.jukco.waitforme.ui.MyInfoScreen
 import com.jukco.waitforme.ui.NoticeScreen
 import com.jukco.waitforme.ui.StoreManagementScreen
 import com.jukco.waitforme.ui.SearchScreen
-import com.jukco.waitforme.ui.sign.sign_in.SignInScreen
-import com.jukco.waitforme.ui.sign.sign_up.InputCredentialsScreen
 import com.jukco.waitforme.ui.WaitScreen
 import com.jukco.waitforme.ui.components.BottomNaviItem
+import com.jukco.waitforme.ui.my_info.MyInfoScreen
 import com.jukco.waitforme.ui.sign.SignViewModel
+import com.jukco.waitforme.ui.sign.sign_in.SignInScreen
+import com.jukco.waitforme.ui.sign.sign_up.InputCredentialsScreen
 import com.jukco.waitforme.ui.sign.sign_up.CompleteScreen
 import com.jukco.waitforme.ui.sign.sign_up.InputNameScreen
 import com.jukco.waitforme.ui.sign.sign_up.SelectCustomerOwnerScreen
@@ -62,8 +62,12 @@ fun NavigationGraph(
         }
         composable(Route.MyInfo.name) {
             MyInfoScreen(
-                onSignInButtonClicked = { navController.navigate(Route.SignIn.name) },
-                onSignUpButtonClicked = { navController.navigate(Route.SignUpInputCredentials.name) },
+                onBackButtonPressed = { navController.navigateUp() },
+                goSignIn = {
+                    navController.navigate(Route.SignGraph.name) {
+                        popUpTo(Route.StoreList.name) { inclusive = true }
+                    }
+                }
             )
         }
         composable(Route.Notice.name) {
@@ -85,9 +89,9 @@ fun NavigationGraph(
             )
         }
 
-        navigation(startDestination = Route.SignIn.name, route = Route.SignProgress.name) {
+        navigation(startDestination = Route.SignIn.name, route = Route.SignGraph.name) {
             composable(Route.SignIn.name) { navBackStackEntry ->
-                val signBackStackEntry = remember(navBackStackEntry) { navController.getBackStackEntry(Route.SignProgress.name) }
+                val signBackStackEntry = remember(navBackStackEntry) { navController.getBackStackEntry(Route.SignGraph.name) }
                 val signViewModel: SignViewModel = viewModel(viewModelStoreOwner = signBackStackEntry, factory = SignViewModel.Factory)
 
                 SignInScreen(
@@ -97,14 +101,14 @@ fun NavigationGraph(
                     onEvent = signViewModel::onSignInEvent,
                     goMain = {
                         navController.navigate(Route.StoreList.name) {
-                            popUpTo(Route.SignProgress.name) { inclusive = true }
+                            popUpTo(Route.SignGraph.name) { inclusive = true }
                         }
                     },
                     goSignUp = { navController.navigate(Route.SignUpInputCredentials.name) },
                 )
             }
             composable(Route.SignUpInputCredentials.name) { navBackStackEntry ->
-                val signBackStackEntry = remember(navBackStackEntry) { navController.getBackStackEntry(Route.SignProgress.name) }
+                val signBackStackEntry = remember(navBackStackEntry) { navController.getBackStackEntry(Route.SignGraph.name) }
                 val signViewModel: SignViewModel = viewModel(viewModelStoreOwner = signBackStackEntry, factory = SignViewModel.Factory)
 
                 InputCredentialsScreen(
@@ -120,7 +124,7 @@ fun NavigationGraph(
                 )
             }
             composable(Route.SignUpInputName.name) { navBackStackEntry ->
-                val signBackStackEntry = remember(navBackStackEntry) { navController.getBackStackEntry(Route.SignProgress.name) }
+                val signBackStackEntry = remember(navBackStackEntry) { navController.getBackStackEntry(Route.SignGraph.name) }
                 val signViewModel: SignViewModel = viewModel(viewModelStoreOwner = signBackStackEntry, factory = SignViewModel.Factory)
 
                 InputNameScreen(
@@ -133,7 +137,7 @@ fun NavigationGraph(
                 )
             }
             composable(Route.SignUpSelectCustomerOwner.name) { navBackStackEntry ->
-                val signBackStackEntry = remember(navBackStackEntry) { navController.getBackStackEntry(Route.SignProgress.name) }
+                val signBackStackEntry = remember(navBackStackEntry) { navController.getBackStackEntry(Route.SignGraph.name) }
                 val signViewModel: SignViewModel = viewModel(viewModelStoreOwner = signBackStackEntry, factory = SignViewModel.Factory)
 
                 SelectCustomerOwnerScreen(
@@ -152,7 +156,7 @@ fun NavigationGraph(
                 CompleteScreen(
                     onStartButtonClicked = {
                         navController.navigate(Route.StoreList.name) {
-                            popUpTo(Route.SignProgress.name) { inclusive = true }
+                            popUpTo(Route.SignGraph.name) { inclusive = true }
                         }
                     }
                 )

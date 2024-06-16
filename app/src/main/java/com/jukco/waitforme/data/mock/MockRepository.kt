@@ -1,5 +1,6 @@
 package com.jukco.waitforme.data.mock
 
+import com.jukco.waitforme.data.mock.MockDataSource.userInfoRes
 import com.jukco.waitforme.data.network.model.LocalSignInRequest
 import com.jukco.waitforme.data.network.model.LocalSignUpRequest
 import com.jukco.waitforme.data.network.model.PhoneNumCheckRequest
@@ -7,8 +8,11 @@ import com.jukco.waitforme.data.network.model.Provider
 import com.jukco.waitforme.data.network.model.SignInResponse
 import com.jukco.waitforme.data.network.model.SocialSignInRequest
 import com.jukco.waitforme.data.network.model.SocialSignUpRequest
+import com.jukco.waitforme.data.network.model.UserInfoRequest
+import com.jukco.waitforme.data.network.model.UserInfoRes
 import com.jukco.waitforme.data.repository.SignRepository
 import com.jukco.waitforme.data.repository.TokenManager
+import com.jukco.waitforme.data.repository.UserRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import retrofit2.Response
@@ -27,7 +31,9 @@ object MockTokenManager : TokenManager {
     override val refreshTokenCreatedTimeFlow: Flow<LocalDateTime?> = MutableStateFlow(null)
     override val refreshTokenExpiredTimeFlow: Flow<LocalDateTime?> = MutableStateFlow(null)
 
-    override suspend fun saveToken(provider: Provider, signInResponse: SignInResponse) {}
+    override suspend fun saveToken(provider: Provider, signInResponse: SignInResponse) = Unit
+    override suspend fun clearToken(provider: Provider) = Unit
+    override suspend fun removeAll() = Unit
 
 }
 
@@ -44,7 +50,7 @@ object MockSignRepository : SignRepository {
     override suspend fun socialSignUp(signUpReq: SocialSignUpRequest): Response<SignInResponse> =
         Response.success(HttpURLConnection.HTTP_OK, MockDataSource.signInRes)
 
-    override suspend fun checkDuplicateName(name: String): Response<Boolean> =
+    override suspend fun checkUniqueName(name: String): Response<Boolean> =
         Response.success(HttpURLConnection.HTTP_OK, false)
 
     override suspend fun requestAuthnNum(phoneNum: String): Response<Boolean> =
@@ -52,5 +58,23 @@ object MockSignRepository : SignRepository {
 
     override suspend fun checkPhoneNumberValidity(request: PhoneNumCheckRequest): Response<Boolean> =
         Response.success(HttpURLConnection.HTTP_OK, true)
+}
 
+object MockUserRepository : UserRepository {
+    override suspend fun getUserInfo(): Response<UserInfoRes> =
+        Response.success(HttpURLConnection.HTTP_OK, userInfoRes)
+
+    override suspend fun editUserInfo(userInfoReq: UserInfoRequest): Response<UserInfoRes> =
+        Response.success(
+            HttpURLConnection.HTTP_OK,
+            userInfoRes.copy(
+                name = userInfoReq.name,
+                birthedAt = userInfoReq.birthedAt,
+                genderType = userInfoReq.genderType,
+                profileImage = userInfoReq.profileImage
+            )
+        )
+
+    override suspend fun withdraw(reason: String): Response<Boolean> =
+        Response.success(HttpURLConnection.HTTP_OK, true)
 }

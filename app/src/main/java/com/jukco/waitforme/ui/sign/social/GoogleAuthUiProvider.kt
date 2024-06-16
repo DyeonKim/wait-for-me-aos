@@ -21,24 +21,11 @@ class GoogleAuthUiProvider(
         return try {
             val credential = credentialManager.getCredential(
                 context = activityContext,
-                request = getCredentialRequest(true),
+                request = getCredentialRequest(),
             ).credential
             getGoogleUserFromCredential(credential)
         } catch (e: GetCredentialException) {
             Log.w(TAG, "승인된 계정이 없습니다.")
-            signUp()
-        }
-    }
-
-    private suspend fun signUp(): SignUpDto? {
-        return try {
-            val credential = credentialManager.getCredential(
-                context = activityContext,
-                request = getCredentialRequest(false),
-            ).credential
-            getGoogleUserFromCredential(credential)
-        } catch (e: GetCredentialException) {
-            Log.e(TAG, "구글 로그인 실패", e)
             null
         }
     }
@@ -63,16 +50,17 @@ class GoogleAuthUiProvider(
         }
     }
 
-    private fun getCredentialRequest(isAuthorized: Boolean): GetCredentialRequest {
+    private fun getCredentialRequest(): GetCredentialRequest {
         return GetCredentialRequest.Builder()
-            .addCredentialOption(getGoogleIdOption(isAuthorized))
+            .addCredentialOption(getGoogleIdOption())
             .build()
     }
 
-    private fun getGoogleIdOption(isAuthorized: Boolean): GetGoogleIdOption {
+    private fun getGoogleIdOption(): GetGoogleIdOption {
         return GetGoogleIdOption.Builder()
-            .setFilterByAuthorizedAccounts(isAuthorized)
+            .setFilterByAuthorizedAccounts(false)
             .setServerClientId(serverClientId)
+            .setAutoSelectEnabled(true)
             .build()
     }
 

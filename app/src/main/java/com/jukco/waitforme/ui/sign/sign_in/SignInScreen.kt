@@ -33,8 +33,8 @@ import com.jukco.waitforme.data.mock.MockSignRepository
 import com.jukco.waitforme.data.mock.MockTokenManager
 import com.jukco.waitforme.data.repository.AuthProvider
 import com.jukco.waitforme.ui.LoadingDialogContainer
+import com.jukco.waitforme.ui.components.ErrorMessage
 import com.jukco.waitforme.ui.components.SocialSignIconButton
-import com.jukco.waitforme.ui.sign.ErrorMessage
 import com.jukco.waitforme.ui.sign.SignGuide
 import com.jukco.waitforme.ui.sign.SignViewModel
 import com.jukco.waitforme.ui.theme.GreyAAA

@@ -22,6 +22,10 @@ class GoogleAuthProvider(
     }
 
     override suspend fun signOut() {
+            credentialManager.clearCredentialState(ClearCredentialStateRequest())
+    }
+
+    override suspend fun withdraw() {
         credentialManager.clearCredentialState(ClearCredentialStateRequest())
     }
 }

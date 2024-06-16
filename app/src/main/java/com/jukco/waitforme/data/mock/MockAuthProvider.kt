@@ -10,4 +10,6 @@ object MockAuthProvider : AuthProvider {
     override fun getUiProvider(): AuthUiProvider = MockAuthUiProvider
 
     override suspend fun signOut() = Unit
+
+    override suspend fun withdraw() = Unit
 }

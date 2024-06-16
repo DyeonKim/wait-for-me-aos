@@ -8,43 +8,42 @@ import com.navercorp.nid.oauth.NidOAuthLogin
 import com.navercorp.nid.oauth.OAuthLoginCallback
 import com.navercorp.nid.profile.NidProfileCallback
 import com.navercorp.nid.profile.data.NidProfileResponse
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlin.coroutines.resume
 
 class NaverAuthUiProvider(
     private val activityContext: Context,
 ) : AuthUiProvider {
-    override suspend fun signIn(): SignUpDto? =
-        if (signInAndCheckSuccess()) {
-            getUserInfo()
-        } else {
-            null
-        }
-
-    private suspend fun signInAndCheckSuccess(): Boolean = suspendCancellableCoroutine { continuation ->
-        val oauthLoginCallback = object : OAuthLoginCallback {
+    override suspend fun signIn(): SignUpDto? = suspendCancellableCoroutine { continuation ->
+        val oAuthLoginCallback = object : OAuthLoginCallback {
             override fun onSuccess() {
-                // 네이버 로그인 인증이 성공했을 때 수행할 코드 추가
-                continuation.resume(true)
+                CoroutineScope(Dispatchers.IO).launch {
+                    continuation.resume(getUserInfo())
+                }
             }
+
             override fun onFailure(httpStatus: Int, message: String) {
                 val errorCode = NaverIdLoginSDK.getLastErrorCode().code
                 val errorDescription = NaverIdLoginSDK.getLastErrorDescription()
                 Log.e(TAG, "Login Fail: errorCode-$errorCode, errorDesc-$errorDescription")
-                continuation.resume(false)
+                continuation.resume(null)
             }
+
             override fun onError(errorCode: Int, message: String) {
                 onFailure(errorCode, message)
             }
         }
 
-        NaverIdLoginSDK.authenticate(activityContext, oauthLoginCallback)
+        NaverIdLoginSDK.authenticate(activityContext, oAuthLoginCallback)
     }
 
     private suspend fun getUserInfo(): SignUpDto? = suspendCancellableCoroutine { continuation ->
         val nidProfileCallback = object : NidProfileCallback<NidProfileResponse> {
-            override fun onSuccess(response: NidProfileResponse) {
-                val profile = response.profile
+            override fun onSuccess(result: NidProfileResponse) {
+                val profile = result.profile
                 if (profile != null) {
                     continuation.resume(SignUpDto(profile))
                 } else {
@@ -52,12 +51,14 @@ class NaverAuthUiProvider(
                     continuation.resume(null)
                 }
             }
+
             override fun onFailure(httpStatus: Int, message: String) {
                 val errorCode = NaverIdLoginSDK.getLastErrorCode().code
                 val errorDescription = NaverIdLoginSDK.getLastErrorDescription()
                 Log.e(TAG, "사용자 정보 요청 실패: errorCode-$errorCode, errorDesc-$errorDescription")
                 continuation.resume(null)
             }
+
             override fun onError(errorCode: Int, message: String) {
                 onFailure(errorCode, message)
             }

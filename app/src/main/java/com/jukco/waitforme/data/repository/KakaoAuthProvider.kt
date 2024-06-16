@@ -24,6 +24,17 @@ class KakaoAuthProvider : AuthProvider {
         }
     }
 
+    override suspend fun withdraw() {
+        UserApiClient.instance.unlink { error ->
+            if (error != null) {
+                Log.e(TAG, "연결 끊기 실패", error)
+            }
+            else {
+                Log.i(TAG, "연결 끊기 성공. SDK에서 토큰 삭제 됨")
+            }
+        }
+    }
+
     companion object {
         private const val TAG = "KakaoAuthProvider"
     }
