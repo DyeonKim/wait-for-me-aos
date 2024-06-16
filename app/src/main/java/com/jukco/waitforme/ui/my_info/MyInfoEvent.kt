@@ -17,8 +17,8 @@ sealed interface MyInfoEvent {
     object Edit : MyInfoEvent
     object Save : MyInfoEvent
     object Cancel : MyInfoEvent
-    object SignOut : MyInfoEvent
+    data class SignOut(val successEvent: () -> Unit) : MyInfoEvent
     object OnWithdrawalBtnClick : MyInfoEvent
     object CancelWithdrawal : MyInfoEvent
-    object Withdraw : MyInfoEvent
+    data class Withdraw(val successEvent: () -> Unit) : MyInfoEvent
 }

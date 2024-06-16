@@ -9,7 +9,7 @@ enum class Route {
     Notice,
     Searching,
     PopupStore,
-    SignProgress,
+    SignGraph,
     SignIn,
     SignUpInputCredentials,
     SignUpInputName,

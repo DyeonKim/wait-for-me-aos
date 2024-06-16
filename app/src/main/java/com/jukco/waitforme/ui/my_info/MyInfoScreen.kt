@@ -72,6 +72,7 @@ import com.jukco.waitforme.ui.theme.WaitForMeTheme
 @Composable
 fun MyInfoScreen(
     onBackButtonPressed: () -> Unit,
+    goSignIn: () -> Unit,
 ) {
     val viewModel: MyInfoViewModel = viewModel(factory = MyInfoViewModel.Factory)
 
@@ -93,6 +94,7 @@ fun MyInfoScreen(
                     myInfo = viewModel.myInfo,
                     errorMessage = viewModel.errorMessage,
                     onEvent = viewModel::onEvent,
+                    goSignIn = goSignIn,
                 )
                 if (viewModel.isEdit) {
                     when {
@@ -124,7 +126,7 @@ fun MyInfoScreen(
                                     }
                                 },
                                 confirmButton = {
-                                    TextButton(onClick = { viewModel.onEvent(MyInfoEvent.Withdraw) }) {
+                                    TextButton(onClick = { viewModel.onEvent(MyInfoEvent.Withdraw(goSignIn)) }) {
                                         Text(text = stringResource(R.string.ok))
                                     }
                                 },
@@ -145,6 +147,7 @@ fun MyInfoLayout(
     myInfo: UserInfoDto,
     @StringRes errorMessage: Int?,
     onEvent: (MyInfoEvent) -> Unit,
+    goSignIn: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Scaffold(
@@ -210,7 +213,7 @@ fun MyInfoLayout(
                     Text(
                         text = stringResource(R.string.sign_out),
                         textDecoration = TextDecoration.Underline,
-                        modifier = Modifier.clickable { onEvent(MyInfoEvent.SignOut) },
+                        modifier = Modifier.clickable { onEvent(MyInfoEvent.SignOut(goSignIn)) },
                     )
                     Spacer(modifier = Modifier.height(16.dp))
                     Button(
@@ -403,6 +406,7 @@ fun MyInfoLayoutPreview() {
             myInfo = viewModel.myInfo,
             errorMessage = viewModel.errorMessage,
             onEvent = viewModel::onEvent,
+            goSignIn = {},
         )
     }
 }

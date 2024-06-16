@@ -22,7 +22,7 @@ fun MainScreen() {
             modifier = Modifier.padding(innerPadding),
             navController = navController,
 //            startDescription = Route.StoreList.name,
-            startDescription = Route.SignProgress.name,
+            startDescription = Route.SignGraph.name,
         )
     }
 }

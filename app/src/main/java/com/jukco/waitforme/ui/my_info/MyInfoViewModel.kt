@@ -25,6 +25,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import retrofit2.HttpException
 import java.io.IOException
 
 class MyInfoViewModel(
@@ -105,12 +106,12 @@ class MyInfoViewModel(
                 reset()
                 isEdit = false
             }
-            is MyInfoEvent.SignOut -> { signOut() }
+            is MyInfoEvent.SignOut -> { signOut(event.successEvent) }
             is MyInfoEvent.OnWithdrawalBtnClick -> { openWithdrawalAlertDialog = true }
             is MyInfoEvent.CancelWithdrawal -> { openWithdrawalAlertDialog = false }
             is MyInfoEvent.Withdraw -> {
                 openWithdrawalAlertDialog = false
-                withdraw()
+                withdraw(event.successEvent)
             }
         }
     }
@@ -200,7 +201,7 @@ class MyInfoViewModel(
 
     }
 
-    private fun signOut() {
+    private fun signOut(successEvent: () -> Unit) {
         viewModelScope.launch {
             try {
                 withContext(Dispatchers.IO) {
@@ -222,10 +223,12 @@ class MyInfoViewModel(
                 }
                 Provider.LOCAL -> {}
             }
+
+            successEvent()
         }
     }
 
-    private fun withdraw() {
+    private fun withdraw(successEvent: () -> Unit) {
         viewModelScope.launch {
             try {
                 val response = userRepository.withdraw("")
@@ -247,11 +250,14 @@ class MyInfoViewModel(
                             }
                             Provider.LOCAL -> {}
                         }
+                        successEvent()
                     }
                     // TODO: 실패 시 오류처리
                 }
             } catch (e: IOException) {
                 // TODO : 네트워크 및 datastore 오류 처리
+            } catch (e: HttpException) {
+                // TODO : 30X, 40X 오류 처리
             }
         }
 
@@ -262,15 +268,12 @@ class MyInfoViewModel(
             try {
                 delay(3000) // TODO : 서버와 연결 후에는 지울 것. 기다리는 최대 시간이 있어야 한다.
                 val response = signRepository.checkUniqueName(myInfo.name)
-
-                if (response.isSuccessful) {
-                    response.body() ?: false
-                } else {
-                    // TODO : 30X, 40X 오류 처리
-                    false
-                }
+                response.body() ?: false
             } catch (e: IOException) {
                 // TODO : 50X 오류 처리
+                false
+            } catch (e: HttpException) {
+                // TODO : 30X, 40X 오류 처리
                 false
             }
         }.await()
@@ -282,17 +285,15 @@ class MyInfoViewModel(
                 delay(3000) // TODO : 서버와 연결 후에는 지울 것. 기다리는 최대 시간이 있어야 한다.
                 val response = userRepository.editUserInfo(userInfoReq)
 
-                if (response.isSuccessful) {
-                    val userInfoRes = response.body()!!
-                    _oldMyInfo.value = userInfoRes
-                    myInfo = UserInfoDto(userInfoRes)
-                    true
-                } else {
-                    // TODO : 30X, 40X 오류 처리
-                    false
-                }
+                val userInfoRes = response.body()!!
+                _oldMyInfo.value = userInfoRes
+                myInfo = UserInfoDto(userInfoRes)
+                true
             } catch (e: IOException) {
                 // TODO : 네트워크 오류 처리
+                false
+            } catch (e: HttpException) {
+                // TODO : 30X, 40X 오류 처리
                 false
             }
         }.await()
