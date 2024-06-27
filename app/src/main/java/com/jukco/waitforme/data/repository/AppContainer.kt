@@ -6,6 +6,7 @@ import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFact
 import com.jukco.waitforme.BuildConfig
 import com.jukco.waitforme.data.mock.MockSignRepository
 import com.jukco.waitforme.data.mock.MockUserRepository
+import com.jukco.waitforme.data.mock.MockStoreRepository
 import com.jukco.waitforme.data.network.api.SignApi
 import com.jukco.waitforme.data.network.api.StoreApi
 import com.jukco.waitforme.data.network.api.UserApi
@@ -61,7 +62,7 @@ class DefaultContainer(context: Context) : AppContainer {
     }
     override val storeRepository: StoreRepository by lazy {
 //        StoreRepositoryImplementation(storeApi)
-        MockStoreRepository()
+        MockStoreRepository
     }
     override val userRepository: UserRepository by lazy {
 //        UserRepositoryImplementation(userApi)
