@@ -3,10 +3,12 @@ package com.jukco.waitforme.data.mock
 import com.jukco.waitforme.data.network.model.GenderType
 import com.jukco.waitforme.data.network.model.Provider
 import com.jukco.waitforme.data.network.model.ImageInfo
+import com.jukco.waitforme.data.network.model.PagerList
 import com.jukco.waitforme.data.network.model.SignInResponse
 import com.jukco.waitforme.data.network.model.SnsInfo
 import com.jukco.waitforme.data.network.model.StoreDetailResponse
 import com.jukco.waitforme.data.network.model.StoreDto
+import com.jukco.waitforme.data.network.model.StoreListResponse
 import com.jukco.waitforme.data.network.model.Token
 import com.jukco.waitforme.data.network.model.UserInfoRes
 
@@ -193,6 +195,19 @@ object MockDataSource {
             isFavorite = false,
             isReserved = false,
         ),
+    )
+
+    val storeListResponse = listOf(
+        StoreListResponse(0, "핑크 홀리데이", "야놀자", "", "2024-07-09", false),
+        StoreListResponse(1, "코카콜라", "코카콜라", "", "2024-08-01", false),
+        StoreListResponse(2, "홀리데이", "여기어때", "https://cdn.pixabay.com/photo/2016/11/23/15/14/jars-1853439_1280.jpg", "2024-06-09", false),
+        StoreListResponse(3, "사이다", "칠성", "", "2024-07-09", false),
+        StoreListResponse(4, "어쩌구", "저쩌구", "https://cdn.pixabay.com/photo/2016/11/22/21/57/apparel-1850804_1280.jpg", "2024-06-09", false),
+        StoreListResponse(5, "야호", "무", "https://cdn.pixabay.com/photo/2017/08/07/19/46/shop-2607121_1280.jpg", "2024-06-09", false),
+        StoreListResponse(6, "스마일", "주말이다", "", "2024-06-21", false),
+        StoreListResponse(7, "핑크", "Pink", "", "2024-06-09", false),
+        StoreListResponse(8, "떠나요", "둘이서", "", "2024-06-09", false),
+        StoreListResponse(9, "I만 다섯", "mbti", "", "2024-06-09", false),
     )
 
     val storeDtoList = listOf(
