@@ -1,6 +1,7 @@
 package com.jukco.waitforme.data.mock
 
 import androidx.paging.PagingData
+import com.jukco.waitforme.data.mock.MockDataSource.storeDtoList
 import com.jukco.waitforme.data.mock.MockDataSource.userInfoRes
 import com.jukco.waitforme.data.network.model.LocalSignInRequest
 import com.jukco.waitforme.data.network.model.LocalSignUpRequest
@@ -14,6 +15,7 @@ import com.jukco.waitforme.data.network.model.StoreDetailResponse
 import com.jukco.waitforme.data.network.model.StoreDto
 import com.jukco.waitforme.data.network.model.UserInfoRequest
 import com.jukco.waitforme.data.network.model.UserInfoRes
+import com.jukco.waitforme.data.repository.BookmarkRepository
 import com.jukco.waitforme.data.repository.SignRepository
 import com.jukco.waitforme.data.repository.StoreRepository
 import com.jukco.waitforme.data.repository.TokenManager
@@ -90,7 +92,7 @@ object MockStoreRepository : StoreRepository {
         sorter: ShopSorter?,
         size: Int,
     ): Flow<PagingData<StoreDto>> {
-        var list = MockDataSource.storeDtoList
+        var list = storeDtoList
 
         if (title != null) {
             list = list.filter { it.title.contains(title) }
@@ -104,4 +106,11 @@ object MockStoreRepository : StoreRepository {
     }
 
     override suspend fun getStore(id: Int): StoreDetailResponse = MockDataSource.storeDetailList[id]
+}
+
+object MockBookmarkRepository : BookmarkRepository {
+    override suspend fun postBookmark(shopId: Int): Response<Boolean> {
+        val index = storeDtoList.indexOfFirst { storeDto -> storeDto.id == shopId }
+        return Response.success(HttpURLConnection.HTTP_OK, !storeDtoList[index].isFavorite)
+    }
 }

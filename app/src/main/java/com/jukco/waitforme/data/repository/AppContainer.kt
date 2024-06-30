@@ -3,6 +3,7 @@ package com.jukco.waitforme.data.repository
 import android.content.Context
 import androidx.credentials.CredentialManager
 import com.jukco.waitforme.BuildConfig
+import com.jukco.waitforme.data.RetrofitUtil.bookmarkApi
 import com.jukco.waitforme.data.RetrofitUtil.signApi
 import com.jukco.waitforme.data.RetrofitUtil.storeApi
 import com.jukco.waitforme.data.RetrofitUtil.userApi
@@ -10,8 +11,9 @@ import com.jukco.waitforme.data.auth.AuthProvider
 import com.jukco.waitforme.data.auth.GoogleAuthProvider
 import com.jukco.waitforme.data.auth.KakaoAuthProvider
 import com.jukco.waitforme.data.auth.NaverAuthProvider
+import com.jukco.waitforme.data.mock.MockBookmarkRepository
 import com.jukco.waitforme.data.mock.MockSignRepository
-import com.jukco.waitforme.data.mock.MockStoreRepository
+import com.jukco.waitforme.data.mock.MockStoreApi
 import com.jukco.waitforme.data.mock.MockUserRepository
 
 interface AppContainer {
@@ -22,6 +24,7 @@ interface AppContainer {
     val signRepository: SignRepository
     val storeRepository: StoreRepository
     val userRepository: UserRepository
+    val bookmarkRepository: BookmarkRepository
 }
 
 class DefaultContainer(context: Context) : AppContainer {
@@ -48,10 +51,14 @@ class DefaultContainer(context: Context) : AppContainer {
     }
     override val storeRepository: StoreRepository by lazy {
 //        StoreRepositoryImplementation(storeApi)
-        MockStoreRepository
+        StoreRepositoryImplementation(MockStoreApi)
     }
     override val userRepository: UserRepository by lazy {
 //        UserRepositoryImplementation(userApi)
         MockUserRepository
+    }
+    override val bookmarkRepository: BookmarkRepository by lazy {
+//        BookmarkRepositoryImplementation(bookmarkApi)
+        MockBookmarkRepository
     }
 }

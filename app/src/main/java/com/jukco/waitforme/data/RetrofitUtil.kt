@@ -2,6 +2,7 @@ package com.jukco.waitforme.data
 
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import com.jukco.waitforme.BuildConfig
+import com.jukco.waitforme.data.network.api.BookmarkApi
 import com.jukco.waitforme.data.network.api.SignApi
 import com.jukco.waitforme.data.network.api.StoreApi
 import com.jukco.waitforme.data.network.api.UserApi
@@ -28,5 +29,8 @@ object RetrofitUtil {
     }
     val storeApi: StoreApi by lazy {
         retrofit.create(StoreApi::class.java)
+    }
+    val bookmarkApi: BookmarkApi by lazy {
+        retrofit.create(BookmarkApi::class.java)
     }
 }
