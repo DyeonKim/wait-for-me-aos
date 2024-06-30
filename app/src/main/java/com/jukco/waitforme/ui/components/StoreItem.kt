@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -25,7 +24,6 @@ import androidx.compose.ui.unit.sp
 import com.jukco.waitforme.R
 import com.jukco.waitforme.data.mock.MockDataSource
 import com.jukco.waitforme.data.network.model.StoreDto
-import com.jukco.waitforme.data.network.model.StoreListResponse
 import com.jukco.waitforme.ui.theme.GreyAAA
 import com.jukco.waitforme.ui.theme.MainBlack
 import com.jukco.waitforme.ui.theme.NotoSansKR
@@ -44,24 +42,21 @@ fun BookmarkRectStoreItem(
     ) {
         Box(modifier = modifier) {
             RectThumbnail(store.imagePath)
-            IconButton(
-                onClick = { onBookmarkChecked(store.id) },
+            Image(
+                painter = painterResource(
+                    if (store.isFavorite) {
+                        R.drawable.ic_bookmark_fill
+                    } else {
+                        R.drawable.ic_bookmark_line_white
+                    },
+                ),
+                contentDescription = stringResource(R.string.btn_bookmark),
                 modifier = Modifier
+                    .clickable { onBookmarkChecked(store.id) }
                     .align(Alignment.BottomEnd)
                     .padding(8.dp)
                 ,
-            ) {
-                Image(
-                    painter = painterResource(
-                        if (store.isFavorite) {
-                            R.drawable.ic_bookmark_fill
-                        } else {
-                            R.drawable.ic_bookmark_line_white
-                        },
-                    ),
-                    contentDescription = stringResource(R.string.btn_bookmark),
-                )
-            }
+            )
         }
         Spacer(modifier = Modifier.height(10.dp))
         Text(
@@ -109,24 +104,21 @@ fun BookmarkSquareStoreItem(
     ) {
         Box(modifier = modifier) {
             SquareThumbnail(store.imagePath)
-            IconButton(
-                onClick = { onBookmarkChecked(store.id) },
+            Image(
+                painter = painterResource(
+                    if (store.isFavorite) {
+                        R.drawable.ic_bookmark_fill
+                    } else {
+                        R.drawable.ic_bookmark_line_white
+                    },
+                ),
+                contentDescription = stringResource(R.string.btn_bookmark),
                 modifier = Modifier
+                    .clickable { onBookmarkChecked(store.id) }
                     .align(Alignment.BottomEnd)
                     .padding(end = 8.dp, bottom = 11.dp)
                 ,
-            ) {
-                Image(
-                    painter = painterResource(
-                        if (store.isFavorite) {
-                            R.drawable.ic_bookmark_fill
-                        } else {
-                            R.drawable.ic_bookmark_line_white
-                        },
-                    ),
-                    contentDescription = stringResource(R.string.btn_bookmark),
-                )
-            }
+            )
         }
         Spacer(modifier = Modifier.height(10.dp))
         Text(

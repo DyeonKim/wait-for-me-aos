@@ -43,6 +43,7 @@ import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemKey
 import com.jukco.waitforme.R
+import com.jukco.waitforme.data.mock.MockBookmarkRepository
 import com.jukco.waitforme.data.mock.MockStoreApi
 import com.jukco.waitforme.data.network.model.StoreDto
 import com.jukco.waitforme.data.repository.StoreRepositoryImplementation
@@ -66,89 +67,40 @@ fun StoreListScreen(
 ) {
     val viewModel: StoreListViewModel = viewModel(factory = StoreListViewModel.Factory)
 
-    when (viewModel.storeListUiState) {
-        is StoreListUiState.Loading -> LoadingScreen()
-        is StoreListUiState.Error -> ErrorScreen(viewModel::refresh)
-        is StoreListUiState.Success -> {
-            StoreListLayout(
-                ongoingStores = viewModel.ongoingStores.collectAsLazyPagingItems(),
-                upcomingStores = viewModel.upcomingStores.collectAsLazyPagingItems(),
-                onNoticeButtonClicked = onNoticeButtonClicked,
-                onSearchingClicked = onSearchingClicked,
-                onItemClicked = onPopItemClicked,
-                onItemBookmarkChecked = viewModel::checkBookmark,
-            )
-        }
-    }
+    StoreListLayout(
+        uiState = viewModel.storeListUiState,
+        refresh = viewModel::refresh,
+        onNoticeButtonClicked = onNoticeButtonClicked,
+        onSearchingClicked = onSearchingClicked,
+        onPopItemClicked = onPopItemClicked,
+        onItemBookmarkChecked = viewModel::checkBookmark,
+    )
 }
 
 
 @Composable
 fun StoreListLayout(
-    ongoingStores: LazyPagingItems<StoreDto>,
-    upcomingStores: LazyPagingItems<StoreDto>,
+    uiState: StoreListUiState,
+    refresh: () -> Unit,
     onNoticeButtonClicked: () -> Unit,
     onSearchingClicked: () -> Unit, // TODO: "" 결과 화면으로 넘어가는 함수로 수정.
-    onItemClicked: (id: Int) -> Unit,
-    onItemBookmarkChecked: (id: Int) -> Unit,
+    onPopItemClicked: (id: Int) -> Unit,
+    onItemBookmarkChecked: (shopId: Int) -> Unit,
 ) {
     Scaffold(
         topBar = { SearchAndNoticeTopBar(onNoticeButtonClicked, onSearchingClicked) },
     ) { scaffoldPadding ->
-        LazyVerticalGrid(
-            columns = GridCells.Adaptive(minSize = 154.dp),
-            horizontalArrangement = Arrangement.spacedBy(12.dp),
-            verticalArrangement = Arrangement.spacedBy(20.dp),
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(horizontal = 20.dp)
-                .padding(top = 12.dp, bottom = 36.dp)
-                .padding(scaffoldPadding)
-            ,
-        ) {
-            item(span = { GridItemSpan(maxLineSpan) }) {
-                Title(
-                    imageSrc = R.drawable.img_user_main_title01,
-                    text = buildAnnotatedString {
-                        append(stringResource(R.string.title_ongoing))
-                        withStyle(style = SpanStyle(color = MainBlue)) {
-                            append(stringResource(R.string.pops))
-                        }
-                    },
-                    action = onSearchingClicked,
-                    actionDescription = R.string.btn_more,
-                )
-            }
-            items(
-                count = ongoingStores.itemCount,
-                key = ongoingStores.itemKey { it.id },
-            ) {index ->
-                val store = ongoingStores.itemSnapshotList[index] ?: return@items
-
-                BookmarkRectStoreItem(
-                    store = store,
-                    onItemClicked = onItemClicked,
-                    onBookmarkChecked = onItemBookmarkChecked
-                )
-            }
-            item(span = { GridItemSpan(maxLineSpan) }) {
-                Spacer(modifier = Modifier.height(20.dp))
-            }
-            item(span = { GridItemSpan(maxLineSpan) }) {
-                Title(
-                    imageSrc = R.drawable.img_user_main_title02,
-                    text = buildAnnotatedString {
-                        append(stringResource(R.string.title_ongoing))
-                        withStyle(style = SpanStyle(color = MainBlue)) {
-                            append(stringResource(R.string.pops))
-                        }
-                    },
-                )
-            }
-            item(span = { GridItemSpan(maxLineSpan) }) {
-                UpcomingStores(
-                    stores = upcomingStores,
-                    onPopItemClicked = onItemClicked,
+        when (uiState) {
+            is StoreListUiState.Loading -> LoadingScreen()
+            is StoreListUiState.Error -> ErrorScreen(refreshAction = refresh)
+            is StoreListUiState.Success -> {
+                StoreListContent(
+                    ongoingStores = uiState.ongoingStores.collectAsLazyPagingItems(),
+                    upcomingStores = uiState.upcomingStores.collectAsLazyPagingItems(),
+                    onSearchingClicked = onSearchingClicked,
+                    onPopItemClicked = onPopItemClicked,
+                    onItemBookmarkChecked = onItemBookmarkChecked,
+                    modifier = Modifier.padding(scaffoldPadding)
                 )
             }
         }
@@ -156,10 +108,79 @@ fun StoreListLayout(
 }
 
 @Composable
-private fun Title(
+fun StoreListContent(
+    ongoingStores: LazyPagingItems<StoreDto>,
+    upcomingStores: LazyPagingItems<StoreDto>,
+    onSearchingClicked: () -> Unit,
+    onPopItemClicked: (id: Int) -> Unit,
+    onItemBookmarkChecked: (id: Int) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    LazyVerticalGrid(
+        columns = GridCells.Adaptive(minSize = 154.dp),
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
+        verticalArrangement = Arrangement.spacedBy(20.dp),
+        modifier = modifier
+            .fillMaxSize()
+            .padding(horizontal = 20.dp)
+            .padding(top = 12.dp, bottom = 36.dp)
+        ,
+    ) {
+        item(span = { GridItemSpan(maxLineSpan) }) {
+            Title(
+                imageSrc = R.drawable.img_user_main_title01,
+                text = buildAnnotatedString {
+                    append(stringResource(R.string.title_ongoing))
+                    withStyle(style = SpanStyle(color = MainBlue)) {
+                        append(stringResource(R.string.pops))
+                    }
+                },
+                action = onSearchingClicked,
+                actionIconSrc = R.drawable.ic_arrow_more_right,
+                actionDescription = R.string.btn_more,
+            )
+        }
+        items(
+            count = ongoingStores.itemCount,
+            key = ongoingStores.itemKey { it.id },
+        ) {index ->
+            val store = ongoingStores.itemSnapshotList[index] ?: return@items
+
+            BookmarkRectStoreItem(
+                store = store,
+                onItemClicked = onPopItemClicked,
+                onBookmarkChecked = onItemBookmarkChecked,
+            )
+        }
+        item(span = { GridItemSpan(maxLineSpan) }) {
+            Spacer(modifier = Modifier.height(20.dp))
+        }
+        item(span = { GridItemSpan(maxLineSpan) }) {
+            Title(
+                imageSrc = R.drawable.img_user_main_title02,
+                text = buildAnnotatedString {
+                    append(stringResource(R.string.title_ongoing))
+                    withStyle(style = SpanStyle(color = MainBlue)) {
+                        append(stringResource(R.string.pops))
+                    }
+                },
+            )
+        }
+        item(span = { GridItemSpan(maxLineSpan) }) {
+            UpcomingStores(
+                stores = upcomingStores,
+                onPopItemClicked = onPopItemClicked,
+            )
+        }
+    }
+}
+
+@Composable
+fun Title(
     @DrawableRes imageSrc: Int,
     text: AnnotatedString,
     action: () -> Unit = {},
+    @DrawableRes actionIconSrc: Int? = null,
     @StringRes actionDescription: Int? = null,
     modifier: Modifier = Modifier,
 ) {
@@ -182,9 +203,9 @@ private fun Title(
             ),
         )
         Spacer(modifier = Modifier.weight(1f))
-        if (action != null) {
+        if (actionIconSrc != null) {
             Image(
-                painter = painterResource(R.drawable.ic_arrow_more_right),
+                painter = painterResource(actionIconSrc),
                 contentDescription = if (actionDescription != null) stringResource(actionDescription) else null,
                 Modifier.clickable { action() },
             )
@@ -260,16 +281,16 @@ private fun UpcomingStore(
 @Composable
 private fun PopListPreview() {
     val viewModel = remember {
-        StoreListViewModel(StoreRepositoryImplementation(MockStoreApi))
+        StoreListViewModel(StoreRepositoryImplementation(MockStoreApi), MockBookmarkRepository)
     }
 
     WaitForMeTheme {
         StoreListLayout(
-            ongoingStores = viewModel.ongoingStores.collectAsLazyPagingItems(),
-            upcomingStores = viewModel.upcomingStores.collectAsLazyPagingItems(),
+            uiState = viewModel.storeListUiState,
+            refresh = viewModel::refresh,
             onNoticeButtonClicked = {},
             onSearchingClicked = {},
-            onItemClicked = {},
+            onPopItemClicked = {},
             onItemBookmarkChecked = viewModel::checkBookmark,
         )
     }
