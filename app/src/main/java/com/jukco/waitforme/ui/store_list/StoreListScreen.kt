@@ -1,17 +1,11 @@
 package com.jukco.waitforme.ui.store_list
 
-import androidx.annotation.DrawableRes
-import androidx.annotation.StringRes
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
@@ -24,9 +18,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.CornerRadius
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.PlatformTextStyle
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
@@ -50,8 +42,9 @@ import com.jukco.waitforme.data.repository.StoreRepositoryImplementation
 import com.jukco.waitforme.ui.ErrorScreen
 import com.jukco.waitforme.ui.LoadingScreen
 import com.jukco.waitforme.ui.components.BookmarkRectStoreItem
-import com.jukco.waitforme.ui.components.SearchAndNoticeTopBar
 import com.jukco.waitforme.ui.components.NoBookmarkStoreItem
+import com.jukco.waitforme.ui.components.SearchAndNoticeTopBar
+import com.jukco.waitforme.ui.components.Title
 import com.jukco.waitforme.ui.theme.MainBlack
 import com.jukco.waitforme.ui.theme.MainBlue
 import com.jukco.waitforme.ui.theme.MainGreen
@@ -62,7 +55,8 @@ import kotlin.math.absoluteValue
 @Composable
 fun StoreListScreen(
     onNoticeButtonClicked: () -> Unit,
-    onSearchingClicked: () -> Unit,
+    moveToSearching: () -> Unit,
+    moveToMoreList: () -> Unit,
     onPopItemClicked: (id: Int) -> Unit,
 ) {
     val viewModel: StoreListViewModel = viewModel(factory = StoreListViewModel.Factory)
@@ -71,7 +65,8 @@ fun StoreListScreen(
         uiState = viewModel.storeListUiState,
         refresh = viewModel::refresh,
         onNoticeButtonClicked = onNoticeButtonClicked,
-        onSearchingClicked = onSearchingClicked,
+        onSearchingClicked = moveToSearching,
+        moveToMoreList = moveToMoreList,
         onPopItemClicked = onPopItemClicked,
         onItemBookmarkChecked = viewModel::checkBookmark,
     )
@@ -83,7 +78,8 @@ fun StoreListLayout(
     uiState: StoreListUiState,
     refresh: () -> Unit,
     onNoticeButtonClicked: () -> Unit,
-    onSearchingClicked: () -> Unit, // TODO: "" 결과 화면으로 넘어가는 함수로 수정.
+    onSearchingClicked: () -> Unit,
+    moveToMoreList: () -> Unit,
     onPopItemClicked: (id: Int) -> Unit,
     onItemBookmarkChecked: (shopId: Int) -> Unit,
 ) {
@@ -91,13 +87,13 @@ fun StoreListLayout(
         topBar = { SearchAndNoticeTopBar(onNoticeButtonClicked, onSearchingClicked) },
     ) { scaffoldPadding ->
         when (uiState) {
-            is StoreListUiState.Loading -> LoadingScreen()
-            is StoreListUiState.Error -> ErrorScreen(refreshAction = refresh)
+            is StoreListUiState.Loading -> LoadingScreen(modifier = Modifier.padding(scaffoldPadding))
+            is StoreListUiState.Error -> ErrorScreen(refreshAction = refresh, modifier = Modifier.padding(scaffoldPadding))
             is StoreListUiState.Success -> {
                 StoreListContent(
                     ongoingStores = uiState.ongoingStores.collectAsLazyPagingItems(),
                     upcomingStores = uiState.upcomingStores.collectAsLazyPagingItems(),
-                    onSearchingClicked = onSearchingClicked,
+                    moveToMoreList = moveToMoreList,
                     onPopItemClicked = onPopItemClicked,
                     onItemBookmarkChecked = onItemBookmarkChecked,
                     modifier = Modifier.padding(scaffoldPadding)
@@ -111,7 +107,7 @@ fun StoreListLayout(
 fun StoreListContent(
     ongoingStores: LazyPagingItems<StoreDto>,
     upcomingStores: LazyPagingItems<StoreDto>,
-    onSearchingClicked: () -> Unit,
+    moveToMoreList: () -> Unit,
     onPopItemClicked: (id: Int) -> Unit,
     onItemBookmarkChecked: (id: Int) -> Unit,
     modifier: Modifier = Modifier,
@@ -123,7 +119,6 @@ fun StoreListContent(
         modifier = modifier
             .fillMaxSize()
             .padding(horizontal = 20.dp)
-            .padding(top = 12.dp, bottom = 36.dp)
         ,
     ) {
         item(span = { GridItemSpan(maxLineSpan) }) {
@@ -135,9 +130,10 @@ fun StoreListContent(
                         append(stringResource(R.string.pops))
                     }
                 },
-                action = onSearchingClicked,
+                action = moveToMoreList,
                 actionIconSrc = R.drawable.ic_arrow_more_right,
                 actionDescription = R.string.btn_more,
+                modifier = Modifier.padding(top = 12.dp),
             )
         }
         items(
@@ -170,44 +166,7 @@ fun StoreListContent(
             UpcomingStores(
                 stores = upcomingStores,
                 onPopItemClicked = onPopItemClicked,
-            )
-        }
-    }
-}
-
-@Composable
-fun Title(
-    @DrawableRes imageSrc: Int,
-    text: AnnotatedString,
-    action: () -> Unit = {},
-    @DrawableRes actionIconSrc: Int? = null,
-    @StringRes actionDescription: Int? = null,
-    modifier: Modifier = Modifier,
-) {
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = modifier,
-    ) {
-        Image(painter = painterResource(imageSrc), contentDescription = null)
-        Spacer(modifier = Modifier.width(4.dp))
-        Text(
-            text = text,
-            style = TextStyle(
-                fontFamily = NotoSansKR,
-                fontWeight = FontWeight.Bold,
-                fontSize = 18.sp,
-                color = MainBlack,
-                lineHeight = 18.sp,
-                platformStyle = PlatformTextStyle(includeFontPadding = false),
-                letterSpacing = (-0.05).em,
-            ),
-        )
-        Spacer(modifier = Modifier.weight(1f))
-        if (actionIconSrc != null) {
-            Image(
-                painter = painterResource(actionIconSrc),
-                contentDescription = if (actionDescription != null) stringResource(actionDescription) else null,
-                Modifier.clickable { action() },
+                modifier = Modifier.padding(bottom = 36.dp),
             )
         }
     }
@@ -289,6 +248,7 @@ private fun PopListPreview() {
             uiState = viewModel.storeListUiState,
             refresh = viewModel::refresh,
             onNoticeButtonClicked = {},
+            moveToMoreList = {},
             onSearchingClicked = {},
             onPopItemClicked = {},
             onItemBookmarkChecked = viewModel::checkBookmark,
