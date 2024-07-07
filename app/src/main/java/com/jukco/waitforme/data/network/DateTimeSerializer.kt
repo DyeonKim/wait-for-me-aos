@@ -7,9 +7,10 @@ import kotlinx.serialization.encoding.Encoder
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
+@OptIn(kotlinx.serialization.ExperimentalSerializationApi::class)
 @Serializer(forClass = LocalDateTime::class)
 object DateTimeSerializer : KSerializer<LocalDateTime> {
-    private val formatter = DateTimeFormatter.ISO_LOCAL_DATE
+    private val formatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME
 
     override fun serialize(encoder: Encoder, value: LocalDateTime) {
         encoder.encodeString(value.format(formatter))
