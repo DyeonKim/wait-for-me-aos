@@ -3,6 +3,8 @@ package com.jukco.waitforme.data.mock
 import com.jukco.waitforme.data.mock.MockDataSource.userInfoRes
 import com.jukco.waitforme.data.network.model.LocalSignInRequest
 import com.jukco.waitforme.data.network.model.LocalSignUpRequest
+import com.jukco.waitforme.data.network.model.NoticeDetailResponse
+import com.jukco.waitforme.data.network.model.NoticeResponse
 import com.jukco.waitforme.data.network.model.PhoneNumCheckRequest
 import com.jukco.waitforme.data.network.model.Provider
 import com.jukco.waitforme.data.network.model.SignInResponse
@@ -10,6 +12,7 @@ import com.jukco.waitforme.data.network.model.SocialSignInRequest
 import com.jukco.waitforme.data.network.model.SocialSignUpRequest
 import com.jukco.waitforme.data.network.model.UserInfoRequest
 import com.jukco.waitforme.data.network.model.UserInfoRes
+import com.jukco.waitforme.data.repository.NoticeRepository
 import com.jukco.waitforme.data.repository.SignRepository
 import com.jukco.waitforme.data.repository.TokenManager
 import com.jukco.waitforme.data.repository.UserRepository
@@ -77,4 +80,13 @@ object MockUserRepository : UserRepository {
 
     override suspend fun withdraw(reason: String): Response<Boolean> =
         Response.success(HttpURLConnection.HTTP_OK, true)
+}
+
+object MockNoticeRepository : NoticeRepository {
+    override suspend fun getNoticeList(): Response<List<NoticeResponse>> =
+        Response.success(HttpURLConnection.HTTP_OK, MockDataSource.noticeList)
+
+    override suspend fun getNotice(noticeId: Int): Response<NoticeDetailResponse> =
+        Response.success(HttpURLConnection.HTTP_OK, MockDataSource.noticeDetailList[noticeId])
+
 }

@@ -7,6 +7,7 @@ enum class Route {
     Bookmark,
     MyInfo,
     Notice,
+    NoticeDetail,
     Searching,
     PopupStore,
     SignGraph,

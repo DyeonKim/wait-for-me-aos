@@ -4,8 +4,10 @@ import android.content.Context
 import androidx.credentials.CredentialManager
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import com.jukco.waitforme.BuildConfig
+import com.jukco.waitforme.data.mock.MockNoticeRepository
 import com.jukco.waitforme.data.mock.MockSignRepository
 import com.jukco.waitforme.data.mock.MockUserRepository
+import com.jukco.waitforme.data.network.api.NoticeApi
 import com.jukco.waitforme.data.network.api.SignApi
 import com.jukco.waitforme.data.network.api.StoreApi
 import com.jukco.waitforme.data.network.api.UserApi
@@ -18,6 +20,7 @@ interface AppContainer {
     val googleAuthProvider: AuthProvider
     val kakaoAuthProvider: AuthProvider
     val naverAuthProvider: AuthProvider
+    val noticeRepository: NoticeRepository
     val signRepository: SignRepository
     val storeRepository: StoreRepository
     val userRepository: UserRepository
@@ -44,6 +47,9 @@ class DefaultContainer(context: Context) : AppContainer {
         .build()
     private val credentialManager = CredentialManager.create(context)
 
+    private val noticeApi: NoticeApi by lazy {
+        retrofit.create(NoticeApi::class.java)
+    }
     private val storeApi: StoreApi by lazy {
         retrofit.create(StoreApi::class.java)
     }
@@ -55,6 +61,10 @@ class DefaultContainer(context: Context) : AppContainer {
     }
 
     // TODO : 서버 연결 전까지 임시 Repository
+    override val noticeRepository: NoticeRepository by lazy {
+//        NoticeRepositoryImplementation(noticeApi)
+        MockNoticeRepository
+    }
     override val signRepository: SignRepository by lazy {
 //        SignRepositoryImplementation(signApi)
         MockSignRepository

@@ -2,7 +2,6 @@ package com.jukco.waitforme.ui.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -14,7 +13,6 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -74,7 +72,7 @@ fun SearchAndNoticeTopBar(
             IconButton(onClick = { onNoticeButtonClicked() }) {
                 Icon(
                     imageVector = ImageVector.vectorResource(R.drawable.ic_notification),
-                    contentDescription = stringResource(R.string.searching),
+                    contentDescription = stringResource(R.string.notice),
                     tint = Color.Unspecified,
                 )
             }
@@ -88,65 +86,6 @@ fun SearchAndNoticeTopBar(
 private fun SearchAndNoticeTopBarPreview() {
     WaitForMeTheme {
         SearchAndNoticeTopBar(
-            onNoticeButtonClicked = {},
-            onSearchingClicked = {},
-        )
-    }
-}
-
-/* TopAppBar에서는 간격을 조절할 수 없어서 만들어 본 건데 또 큰 차이는 없어서 고민 중입니다... */
-@Composable
-fun ExTopBar(
-    onNoticeButtonClicked: () -> Unit,
-    onSearchingClicked: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier.fillMaxWidth()
-            .padding(start = 20.dp, end = 20.dp, top = 12.dp, bottom = 12.dp),
-    ) {
-        Text(
-            text = stringResource(R.string.searching_hint),
-            color = GreyAAA,
-            style = TextStyle(
-                fontFamily = NotoSansKR,
-                fontWeight = FontWeight.Medium,
-                fontSize = 13.sp,
-                lineHeight = 13.sp,
-                platformStyle = PlatformTextStyle(includeFontPadding = false),
-                letterSpacing = (-0.05).em,
-            ),
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
-            modifier = Modifier.clickable { onSearchingClicked() }
-                .weight(1f)
-                .background(
-                    color = GreyEEE,
-                    shape = RoundedCornerShape(
-                        topStart = 4.dp,
-                        topEnd = 24.dp,
-                        bottomStart = 4.dp,
-                        bottomEnd = 4.dp,
-                    ),
-                )
-                .padding(start = 12.dp, top = 11.dp, bottom = 12.dp),
-        )
-        Icon(
-            imageVector = ImageVector.vectorResource(R.drawable.ic_notification),
-            contentDescription = stringResource(R.string.searching),
-            tint = Color.Unspecified,
-            modifier = Modifier.clickable { onNoticeButtonClicked() }
-                .padding(start = 8.dp),
-        )
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-private fun ExTopBarPreview() {
-    WaitForMeTheme {
-        ExTopBar(
             onNoticeButtonClicked = {},
             onSearchingClicked = {},
         )
