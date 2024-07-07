@@ -17,7 +17,7 @@ object MockStoreApi : StoreApi {
         page: Int?,
         size: Int?
     ): Response<PagerList<StoreListResponse>> {
-        val listResponse = storeListResponse.apply {
+        val listResponse = storeListResponse.run {
             if (title != null) {
                 filter { it.title.contains(title) }
             }
