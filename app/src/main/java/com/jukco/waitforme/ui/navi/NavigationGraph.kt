@@ -12,7 +12,8 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import androidx.navigation.navigation
 import com.jukco.waitforme.ui.BookmarkScreen
-import com.jukco.waitforme.ui.NoticeScreen
+import com.jukco.waitforme.ui.notice.list.NoticeScreen
+import com.jukco.waitforme.ui.notice.detail.NoticeDetailScreen
 import com.jukco.waitforme.ui.StoreManagementScreen
 import com.jukco.waitforme.ui.search.SearchInputScreen
 import com.jukco.waitforme.ui.sign.sign_in.SignInScreen
@@ -74,7 +75,16 @@ fun NavigationGraph(
         }
         composable(Route.Notice.name) {
             NoticeScreen(
-                onCloseButtonClicked = { navController.popBackStack() },
+                onNoticeItemClicked = { noticeId -> navController.navigate("${Route.NoticeDetail.name}/$noticeId") },
+                onBackButtonClicked = { navController.navigateUp() },
+            )
+        }
+        composable(
+            route = "${Route.NoticeDetail.name}/{noticeId}",
+            arguments = listOf(navArgument("noticeId") { type = NavType.IntType }),
+        ) {
+            NoticeDetailScreen(
+                onBackButtonClicked = { navController.navigateUp() }
             )
         }
         composable(

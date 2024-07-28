@@ -1,6 +1,8 @@
 package com.jukco.waitforme.data.mock
 
 import com.jukco.waitforme.data.network.model.GenderType
+import com.jukco.waitforme.data.network.model.NoticeDetailResponse
+import com.jukco.waitforme.data.network.model.NoticeResponse
 import com.jukco.waitforme.data.network.model.Provider
 import com.jukco.waitforme.data.network.model.ImageInfo
 import com.jukco.waitforme.data.network.model.SignInResponse
@@ -10,6 +12,7 @@ import com.jukco.waitforme.data.network.model.StoreDto
 import com.jukco.waitforme.data.network.model.StoreListResponse
 import com.jukco.waitforme.data.network.model.Token
 import com.jukco.waitforme.data.network.model.UserInfoRes
+import java.time.LocalDateTime
 
 object MockDataSource {
     val accessToken = Token(
@@ -28,6 +31,61 @@ object MockDataSource {
         isOwner = false,
         accessToken = accessToken,
         refreshToken = refreshToken,
+    )
+
+    val noticeList = listOf(
+        NoticeResponse(0, "테스트입니다1", LocalDateTime.now()),
+        NoticeResponse(1, "테스트입니다2", LocalDateTime.now()),
+        NoticeResponse(2, "테스트입니다3", LocalDateTime.now()),
+        NoticeResponse(3, "테스트입니다4", LocalDateTime.now()),
+        NoticeResponse(4, "테스트입니다5", LocalDateTime.now()),
+        NoticeResponse(5, "테스트입니다6", LocalDateTime.now()),
+        NoticeResponse(6, "테스트입니다7", LocalDateTime.now()),
+    )
+
+    val noticeDetailList = listOf(
+        NoticeDetailResponse(
+            0,
+            "테스트입니다1",
+            "1직원정보 업데이트를 위해 NAHAGO 모바일앱을 통해 정보를 등록하여 주시기 바랍니다.\n\n이외 필수 기재사항은 첨부파일을 참고하여 주시기 바랍니다.",
+            LocalDateTime.now(),
+        ),
+        NoticeDetailResponse(
+            1,
+            "테스트입니다2",
+            "2직원정보 업데이트를 위해 NAHAGO 모바일앱을 통해 정보를 등록하여 주시기 바랍니다.\n\n이외 필수 기재사항은 첨부파일을 참고하여 주시기 바랍니다.",
+            LocalDateTime.now(),
+        ),
+        NoticeDetailResponse(
+            2,
+            "테스트입니다3",
+            "3직원정보 업데이트를 위해 NAHAGO 모바일앱을 통해 정보를 등록하여 주시기 바랍니다.\n\n이외 필수 기재사항은 첨부파일을 참고하여 주시기 바랍니다.",
+            LocalDateTime.now(),
+        ),
+        NoticeDetailResponse(
+            3,
+            "테스트입니다4",
+            "4직원정보 업데이트를 위해 NAHAGO 모바일앱을 통해 정보를 등록하여 주시기 바랍니다.\n\n이외 필수 기재사항은 첨부파일을 참고하여 주시기 바랍니다.",
+            LocalDateTime.now(),
+        ),
+        NoticeDetailResponse(
+            4,
+            "테스트입니다5",
+            "5직원정보 업데이트를 위해 NAHAGO 모바일앱을 통해 정보를 등록하여 주시기 바랍니다.\n\n이외 필수 기재사항은 첨부파일을 참고하여 주시기 바랍니다.",
+            LocalDateTime.now(),
+        ),
+        NoticeDetailResponse(
+            5,
+            "테스트입니다6",
+            "6직원정보 업데이트를 위해 NAHAGO 모바일앱을 통해 정보를 등록하여 주시기 바랍니다.\n\n이외 필수 기재사항은 첨부파일을 참고하여 주시기 바랍니다.",
+            LocalDateTime.now(),
+        ),
+        NoticeDetailResponse(
+            6,
+            "테스트입니다7",
+            "7직원정보 업데이트를 위해 NAHAGO 모바일앱을 통해 정보를 등록하여 주시기 바랍니다.\n\n이외 필수 기재사항은 첨부파일을 참고하여 주시기 바랍니다.",
+            LocalDateTime.now(),
+        ),
     )
 
     val userInfoRes = UserInfoRes(
